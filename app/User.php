@@ -1,0 +1,68 @@
+<?php
+
+namespace App;
+
+use App\Model\Order;
+use App\Model\Review;
+use App\Model\ShippingAddress;
+use App\Model\Wishlist;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+
+
+class User extends Authenticatable
+{
+    use Notifiable, HasApiTokens;
+
+    protected $fillable = [
+        'f_name', 'l_name', 'name', 'email', 'password', 'phone', 'image', 'login_medium','is_active','social_id','is_phone_verified','temporary_token'
+    ];
+
+
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_active' => 'integer',
+        'is_phone_verified'=>'integer',
+        'is_email_verified' => 'integer'
+    ];
+
+    public function wish_list()
+    {
+        return $this->hasMany(Wishlist::class, 'customer_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'customer_id');
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
+    public function shipping()
+    {
+        return $this->belongsTo(ShippingAddress::class, 'shipping_address');
+    }
+
+    public function pharmacy(){
+        return $this->hasOne(Pharmacy::class,'user_id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class,'user_id');
+    }
+
+    public function pharmacies()
+    {
+        return $this->hasMany(Pharmacy::class,'id');
+    }
+
+}

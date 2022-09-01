@@ -185,12 +185,12 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         //pharmacy
         Route::group(['prefix' => 'pharmacy', 'as' => 'pharmacy.', 'middleware' => ['module:product_management']], function () {
             Route::get('list/{status}', 'PharmacyController@list')->name('list');
-
             Route::post('delete', 'PharmacyController@destroy')->name('delete');
             Route::get('vip/{id}/{status}', 'PharmacyController@vip')->name('vip');
 
             Route::get('activation/{id}/{status}', 'PharmacyController@activation')->name('activation');
 
+            Route::get('export/{id}', 'PharmacyController@generate_excel')->name('export');
 
             Route::get('bulk-import', 'PharmacyController@bulk_import_index')->name('bulk-import');
             Route::post('bulk-import', 'PharmacyController@bulk_import_data');
@@ -272,7 +272,6 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         });
 
 
-
         //customer
         Route::group(['prefix' => 'customer', 'as' => 'customer.', 'middleware' => ['module:user_section']], function () {
             Route::get('list', 'CustomerController@customer_list')->name('list');
@@ -281,6 +280,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('edit/{id}', 'CustomerController@edit')->name('edit');
             Route::post('update/{id}', 'CustomerController@update')->name('update');
             Route::delete('delete/{id}', 'CustomerController@delete')->name('delete');
+
+
         });
 
 
@@ -562,10 +563,6 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
            //generate excel file
             Route::get('generate-excel/{order_id}', 'OrderController@generate_excel')->name('generate-excel');
         });
-
-
-
-
 
 
         //pos management

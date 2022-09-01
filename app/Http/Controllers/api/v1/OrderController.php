@@ -33,28 +33,30 @@ class OrderController extends Controller
 
         return response()->json(OrderManager::track_order($request['order_id']), 200);
     }
+
     public function order_cancel(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'order_id' => 'required'
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
         $order = Order::where(['id' => $request->order_id])->first();
-        
+
         if ($order['payment_method'] == 'cash_on_delivery' && $order['order_status'] == 'pending') {
             OrderManager::stock_update_on_order_status_change($order, 'canceled');
             Order::where(['id' => $request->order_id])->update([
                 'order_status' => 'canceled'
             ]);
-            
+
             return response()->json(translate('order_canceled_successfully'), 200);
         }
-        
+
         return response()->json(translate('status_not_changable_now'), 302);
     }
+
     public function place_order(Request $request)
     {
         $unique_id = $request->user()->id . '-' . rand(000001, 999999) . '-' . time();
@@ -84,10 +86,11 @@ class OrderController extends Controller
 
         return response()->json(translate('order_placed_successfully'), 200);
     }
+    
     public function refund_request(Request $request)
     {
         $order_details = OrderDetail::find($request->order_details_id);
-        
+
         if($order_details->delivery_status == 'delivered')
         {
             $order = Order::find($order_details->order_id);
@@ -95,11 +98,11 @@ class OrderController extends Controller
             $refund_amount = 0;
             $data = [];
             foreach ($order->details as $key => $or_d) {
-                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount; 
+                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount;
             }
-                
+
             $subtotal = ($order_details->price * $order_details->qty) - $order_details->discount + $order_details->tax;
-            
+
             $coupon_discount = ($order->discount_amount*$subtotal)/$total_product_price;
 
             $refund_amount = $subtotal - $coupon_discount;
@@ -115,7 +118,7 @@ class OrderController extends Controller
             $refund_day_limit = Helpers::get_business_settings('refund_day_limit');
             $order_details_date = $order_details->created_at;
             $current = \Carbon\Carbon::now();
-            $length = $order_details_date->diffInDays($current); 
+            $length = $order_details_date->diffInDays($current);
             $expired = false;
             $already_requested = false;
             if($order_details->refund_request != 0)
@@ -130,20 +133,21 @@ class OrderController extends Controller
         }else{
             return response()->json(translate('You_can_request_for_refund_after_order_delivered'), 200);
         }
-        
+
     }
+
     public function store_refund(Request $request)
     {
-    
+
         $order_details = OrderDetail::find($request->order_details_id);
-        
+
         if($order_details->refund_request == 0){
 
             $validator = Validator::make($request->all(), [
                 'order_details_id' => 'required',
                 'amount' => 'required',
                 'refund_reason' => 'required'
-                
+
             ]);
             if ($validator->fails()) {
                 return response()->json(['errors' => Helpers::error_processor($validator)], 403);
@@ -172,8 +176,10 @@ class OrderController extends Controller
         }else{
             return response()->json(translate('already_applied_for_refund_request!!'), 302);
         }
-        
+
     }
+
+
     public function refund_details(Request $request)
     {
         $order_details = OrderDetail::find($request->id);
@@ -185,16 +191,16 @@ class OrderController extends Controller
         });
 
         $order = Order::find($order_details->order_id);
-            
+
             $total_product_price = 0;
             $refund_amount = 0;
             $data = [];
             foreach ($order->details as $key => $or_d) {
-                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount; 
+                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount;
             }
-                
+
             $subtotal = ($order_details->price * $order_details->qty) - $order_details->discount + $order_details->tax;
-            
+
             $coupon_discount = ($order->discount_amount*$subtotal)/$total_product_price;
 
             $refund_amount = $subtotal - $coupon_discount;
@@ -207,7 +213,7 @@ class OrderController extends Controller
             $data['coupon_discount'] = $coupon_discount;
             $data['refund_amount'] = $refund_amount;
             $data['refund_request']=$refund;
-        
+
         // $refund = [
         //         "id"=> $refund->id,
         //         "order_details_id"=>$refund->order_details_id,
@@ -220,8 +226,8 @@ class OrderController extends Controller
         //         "images"=>json_decode($refund->images),
         //         "created_at"=>$refund->created_at,
         //         "updated_at"=>$refund->updated_at,
-                
-        // ];            
+
+        // ];
         return response()->json($data, 200);
     }
 }

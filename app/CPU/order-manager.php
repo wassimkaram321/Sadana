@@ -293,7 +293,7 @@ class OrderManager
             'customer_id' => $user->id,
             'seller_id' => $seller_data->seller_id,
             'seller_is' => $seller_data->seller_is,
-            'customer_type' => 'customer',        //MMMMMM
+            'customer_type' => $user->user_type,        //MMMMMM
             'payment_status' => $data['payment_status'],
             'order_status' => $data['order_status'],
             'payment_method' => $data['payment_method'],

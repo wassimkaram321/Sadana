@@ -7,7 +7,9 @@
     <link href="{{asset('public/assets/back-end/css/croppie.css')}}" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 @endpush
-
+@php
+    $i=0;
+@endphp
 @section('content')
 <div class="content container-fluid">
     <nav aria-label="breadcrumb">
@@ -27,6 +29,7 @@
                 <div class="card-body" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                     <form action="{{route('admin.brand.update',[$b['id']])}}" method="post" enctype="multipart/form-data">
                         @csrf
+
                         @php($language=\App\Model\BusinessSetting::where('type','pnc_language')->first())
                             @php($language = $language->value ?? null)
                             @php($default_lang = 'en')
@@ -65,12 +68,14 @@
                                 @endforeach
                                 <div class="form-group">
                                     <label for="brand">{{ \App\CPU\translate('brand_logo')}}</label><span class="badge badge-soft-danger">( {{ \App\CPU\translate('ratio')}} 1:1 )</span>
+
                                     <br>
                                     <div class="custom-file" style="text-align: left">
                                         <input type="file" name="image" id="customFileUpload" class="custom-file-input"
                                             accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                         <label class="custom-file-label" for="customFileUpload">{{\App\CPU\translate('choose')}} {{\App\CPU\translate('file')}}</label>
                                     </div>
+                                 
                                 </div>
                             </div>
                             <div class="col-md-6 mb-2">

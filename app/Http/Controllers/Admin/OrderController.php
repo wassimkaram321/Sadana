@@ -109,7 +109,7 @@ class OrderController extends Controller
 
         if($order->orderBy_id!=null)
         {
-            $customerDetails=User::where('id',$order->orderBy_id)->get()->first();
+            $customerDetails=User::where('id',$order->customer_id)->get()->first();
 
             if ($order->order_type == 'default_type') {
                 return view('admin-views.order.order-details', compact('shipping_address', 'order', 'linked_orders', 'delivery_men','customerDetails'));
@@ -120,7 +120,8 @@ class OrderController extends Controller
 
 
         if ($order->order_type == 'default_type') {
-            return view('admin-views.order.order-details', compact('shipping_address', 'order', 'linked_orders', 'delivery_men'));
+            $customerDetails=User::where('id',$order->customer_id)->get()->first();
+            return view('admin-views.order.order-details', compact('shipping_address', 'order', 'linked_orders', 'delivery_men','customerDetails'));
         } else {
             return view('admin-views.pos.order.order-details', compact('order','shipping_address'));
         }

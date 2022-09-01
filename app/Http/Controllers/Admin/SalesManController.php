@@ -44,6 +44,9 @@ class SalesManController extends Controller
         $sales_men = $sales_men->latest()->where(['user_type' => 'salesman'])->paginate(25)->appends($query_param);
         return view('admin-views.sales-man.list', compact('sales_men', 'search'));
     }
+
+
+
     public function search(Request $request)
     {
         $key = explode(' ', $request['search']);
@@ -60,6 +63,9 @@ class SalesManController extends Controller
             'view' => view('admin-views.sales-man.partials._table', compact('sales_men'))->render()
         ]);
     }
+
+
+
     public function preview($id)
     {
         $sm= User::where(['id' => $id])->first();
@@ -99,8 +105,6 @@ class SalesManController extends Controller
 
     public function store(Request $request)
     {
-        //
-
         $request->validate([
             'f_name' => 'required',
             'email' => 'required',
@@ -113,6 +117,7 @@ class SalesManController extends Controller
 
         $sm = new User();
         $sm->user_type= 'salesman';
+        $sm->name = $request->f_name.' '.$request->l_name;
         $sm->f_name = $request->f_name;
         $sm->l_name = $request->l_name;
         $sm->email = $request->email;

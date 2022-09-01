@@ -319,7 +319,7 @@
                                             <span class="tio-circle nav-indicator-icon"></span>
                                             <span class="text-truncate">{{ \App\CPU\translate('Pending') }}</span>
                                             <span class="badge badge-soft-info badge-pill ml-1">
-                                                {{ \App\User::where('is_active',0)->count() }}
+                                                {{ \App\User::where('is_active',0)->where('user_type','pharmacist')->count() }}
                                             </span>
                                         </a>
                                     </li>
@@ -329,12 +329,12 @@
                                             <span class="tio-circle nav-indicator-icon"></span>
                                             <span class="text-truncate">{{ \App\CPU\translate('Confirmed') }}</span>
                                             <span class="badge badge-soft-info badge-pill ml-1">
-                                                {{ \App\User::where('is_active', 1)->count() }}
+                                                {{ \App\User::where('is_active',1)->where('user_type','pharmacist')->count() }}
                                             </span>
                                         </a>
                                     </li>
 
-                                    <li class="nav-item {{ Request::is('admin/pharmacy/bulk-import') ? 'active' : '' }}">
+                                    {{-- <li class="nav-item {{ Request::is('admin/pharmacy/bulk-import') ? 'active' : '' }}">
                                         <a class="nav-link " href="{{ route('admin.pharmacy.bulk-import') }}">
                                             <span class="tio-circle nav-indicator-icon"></span>
                                             <span
@@ -348,7 +348,7 @@
                                             <span
                                                 class="text-truncate">{{ \App\CPU\translate('bulk_export') }}</span>
                                         </a>
-                                    </li>
+                                    </li> --}}
 
                                 </ul>
                             </li>

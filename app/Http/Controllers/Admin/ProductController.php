@@ -819,6 +819,7 @@ class ProductController extends BaseController
 
 
         $data = [];
+        $dataUpdate=[];
         $skip = ['youtube_video_url', 'details', 'thumbnail','حد الطلبة'];
 
         foreach ($collections as $collection) {
@@ -830,37 +831,7 @@ class ProductController extends BaseController
                 }
             }
 
-           // $thumbnail = explode('/', $collection['thumbnail']);
 
-            // array_push($data, [
-            //     'name' => $collection['name'],
-            //     'slug' => Str::slug($collection['name'], '-') . '-' . Str::random(6),
-            //     'category_ids' => json_encode([['id' => (string)$collection['category_id'], 'position' => 1], ['id' => (string)$collection['sub_category_id'], 'position' => 2], ['id' => (string)$collection['sub_sub_category_id'], 'position' => 3]]),
-            //     'brand_id' => $collection['brand_id'],
-            //     'unit' => $collection['unit'],
-            //     'min_qty' => $collection['min_qty'],
-            //     'refundable' => $collection['refundable'],
-            //     'unit_price' => $collection['unit_price'],
-            //     'purchase_price' => $collection['purchase_price'],
-            //     'tax' => $collection['tax'],
-            //     'discount' => $collection['discount'],
-            //     'discount_type' => $collection['discount_type'],
-            //     'current_stock' => $collection['current_stock'],
-            //     'details' => $collection['details'],
-            //     'video_provider' => 'youtube',
-            //     'video_url' => $collection['youtube_video_url'],
-            //     'images' => json_encode(['def.png']),
-            //     'thumbnail' => $thumbnail[1]??$thumbnail[0],
-            //     'status' => 1,
-            //     'request_status' => 1,
-            //     'colors' => json_encode([]),
-            //     'attributes' => json_encode([]),
-            //     'choice_options' => json_encode([]),
-            //     'variation' => json_encode([]),
-            //     'featured_status' => 1,
-            //     'added_by' => 'admin',
-            //     'user_id' => auth('admin')->id(),
-            // ]);
 
             if(isset($collection['اسم المستودع']))
             {
@@ -911,40 +882,51 @@ class ProductController extends BaseController
                 $brand_id=$NewBrand->id;
             }
 
-            array_push($data, [
-                'brand_id' => $brand_id,
-                'name' => $collection['اسم المادة'],
-                'unit_price' => $collection['السعر'],
-                'current_stock' => $collection['الكمية'],
-                'details' => $collection['الملاحظات'],
-                'scientific_formula' => $collection['التركيبة العلمية'],
-                'q_normal_offer' => $collection['العرض لل'],
-                'q_featured_offer' => $collection['العرض مميز لل'],
-                'normal_offer' => $collection['العرض'],
-                'featured_offer' => $collection['العرض المميز'],
-                'demand_limit' => $collection['حد الطلب'],
-                'expiry_date' => $collection['تاريخ الصلاحية'],
+            $product = Product::where('name', 'LIKE', '%'.$collection['اسم المادة'].'%')->get()->first();
+            if(isset($product))
+            {
 
-                //By defult
-                'store_id' => $store_id,
-                'unit' => "pc",
-                'category_ids' => json_encode($category),
-                'refundable' => false,
-                'video_provider' => 'youtube',
-                'thumbnail' =>'def.png',
-                'images' => json_encode(['def.png']),
-                'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
-                'status' => 1,
-                'request_status' => 1,
-                'colors' => json_encode([]),
-                'attributes' => json_encode([]),
-                'choice_options' => json_encode([]),
-                'variation' => json_encode([]),
-                'featured_status' => 1,
-                'added_by' => 'admin',
-                'user_id' => 1,
-            ]);
+            }
+            else
+            {
+
+            // array_push($data, [
+            //     'brand_id' => $brand_id,
+            //     'name' => $collection['اسم المادة'],
+            //     'unit_price' => $collection['السعر'],
+            //     'current_stock' => $collection['الكمية'],
+            //     'details' => $collection['الملاحظات'],
+            //     'scientific_formula' => $collection['التركيبة العلمية'],
+            //     'q_normal_offer' => $collection['العرض لل'],
+            //     'q_featured_offer' => $collection['العرض مميز لل'],
+            //     'normal_offer' => $collection['العرض'],
+            //     'featured_offer' => $collection['العرض المميز'],
+            //     'demand_limit' => $collection['حد الطلب'],
+            //     'expiry_date' => $collection['تاريخ الصلاحية'],
+
+            //     //By defult
+            //     'store_id' => $store_id,
+            //     'unit' => "pc",
+            //     'category_ids' => json_encode($category),
+            //     'refundable' => false,
+            //     'video_provider' => 'youtube',
+            //     'thumbnail' =>'def.png',
+            //     'images' => json_encode(['def.png']),
+            //     'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
+            //     'status' => 1,
+            //     'request_status' => 1,
+            //     'colors' => json_encode([]),
+            //     'attributes' => json_encode([]),
+            //     'choice_options' => json_encode([]),
+            //     'variation' => json_encode([]),
+            //     'featured_status' => 1,
+            //     'added_by' => 'admin',
+            //     'user_id' => 1,
+            // ]);
+            }
+
         }
+        DB::table('products')->update($dataUpdate);
         DB::table('products')->insert($data);
         Toastr::success(count($data) . ' - Products imported successfully!');
         return back();

@@ -109,9 +109,10 @@
                                                         <i class="tio-settings"></i>
                                                     </button>
                                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        {{-- <a class="dropdown-item" href="{{route('admin.customer.view',[$p['id']])}}">
-                                                            <i class="tio-visible"></i> {{\App\CPU\translate('View')}}
-                                                        </a> --}}
+
+                                                        <a class="dropdown-item" href={{route('admin.pharmacy.export',[$p['id']])}}>
+                                                            <i class="tio-visible"></i> {{\App\CPU\translate('Export')}}
+                                                        </a>
                                                         <a class="dropdown-item" href="{{route('admin.customer.edit',[$p['id']])}}">
                                                             <i class="tio-visible"></i> {{\App\CPU\translate('Edit')}}
                                                         </a>

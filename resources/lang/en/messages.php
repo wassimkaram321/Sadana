@@ -1970,4 +1970,5 @@
   'no!' => 'No!',
   'yes!' => 'Yes!',
   'Product not found!' => 'Product not found!',
+  'You_can_track_your_order_by_clicking_the_below_button' => 'You can track your order by clicking the below button',
 );

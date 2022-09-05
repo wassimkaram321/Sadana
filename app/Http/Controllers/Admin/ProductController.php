@@ -32,7 +32,7 @@ class ProductController extends BaseController
         $cat = Category::where(['parent_id' => 0])->get();
         $br = Brand::orderBY('name', 'ASC')->get();
         $st = Store::orderBY('store_name', 'ASC')->get();
-        return view('admin-views.product.add-new', compact('cat', 'br','st'));
+        return view('admin-views.product.add-new', compact('cat', 'br', 'st'));
     }
 
     public function featured_status(Request $request)
@@ -67,9 +67,9 @@ class ProductController extends BaseController
     {
         $product = Product::with(['reviews'])->where(['id' => $id])->first();
         $reviews = Review::where(['product_id' => $id])->paginate(Helpers::pagination_limit());
-        $brand=Brand::where(['id' => $product->brand_id])->first();
-        $store=Store::where(['id' => $product->store_id])->first();
-        return view('admin-views.product.view', compact('product', 'reviews','brand','store'));
+        $brand = Brand::where(['id' => $product->brand_id])->first();
+        $store = Store::where(['id' => $product->store_id])->first();
+        return view('admin-views.product.view', compact('product', 'reviews', 'brand', 'store'));
     }
 
     public function store(Request $request)
@@ -77,7 +77,7 @@ class ProductController extends BaseController
         $validator = Validator::make($request->all(), [
             'category_id' => 'required',
             'brand_id' => 'required',
-            'store_id'=>'required',
+            'store_id' => 'required',
             'unit' => 'required',
             'images' => 'required',
             'image' => 'required',
@@ -94,7 +94,7 @@ class ProductController extends BaseController
             'featured_offer' => 'required|numeric',
             'q_normal_offer' => 'required|numeric',
             'normal_offer' => 'required|numeric',
-            'scientific_formula'=>'required',
+            'scientific_formula' => 'required',
         ], [
             'images.required' => 'Product images is required!',
             'image.required' => 'Product thumbnail is required!',
@@ -112,7 +112,8 @@ class ProductController extends BaseController
         if ($request['unit_price'] <= $dis) {
             $validator->after(function ($validator) {
                 $validator->errors()->add(
-                    'unit_price', 'Discount can not be more or equal to the price!'
+                    'unit_price',
+                    'Discount can not be more or equal to the price!'
                 );
             });
         }
@@ -123,7 +124,7 @@ class ProductController extends BaseController
         $p->added_by = "admin";
         $p->name = $request->name[array_search('en', $request->lang)];
         $p->slug = Str::slug($request->name[array_search('en', $request->lang)], '-') . '-' . Str::random(6);
-        $p->store_id=$request->store_id;
+        $p->store_id = $request->store_id;
 
         $category = [];
 
@@ -156,9 +157,9 @@ class ProductController extends BaseController
 
 
 
-         $p->demand_limit = $request->demand_limit;
-         $p->expiry_date = $request->expiry_date;
-         $p->production_date = $request->production_date;
+        $p->demand_limit = $request->demand_limit;
+        $p->expiry_date = $request->expiry_date;
+        $p->production_date = $request->production_date;
         $p->q_featured_offer = $request->q_featured_offer;
         $p->featured_offer = $request->featured_offer;
         $p->normal_offer = $request->normal_offer;
@@ -232,7 +233,7 @@ class ProductController extends BaseController
                 $stock_count += $item['qty'];
             }
         } else {
-            $stock_count = (integer)$request['current_stock'];
+            $stock_count = (int)$request['current_stock'];
         }
 
         if ($validator->errors()->count() > 0) {
@@ -246,7 +247,7 @@ class ProductController extends BaseController
         // $p->tax = $request->tax_type == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
         // $p->tax_type = $request->tax_type;
         $p->tax_type = "flat";
-        $p->tax=0;
+        $p->tax = 0;
         $p->discount = $request->discount_type == 'flat' ? BackEndHelper::currency_to_usd($request->discount) : $request->discount;
         $p->discount_type = $request->discount_type;
         $p->attributes = json_encode($request->choice_attributes);
@@ -256,7 +257,7 @@ class ProductController extends BaseController
         $p->video_url = $request->video_link;
         $p->request_status = 1;
         $p->shipping_cost = BackEndHelper::currency_to_usd($request->shipping_cost);
-        $p->multiply_qty = $request->multiplyQTY=='on'?1:0;
+        $p->multiply_qty = $request->multiplyQTY == 'on' ? 1 : 0;
 
         if ($request->ajax()) {
             return response()->json([], 200);
@@ -350,7 +351,7 @@ class ProductController extends BaseController
         if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $pro = Product::where(['added_by' => 'seller'])
-                ->where('is_shipping_cost_updated',0)
+                ->where('is_shipping_cost_updated', 0)
                 ->where(function ($q) use ($key) {
                     foreach ($key as $value) {
                         $q->Where('name', 'like', "%{$value}%");
@@ -358,7 +359,7 @@ class ProductController extends BaseController
                 });
             $query_param = ['search' => $request['search']];
         } else {
-            $pro = Product::where(['added_by' => 'seller'])->where('is_shipping_cost_updated',0);
+            $pro = Product::where(['added_by' => 'seller'])->where('is_shipping_cost_updated', 0);
         }
         $pro = $pro->orderBy('id', 'DESC')->paginate(Helpers::pagination_limit())->appends($query_param);
 
@@ -459,18 +460,15 @@ class ProductController extends BaseController
     {
 
         $product = Product::where(['id' => $request['product_id']])->first();
-        if($request->status == 1)
-        {
+        if ($request->status == 1) {
             $product->shipping_cost = $product->temp_shipping_cost;
             $product->is_shipping_cost_updated = $request->status;
-        }else{
+        } else {
             $product->is_shipping_cost_updated = $request->status;
         }
 
         $product->save();
-        return response()->json([
-
-        ], 200);
+        return response()->json([], 200);
     }
 
     public function get_categories(Request $request)
@@ -533,7 +531,7 @@ class ProductController extends BaseController
         $br = Brand::orderBY('name', 'ASC')->get();
         $st = Store::orderBY('store_name', 'ASC')->get();
 
-        return view('admin-views.product.edit', compact('categories','st', 'br', 'product', 'product_category'));
+        return view('admin-views.product.edit', compact('categories', 'st', 'br', 'product', 'product_category'));
     }
 
     public function update(Request $request, $id)
@@ -546,7 +544,7 @@ class ProductController extends BaseController
             //'tax' => 'required|min:0',
             'unit_price' => 'required|numeric|min:1',
             'purchase_price' => 'required|numeric|min:1',
-            'discount' =>'required|gt:-1',
+            'discount' => 'required|gt:-1',
             //'shipping_cost' => 'required|gt:-1',
 
             'demand_limit' => 'required|gt:-1|numeric',
@@ -556,7 +554,7 @@ class ProductController extends BaseController
             'featured_offer' => 'required|numeric',
             'q_normal_offer' => 'required|numeric',
             'normal_offer' => 'required|numeric',
-            'scientific_formula'=>'required',
+            'scientific_formula' => 'required',
 
 
         ], [
@@ -604,7 +602,7 @@ class ProductController extends BaseController
         $product->brand_id = $request->brand_id;
         $product->unit = $request->unit;
         $product->details = $request->description[array_search('en', $request->lang)];
-        $product_images = json_decode($product->images);
+
 
         $product->demand_limit = $request->demand_limit;
         $product->expiry_date = $request->expiry_date;
@@ -675,7 +673,7 @@ class ProductController extends BaseController
                 $stock_count += $item['qty'];
             }
         } else {
-            $stock_count = (integer)$request['current_stock'];
+            $stock_count = (int)$request['current_stock'];
         }
 
         if ($validator->errors()->count() > 0) {
@@ -691,7 +689,7 @@ class ProductController extends BaseController
         $product->variation = json_encode($variations);
         $product->unit_price = BackEndHelper::currency_to_usd($request->unit_price);
         $product->purchase_price = BackEndHelper::currency_to_usd($request->purchase_price);
-        $product->tax=0;
+        $product->tax = 0;
         // $product->tax = $request->tax == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
         // $product->tax_type = $request->tax_type;
         $product->discount = $request->discount_type == 'flat' ? BackEndHelper::currency_to_usd($request->discount) : $request->discount;
@@ -704,16 +702,22 @@ class ProductController extends BaseController
         if ($product->added_by == 'seller' && $product->request_status == 2) {
             $product->request_status = 1;
         }
+
         $product->shipping_cost = BackEndHelper::currency_to_usd($request->shipping_cost);
-        $product->multiply_qty = $request->multiplyQTY=='on'?1:0;
+        $product->multiply_qty = $request->multiplyQTY == 'on' ? 1 : 0;
         if ($request->ajax()) {
             return response()->json([], 200);
         } else {
             if ($request->file('images')) {
+
                 foreach ($request->file('images') as $img) {
                     $product_images[] = ImageManager::upload('product/', 'png', $img);
                 }
                 $product->images = json_encode($product_images);
+            }
+            else
+            {
+                $product_images = json_decode($product->images);
             }
 
             if ($request->file('image')) {
@@ -731,19 +735,23 @@ class ProductController extends BaseController
             foreach ($request->lang as $index => $key) {
                 if ($request->name[$index] && $key != 'en') {
                     Translation::updateOrInsert(
-                        ['translationable_type' => 'App\Model\Product',
+                        [
+                            'translationable_type' => 'App\Model\Product',
                             'translationable_id' => $product->id,
                             'locale' => $key,
-                            'key' => 'name'],
+                            'key' => 'name'
+                        ],
                         ['value' => $request->name[$index]]
                     );
                 }
                 if ($request->description[$index] && $key != 'en') {
                     Translation::updateOrInsert(
-                        ['translationable_type' => 'App\Model\Product',
+                        [
+                            'translationable_type' => 'App\Model\Product',
                             'translationable_id' => $product->id,
                             'locale' => $key,
-                            'key' => 'description'],
+                            'key' => 'description'
+                        ],
                         ['value' => $request->description[$index]]
                     );
                 }
@@ -760,9 +768,8 @@ class ProductController extends BaseController
         $product = Product::find($request['id']);
         $array = [];
 
-        $countImages=count(json_decode($product['images']));
-        if($countImages!=0)
-        {
+        $countImages = count(json_decode($product['images']));
+        if ($countImages != 0) {
             if ($countImages < 2) {
                 Toastr::warning('You cannot delete all images!');
                 return back();
@@ -831,13 +838,13 @@ class ProductController extends BaseController
 
 
         $data = [];
-        $dataUpdate=[];
-        $skip = ['youtube_video_url', 'details', 'thumbnail','حد الطلبة'];
+        $dataUpdate = [];
+        $skip = ['youtube_video_url', 'details', 'thumbnail', 'حد الطلبة'];
 
         foreach ($collections as $collection) {
 
             foreach ($collection as $key => $value) {
-                if ($key!="" && $value === "" && !in_array($key, $skip)) {
+                if ($key != "" && $value === "" && !in_array($key, $skip)) {
                     Toastr::error('Please fill ' . $key . ' fields');
                     return back();
                 }
@@ -845,30 +852,23 @@ class ProductController extends BaseController
 
 
 
-            if(isset($collection['اسم المستودع']))
-            {
-                $store = Store::where('store_name', 'LIKE', '%'.$collection['اسم المستودع'].'%')->get()->first();
-                if(isset($store))
-                {
-                      $store_id=$store->id;
-                }else
-                {
+            if (isset($collection['اسم المستودع'])) {
+                $store = Store::where('store_name', 'LIKE', '%' . $collection['اسم المستودع'] . '%')->get()->first();
+                if (isset($store)) {
+                    $store_id = $store->id;
+                } else {
                     $NewStore = new Store();
                     $NewStore->store_name = $collection['اسم المستودع'];
-                    $NewStore->store_image='def.png';
-                    $NewStore->store_status=1;
+                    $NewStore->store_image = 'def.png';
+                    $NewStore->store_status = 1;
                     $NewStore->save();
-                    $store_id=$NewStore->id;
+                    $store_id = $NewStore->id;
                 }
-            }
-            else{
+            } else {
                 $store = Store::take(1)->first();
-                if(isset($store))
-                {
-                    $store_id=$store->id;
-                }
-                else
-                {
+                if (isset($store)) {
+                    $store_id = $store->id;
+                } else {
                     Toastr::error('Please create a store first or Add the store name field to the uploaded file');
                     return back();
                 }
@@ -880,80 +880,73 @@ class ProductController extends BaseController
                 'position' => 10,
             ]);
 
-            $brand = Brand::where('name', 'LIKE', '%'.$collection['المجموعة'].'%')->get()->first();
-            if(isset($brand))
-            {
-                  $brand_id=$brand->id;
-            }else
-            {
+            $brand = Brand::where('name', 'LIKE', '%' . $collection['المجموعة'] . '%')->get()->first();
+            if (isset($brand)) {
+                $brand_id = $brand->id;
+            } else {
                 $NewBrand = new Brand();
                 $NewBrand->name = $collection['المجموعة'];
-                $NewBrand->image='def.png';
-                $NewBrand->status=1;
+                $NewBrand->image = 'def.png';
+                $NewBrand->status = 1;
                 $NewBrand->save();
-                $brand_id=$NewBrand->id;
+                $brand_id = $NewBrand->id;
             }
 
-            $product = Product::where('name', 'LIKE', '%'.$collection['اسم المادة'].'%')->get()->first();
+            $product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
             //dd($collection['العرض المميز']);
 
-            if(isset($product))
-            {
-                $product->unit_price=$collection['السعر'];
-                $product->current_stock=$collection['الكمية'];
-                $product->details=$collection['الملاحظات'];
-                $product->scientific_formula=$collection['التركيبة العلمية'];
-                $product->q_normal_offer=$collection['العرض لل'];
-                $product->normal_offer=$collection['العرض'];
-                $product->q_normal_offer=$collection['العرض لل'];
-                $product->q_featured_offer=$collection['العرض مميز لل'];
-                $product->featured_offer=$collection['العرض المميز'];
-                $product->expiry_date=$collection['تاريخ الصلاحية'];
-                $product->demand_limit=$collection['حد الطلب'];
-                $product->store_id=$store_id;
+            if (isset($product)) {
+                $product->unit_price = $collection['السعر'];
+                $product->current_stock = $collection['الكمية'];
+                $product->details = $collection['الملاحظات'];
+                $product->scientific_formula = $collection['التركيبة العلمية'];
+                $product->q_normal_offer = $collection['العرض لل'];
+                $product->normal_offer = $collection['العرض'];
+                $product->q_normal_offer = $collection['العرض لل'];
+                $product->q_featured_offer = $collection['العرض مميز لل'];
+                $product->featured_offer = $collection['العرض المميز'];
+                $product->expiry_date = $collection['تاريخ الصلاحية'];
+                $product->demand_limit = $collection['حد الطلب'];
+                $product->store_id = $store_id;
                 $product->save();
+            } else {
+
+                array_push($data, [
+                    'brand_id' => $brand_id,
+                    'name' => $collection['اسم المادة'],
+                    'unit_price' => $collection['السعر'],
+                    'current_stock' => $collection['الكمية'],
+                    'details' => $collection['الملاحظات'],
+                    'scientific_formula' => $collection['التركيبة العلمية'],
+                    'q_normal_offer' => $collection['العرض لل'],
+                    'q_featured_offer' => $collection['العرض مميز لل'],
+                    'normal_offer' => $collection['العرض'],
+                    'featured_offer' => $collection['العرض المميز'],
+                    'demand_limit' => $collection['حد الطلب'],
+                    'expiry_date' => $collection['تاريخ الصلاحية'],
+
+                    //By defult
+                    'store_id' => $store_id,
+                    'unit' => "pc",
+                    'category_ids' => json_encode($category),
+                    'refundable' => false,
+                    'video_provider' => 'youtube',
+                    'thumbnail' => 'def.png',
+                    'images' => json_encode(['def.png']),
+                    'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
+                    'status' => 1,
+                    'request_status' => 1,
+                    'colors' => json_encode([]),
+                    'attributes' => json_encode([]),
+                    'choice_options' => json_encode([]),
+                    'variation' => json_encode([]),
+                    'featured_status' => 1,
+                    'added_by' => 'admin',
+                    'user_id' => 1,
+                ]);
             }
-            else
-            {
-
-            array_push($data, [
-                'brand_id' => $brand_id,
-                'name' => $collection['اسم المادة'],
-                'unit_price' => $collection['السعر'],
-                'current_stock' => $collection['الكمية'],
-                'details' => $collection['الملاحظات'],
-                'scientific_formula' => $collection['التركيبة العلمية'],
-                'q_normal_offer' => $collection['العرض لل'],
-                'q_featured_offer' => $collection['العرض مميز لل'],
-                'normal_offer' => $collection['العرض'],
-                'featured_offer' => $collection['العرض المميز'],
-                'demand_limit' => $collection['حد الطلب'],
-                'expiry_date' => $collection['تاريخ الصلاحية'],
-
-                //By defult
-                'store_id' => $store_id,
-                'unit' => "pc",
-                'category_ids' => json_encode($category),
-                'refundable' => false,
-                'video_provider' => 'youtube',
-                'thumbnail' =>'def.png',
-                'images' => json_encode(['def.png']),
-                'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
-                'status' => 1,
-                'request_status' => 1,
-                'colors' => json_encode([]),
-                'attributes' => json_encode([]),
-                'choice_options' => json_encode([]),
-                'variation' => json_encode([]),
-                'featured_status' => 1,
-                'added_by' => 'admin',
-                'user_id' => 1,
-            ]);
-            }
-
         }
-        if(count($data)>0)
-        {
+        if (count($data) > 0) {
             DB::table('products')->insert($data);
         }
         Toastr::success(count($data) . ' - Products imported successfully!');
@@ -1003,7 +996,7 @@ class ProductController extends BaseController
                 'المجموعة' => $brand->name,
                 'اسم المادة' => $item->name,
                 'الكمية' => $item->current_stock,
-                'السعر' =>$item->unit_price,
+                'السعر' => $item->unit_price,
                 'العرض لل' => $item->q_normal_offer,
                 'العرض' => $item->normal_offer,
                 'العرض مميز لل' => $item->q_featured_offer,
@@ -1017,5 +1010,40 @@ class ProductController extends BaseController
 
 
         return (new FastExcel($storage))->download('inhouse_products.xlsx');
+    }
+
+
+    public function bulk_import_data_purchase_price(Request $request)
+    {
+        try {
+            $collections = (new FastExcel)->import($request->file('products_file'));
+        } catch (\Exception $exception) {
+            Toastr::error('You have uploaded a wrong format file, please upload the right file.');
+            return back();
+        }
+
+
+        $data = [];
+        $dataUpdate = [];
+        $skip = ['youtube_video_url', 'details', 'thumbnail'];
+
+        foreach ($collections as $collection) {
+
+            // foreach ($collection as $key => $value) {
+            //     if ($key!="" && $value === "" && !in_array($key, $skip)) {
+            //         Toastr::error('Please fill ' . $key . ' fields');
+            //         return back();
+            //     }
+            // }
+
+            $product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
+            if (isset($product)) {
+                $product->purchase_price = $collection['السعر'];
+                $product->save();
+            }
+        }
+
+        Toastr::success(count($data) . ' - Products purchase_price imported successfully!');
+        return back();
     }
 }

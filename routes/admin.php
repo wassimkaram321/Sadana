@@ -355,6 +355,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('bulk-import', 'ProductController@bulk_import_index')->name('bulk-import');
             Route::post('bulk-import', 'ProductController@bulk_import_data');
             Route::get('bulk-export', 'ProductController@bulk_export_data')->name('bulk-export');
+
+            Route::post('bulk-import-price', 'ProductController@bulk_import_data_purchase_price')->name('bulk-import-price');
         });
 
 

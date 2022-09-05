@@ -66,6 +66,43 @@
                     </div>
                 </form>
             </div>
+
+
+
+
+            <div class="col-md-12">
+                <form class="product-form" action="{{route('admin.product.bulk-import-price')}}" method="POST"
+                      enctype="multipart/form-data">
+                    @csrf
+                    <div class="card mt-2 rest-part">
+                        <div class="card-header">
+                            <h4>{{\App\CPU\translate('Import Products purchase price File')}}</h4>
+                            <a href="{{asset('public/assets/product_bulk_formatPrice.xlsx')}}" download=""
+                               class="btn btn-secondary">{{\App\CPU\translate('Download Format')}}</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="file" name="products_file">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-footer">
+                        <div class="row">
+                            <div class="col-md-12" style="padding-top: 20px">
+                                <button type="submit" class="btn btn-primary">{{\App\CPU\translate('Submit')}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+
         </div>
     </div>
 @endsection

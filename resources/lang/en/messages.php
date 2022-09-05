@@ -1983,4 +1983,11 @@
   'optional, please provide
                                     embed link not direct link' => 'Optional  please provide
                                     embed link not direct link',
+  'Demand_limit' => 'Demand limit',
+  'Featured offer' => 'Featured offer',
+  'Every' => 'Every',
+  'Scientific_formula' => 'Scientific formula',
+  'Normal' => 'Normal',
+  'Featured' => 'Featured',
+  'Import Products purchase price File' => 'Import Products purchase price File',
 );

@@ -91,9 +91,8 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group">
-                                <div class="row mb-5">
-
-                                    <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-4">
                                         <label for="name">{{\App\CPU\translate('Category')}}</label>
                                         <select
                                             class="js-example-basic-multiple js-states js-example-responsive form-control"
@@ -101,60 +100,14 @@
                                             id="category_id"
                                             onchange="getRequest('{{url('/')}}/admin/product/get-categories?parent_id='+this.value,'sub-category-select','select')">
                                             <option value="0" selected disabled>---{{\App\CPU\translate('Select')}}---</option>
-
                                             @foreach($categories as $category)
-                                            <option
-                                                value="{{$category['id']}}" {{ $category->id==$product_category[0]->id ? 'selected' : ''}} >{{$category['name']}}</option>
-                                           @endforeach
-
+                                                <option
+                                                    value="{{$category['id']}}" {{ $category->id==$product_category[0]->id ? 'selected' : ''}} >{{$category['name']}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
-                                      <div class="col-md-6">
-                                            <label for="name">{{\App\CPU\translate('Store')}}</label>
-                                            <select
-                                                class="js-example-basic-multiple js-states js-example-responsive form-control"
-                                                name="store_id">
-                                                <option value="{{null}}" selected disabled>---{{\App\CPU\translate('Select')}}---</option>
-                                                @foreach($st as $s)
-                                                    <option
-                                                        value="{{$s['id']}}" {{ $s->id==$product->store_id ? 'selected' : ''}} >{{$s['store_name']}}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                    <!--Stores-->
-                                    {{-- <div class="row"> --}}
-
-
-
-
-                                    {{-- <div class="col-md-4">
-                                        <label for="name">{{\App\CPU\translate('Sub Category')}}</label>
-                                        <select
-                                            class="js-example-basic-multiple js-states js-example-responsive form-control"
-                                            name="sub_category_id" id="sub-category-select"
-                                            data-id="{{count($product_category)>=2?$product_category[1]->id:''}}"
-                                            onchange="getRequest('{{url('/')}}/admin/product/get-categories?parent_id='+this.value,'sub-sub-category-select','select')">
-                                        </select>
-                                    </div> --}}
-                                    {{-- <div class="col-md-4">
-                                        <label for="name">{{\App\CPU\translate('Sub Sub Category')}}</label>
-
-                                        <select
-                                            class="js-example-basic-multiple js-states js-example-responsive form-control"
-                                            data-id="{{count($product_category)>=3?$product_category[2]->id:''}}"
-                                            name="sub_sub_category_id" id="sub-sub-category-select">
-
-                                        </select>
-                                    </div> --}}
-                                {{-- </div> --}}
-
-                            </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label for="name">{{\App\CPU\translate('Brand')}}</label>
                                         <select
                                             class="js-example-basic-multiple js-states js-example-responsive form-control"
@@ -167,7 +120,26 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
+                                        <label for="name">{{ \App\CPU\translate('Store') }}</label>
+                                        <select
+                                            class="js-example-basic-multiple js-states js-example-responsive form-control"
+                                            name="store_id" required style="width: 100%;">
+                                            <option value="{{ null }}" selected disabled>
+                                                ---{{ \App\CPU\translate('Select') }}---</option>
+                                            @foreach ($st as $s)
+                                            <option value="{{ $s['id'] }}" {{ $s->id==$product->store_id ? 'selected' : ''}}>{{ $s['store_name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+
+                                    <div class="col-md-4">
                                         <label for="name">{{\App\CPU\translate('Unit')}}</label>
                                         <select
                                             class="js-example-basic-multiple js-states js-example-responsive form-control"
@@ -178,26 +150,63 @@
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    <div class="col-md-4">
+                                        <label for="name">{{ \App\CPU\translate('Demand limit') }}</label>
+                                        <input type="number" min="0" value={{$product->demand_limit}} step="0.01"
+                                            name="demand_limit" class="js-example-basic-multiple form-control"
+                                            style="width: 100%;">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="name">{{ \App\CPU\translate('Scientific formula') }}</label>
+                                        <input type="text" value={{$product->scientific_formula}} name="scientific_formula"
+                                            class="js-example-basic-multiple form-control" style="width: 100%;">
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <br>
+
+
+
+                    <div class="card mt-2 rest-part">
+                        <div class="card-header">
+                            <h4>{{ \App\CPU\translate('offers') }}</h4>
+                        </div>
+                        <div class="card-body">
+
                             <div class="row">
-                                <!--Demand limit-->
+                                <!--Production date-->
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <label for="name">{{ \App\CPU\translate('Demand limit') }}</label>
-                                    <input type="number" value={{ $product->demand_limit }} min="0" value="0" step="0.01" name="demand_limit"
-                                    class="js-example-basic-multiple form-control" style="width: 100%;">
+                                    <label for="name">{{ \App\CPU\translate('q_normal_offer') }}</label>
+                                    <input type="number" min="0" value={{$product->q_normal_offer}} step="0.01" name="q_normal_offer"
+                                class="js-example-basic-multiple form-control" style="width: 100%;">
                                 </div>
-
+                                <!--expiry date dateit-->
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <label for="name">{{ \App\CPU\translate('Scientific formula') }}</label>
-                                    <input type="text" value={{ $product->scientific_formula }} name="scientific_formula"
-                                    class="js-example-basic-multiple form-control" style="width: 100%;">
+                                    <label for="name">{{ \App\CPU\translate('normal_offer') }}</label>
+                                    <input type="number" min="0" value={{$product->normal_offer}} step="0.01" name="normal_offer"
+                                class="js-example-basic-multiple form-control" style="width: 100%;">
                                 </div>
-
                             </div>
 
+                            <div class="row">
+                                <!--Production date-->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <label for="name">{{ \App\CPU\translate('q_featured_offer') }}</label>
+                                    <input type="number" min="0" value={{$product->q_featured_offer}} step="0.01" name="q_featured_offer"
+                                class="js-example-basic-multiple form-control" style="width: 100%;">
+                                </div>
+                                <!--expiry date dateit-->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <label for="name">{{ \App\CPU\translate('featured_offer') }}</label>
+                                    <input type="number" min="0" value={{$product->featured_offer}} step="0.01" name="featured_offer"
+                                    class="js-example-basic-multiple form-control" style="width: 100%;">
+                                </div>
+                            </div>
 
                         </div>
                     </div>
@@ -209,134 +218,26 @@
                         </div>
                         <div class="card-body">
 
-                                <div class="row">
-                                    <!--Production date-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('Production date') }}</label>
-                                         <input type="date"  step="0.01" value={{ $product->production_date }}  name="production_date"
+                            <div class="row">
+                                <!--Production date-->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <label for="name">{{ \App\CPU\translate('Production date') }}</label>
+                                    <input value={{$product->production_date}} type="date" step="0.01" name="production_date"
                                         class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
-                                    <!--expiry date dateit-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('expiry date') }}</label>
-                                        <input type="date"  step="0.01" value={{ $product->expiry_date }} name="expiry_date"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
                                 </div>
-
+                                <!--expiry date dateit-->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <label for="name">{{ \App\CPU\translate('expiry date') }}</label>
+                                    <input  value={{$product->expiry_date}} type="date" step="0.01" name="expiry_date"
+                                        class="js-example-basic-multiple form-control" style="width: 100%;">
+                                </div>
                             </div>
+
                         </div>
                     </div>
 
 
 
-                    <div class="card mt-2 rest-part">
-                        <div class="card-header">
-                            <h4>{{ \App\CPU\translate('Offers') }}</h4>
-                        </div>
-                        <div class="card-body">
-
-                                <div class="row">
-                                    <!--Category-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('Quantity featured offer') }}</label>
-                                         <input type="number" value={{ $product->q_featured_offer }} min="0" value="0" step="0.01" name="q_featured_offer"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
-                                    <!--Unit-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('featured offer') }}</label>
-                                        <input type="number" value={{ $product->featured_offer }} min="0" value="0" step="0.01" name="featured_offer"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
-                                </div>
-
-
-                                <br>
-                                <div class="row">
-                                    <!--Category-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('Quantity normal offer') }}</label>
-                                        <input type="number" value={{ $product->q_normal_offer }} min="0" value="0" step="0.01" name="q_normal_offer"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
-                                    <!--Normal offer-->
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <label for="name">{{ \App\CPU\translate('Normal offer') }}</label>
-                                        <input type="number" value={{ $product->normal_offer }} min="0" value="0" step="0.01" name="normal_offer"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-
-
-
-                    {{-- <div class="card mt-2 rest-part">
-                        <div class="card-header">
-                            <h4>{{\App\CPU\translate('Variation')}}</h4>
-                        </div>
-                        <div class="card-body">
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-md-6">
-
-                                        <label for="colors">
-                                            {{\App\CPU\translate('Colors')}} :
-                                        </label>
-                                        <label class="switch">
-                                            <input type="checkbox" class="status"
-                                                   name="colors_active" {{count($product['colors'])>0?'checked':''}}>
-                                            <span class="slider round"></span>
-                                        </label>
-
-                                        <select
-                                            class="js-example-basic-multiple js-states js-example-responsive form-control color-var-select"
-                                            name="colors[]" multiple="multiple"
-                                            id="colors-selector" {{count($product['colors'])>0?'':'disabled'}}>
-                                            @foreach (\App\Model\Color::orderBy('name', 'asc')->get() as $key => $color)
-                                                <option
-                                                    value={{ $color->code }} {{in_array($color->code,$product['colors'])?'selected':''}}>
-                                                    {{$color['name']}}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label for="attributes" style="padding-bottom: 3px">
-                                            {{\App\CPU\translate('Attributes')}} :
-                                        </label>
-                                        <select
-                                            class="js-example-basic-multiple js-states js-example-responsive form-control"
-                                            name="choice_attributes[]" id="choice_attributes" multiple="multiple">
-                                            @foreach (\App\Model\Attribute::orderBy('name', 'asc')->get() as $key => $a)
-                                                @if($product['attributes']!='null')
-                                                    <option
-                                                        value="{{ $a['id']}}" {{in_array($a->id,json_decode($product['attributes'],true))?'selected':''}}>
-                                                        {{$a['name']}}
-                                                    </option>
-                                                @else
-                                                    <option value="{{ $a['id']}}">{{$a['name']}}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-12 mt-2 mb-2">
-                                        <div class="customer_choice_options" id="customer_choice_options">
-                                            @include('admin-views.product.partials._choices',['choice_no'=>json_decode($product['attributes']),'choice_options'=>json_decode($product['choice_options'],true)])
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
 
                     <div class="card mt-2 rest-part">
                         <div class="card-header">
@@ -361,70 +262,33 @@
                                                value={{ \App\CPU\Convert::default($product->purchase_price) }} required>
                                     </div>
 
-                                    <div class="col-md-5">
-                                        <label class="control-label">{{\App\CPU\translate('Tax')}}</label>
-                                        <label class="badge badge-info">{{\App\CPU\translate('Percent')}} ( % )</label>
-                                        <input type="number" min="0" value={{ $product->tax }} step="0.01"
-                                               placeholder="{{\App\CPU\translate('Tax') }}" name="tax"
-                                               class="form-control" required>
-                                        <input name="tax_type" value="percent" style="display: none">
-                                    </div>
 
-                                    <div class="col-md-5">
+
+                                    <div class="col-md-6">
                                         <label class="control-label">{{\App\CPU\translate('Discount')}}</label>
                                         <input type="number" min="0"
                                                value={{ $product->discount_type=='flat'?\App\CPU\Convert::default($product->discount): $product->discount}} step="0.01"
                                                placeholder="{{\App\CPU\translate('Discount') }}" name="discount"
                                                class="form-control" required>
                                     </div>
-                                    <div class="col-md-2" style="padding-top: 30px;">
-                                        <select
-                                            style="width: 100%"
-                                            class="js-example-basic-multiple js-states js-example-responsive demo-select2"
-                                            name="discount_type">
-                                            <option
-                                                value="percent" {{$product['discount_type']=='percent'?'selected':''}}>{{\App\CPU\translate('Percent')}}</option>
-                                            <option
-                                                value="flat" {{$product['discount_type']=='flat'?'selected':''}}>{{\App\CPU\translate('Flat')}}</option>
 
-                                        </select>
-                                    </div>
-                                    <div class="col-12 pt-4 sku_combination" id="sku_combination">
-                                        @include('admin-views.product.partials._edit_sku_combinations',['combinations'=>json_decode($product['variation'],true)])
-                                    </div>
-                                    <div class="col-sm-6 col-md-6 col-lg-4" id="quantity">
+                                    <div class="col-md-6" id="quantity">
                                         <label
                                             class="control-label">{{\App\CPU\translate('total')}} {{\App\CPU\translate('Quantity')}}</label>
                                         <input type="number" min="0" value={{ $product->current_stock }} step="1"
                                                placeholder="{{\App\CPU\translate('Quantity') }}"
                                                name="current_stock" class="form-control" required>
                                     </div>
-                                    <div class="col-sm-6 col-md-6 col-lg-4" id="shipping_cost">
-                                        <label
-                                            class="control-label">{{\App\CPU\translate('shipping_cost')}} </label>
-                                        <input type="number" min="0" value="{{\App\CPU\Convert::default($product->shipping_cost)}}" step="1"
-                                               placeholder="{{\App\CPU\translate('shipping_cost')}}"
-                                               name="shipping_cost" class="form-control" required>
-                                    </div>
-                                    <div class="col-md-6 col-lg-4 mt-sm-1" id="shipping_cost_multy">
-                                        <div>
-                                            <label
-                                            class="control-label">{{\App\CPU\translate('shipping_cost_multiply_with_quantity')}} </label>
 
-                                        </div>
-                                        <div>
-                                            <label class="switch">
-                                                <input type="checkbox" name="multiplyQTY"
-                                                       id="" {{$product->multiply_qty == 1?'checked':''}}>
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                    </div>
+
                                 </div>
                             </div>
                             <br>
                         </div>
                     </div>
+
+
+
 
                     <div class="card mt-2 mb-2 rest-part">
                         <div class="card-header">
@@ -483,23 +347,21 @@
                                     </div>
                                     <div class="p-2 border border-dashed" style="max-width:430px;">
                                         <div class="row" id="coba">
-                                            @if ($product->images)
                                             @foreach (json_decode($product->images) as $key => $photo)
-                                            <div class="col-6">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <img style="width: 100%" height="auto"
-                                                             onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                                                             src="{{asset("storage/app/public/product/$photo")}}"
-                                                             alt="Product image">
-                                                        <a href="{{route('admin.product.remove-image',['id'=>$product['id'],'name'=>$photo])}}"
-                                                           class="btn btn-danger btn-block">{{\App\CPU\translate('Remove')}}</a>
+                                                <div class="col-6">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <img style="width: 100%" height="auto"
+                                                                 onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
+                                                                 src="{{asset("storage/app/public/product/$photo")}}"
+                                                                 alt="Product image">
+                                                            <a href="{{route('admin.product.remove-image',['id'=>$product['id'],'name'=>$photo])}}"
+                                                               class="btn btn-danger btn-block">{{\App\CPU\translate('Remove')}}</a>
 
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                         @endforeach
-                                            @endif
+                                            @endforeach
                                         </div>
                                     </div>
 
@@ -528,6 +390,8 @@
                         </div>
                     </div>
 
+
+
                     <div class="card card-footer">
                         <div class="row">
                             <div class="col-md-12" style="padding-top: 20px">
@@ -549,7 +413,7 @@
     <script src="{{asset('public/assets/back-end')}}/js/tags-input.min.js"></script>
     <script src="{{asset('public/assets/back-end/js/spartan-multi-image-picker.js')}}"></script>
     <script>
-            var imageCount = 2;
+        var imageCount = {{4-count(json_decode($product->images))}};
         var thumbnail = '{{\App\CPU\ProductManager::product_image_path('thumbnail').'/'.$product->thumbnail??asset('public/assets/back-end/img/400x400/img2.jpg')}}';
         $(function () {
             if (imageCount > 0) {

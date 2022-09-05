@@ -176,14 +176,15 @@ Route::post('/ipn', 'SslCommerzPaymentController@ipn');
 //SSLCOMMERZ END
 
 
-/*paypal*/
+//paypal
+
 Route::get('/paypal', function (){return view('paypal-test');})->name('paypal');
 Route::post('pay-paypal', 'PaypalPaymentController@payWithpaypal')->name('pay-paypal');
 Route::get('paypal-status', 'PaypalPaymentController@getPaymentStatus')->name('paypal-status');
 Route::get('paypal-success', 'PaypalPaymentController@success')->name('paypal-success');
 Route::get('paypal-fail', 'PaypalPaymentController@fail')->name('paypal-fail');
 
-/*paypal*/
+//paypal
 
 Route::get('stripe', function (){
 return view('stripe-test');
@@ -241,6 +242,7 @@ Route::group(['prefix'=>'bkash'], function () {
     //Route::get('refund', 'BkashRefundController@index')->name('bkash-refund');
     //Route::post('refund', 'BkashRefundController@refund')->name('bkash-refund');
 });
+
 
 //fawry
 Route::get('/fawry', 'FawryPaymentController@index')->name('fawry');

@@ -268,29 +268,6 @@
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-10 pt-2 border-left">
 
-                        {{-- <span> @if (count(json_decode($product->colors)) > 0)
-                                <div class="row no-gutters">
-                                <div class="col-2">
-                                    <div class="product-description-label mt-2">{{\App\CPU\translate('Available color')}}:
-                                    </div>
-                                </div>
-                                <div class="col-10">
-                                    <ul class="list-inline checkbox-color mb-1">
-                                        @foreach (json_decode($product->colors) as $key => $color)
-                                            <li>
-
-                                                <label style="background: {{ $color }};"
-                                                       for="{{ $product->id }}-color-{{ $key }}"
-                                                       data-toggle="tooltip"></label>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                            @endif</span><br>
-                        <span> --}}
-
-
                             <div class="row" style="margin-left: 9%;">
                                     {{\App\CPU\translate('Product Image')}}
                                 </div>

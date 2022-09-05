@@ -290,7 +290,15 @@ class OrderController extends Controller
 
         $userName = User::where('id', $product_details->user_id)->get()->first();
         $xlsx=".xlsx";
-        $result = $userName->name.''.$xlsx;
+        if(isset($userName->name))
+        {
+            $result = $userName->name.''.now().''.$xlsx;
+        }
+        else
+        {
+            $result = $orderProduct->name.'-'.now().''.$xlsx;
+        }
+
         return (new FastExcel($storage))->download($result);
     }
 

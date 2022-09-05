@@ -79,13 +79,13 @@ class ProductController extends BaseController
             'brand_id' => 'required',
             'store_id'=>'required',
             'unit' => 'required',
-            //'images' => 'required',
-            //'image' => 'required',
+            'images' => 'required',
+            'image' => 'required',
             'tax' => 'min:0',
             'unit_price' => 'required|numeric|min:1',
             'purchase_price' => 'required|numeric|min:1',
             'discount' => 'required|gt:-1',
-            //'shipping_cost' => 'required|gt:-1',
+
 
             'demand_limit' => 'required|gt:-1|numeric',
             'expiry_date' => 'required|date',
@@ -96,7 +96,7 @@ class ProductController extends BaseController
             'normal_offer' => 'required|numeric',
             'scientific_formula'=>'required',
         ], [
-            //'images.required' => 'Product images is required!',
+            'images.required' => 'Product images is required!',
             'image.required' => 'Product thumbnail is required!',
             'category_id.required' => 'category  is required!',
             'brand_id.required' => 'brand  is required!',
@@ -154,15 +154,20 @@ class ProductController extends BaseController
         $p->details = $request->description[array_search('en', $request->lang)];
 
 
-        $p->demand_limit = $request->demand_limit;
-        $p->expiry_date = $request->expiry_date;
-        $p->production_date = $request->production_date;
+
+
+         $p->demand_limit = $request->demand_limit;
+         $p->expiry_date = $request->expiry_date;
+         $p->production_date = $request->production_date;
         $p->q_featured_offer = $request->q_featured_offer;
         $p->featured_offer = $request->featured_offer;
         $p->normal_offer = $request->normal_offer;
         $p->q_normal_offer = $request->q_normal_offer;
         $p->scientific_formula = $request->scientific_formula;
+
+
         //add colors
+
 
         if ($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0) {
             $p->colors = json_encode($request->colors);
@@ -238,8 +243,10 @@ class ProductController extends BaseController
         $p->variation = json_encode($variations);
         $p->unit_price = BackEndHelper::currency_to_usd($request->unit_price);
         $p->purchase_price = BackEndHelper::currency_to_usd($request->purchase_price);
-        $p->tax = $request->tax_type == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
-        $p->tax_type = $request->tax_type;
+        // $p->tax = $request->tax_type == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
+        // $p->tax_type = $request->tax_type;
+        $p->tax_type = "flat";
+        $p->tax=0;
         $p->discount = $request->discount_type == 'flat' ? BackEndHelper::currency_to_usd($request->discount) : $request->discount;
         $p->discount_type = $request->discount_type;
         $p->attributes = json_encode($request->choice_attributes);
@@ -262,6 +269,12 @@ class ProductController extends BaseController
                 }
                 $p->images = json_encode($product_images);
             }
+
+            // if ($request->file('images')) {
+            //     $product_images= ImageManager::upload('product/', 'png', $request->file('images'));
+            //     $p->images = $product_images;
+            // }
+
 
             $p->thumbnail = ImageManager::upload('product/thumbnail/', 'png', $request->image);
 
@@ -520,8 +533,6 @@ class ProductController extends BaseController
         $br = Brand::orderBY('name', 'ASC')->get();
         $st = Store::orderBY('store_name', 'ASC')->get();
 
-
-
         return view('admin-views.product.edit', compact('categories','st', 'br', 'product', 'product_category'));
     }
 
@@ -532,11 +543,11 @@ class ProductController extends BaseController
             'category_id' => 'required',
             'brand_id' => 'required',
             'unit' => 'required',
-            'tax' => 'required|min:0',
+            //'tax' => 'required|min:0',
             'unit_price' => 'required|numeric|min:1',
             'purchase_price' => 'required|numeric|min:1',
             'discount' =>'required|gt:-1',
-            'shipping_cost' => 'required|gt:-1',
+            //'shipping_cost' => 'required|gt:-1',
 
             'demand_limit' => 'required|gt:-1|numeric',
             'expiry_date' => 'required|date',
@@ -680,8 +691,9 @@ class ProductController extends BaseController
         $product->variation = json_encode($variations);
         $product->unit_price = BackEndHelper::currency_to_usd($request->unit_price);
         $product->purchase_price = BackEndHelper::currency_to_usd($request->purchase_price);
-        $product->tax = $request->tax == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
-        $product->tax_type = $request->tax_type;
+        $product->tax=0;
+        // $product->tax = $request->tax == 'flat' ? BackEndHelper::currency_to_usd($request->tax) : $request->tax;
+        // $product->tax_type = $request->tax_type;
         $product->discount = $request->discount_type == 'flat' ? BackEndHelper::currency_to_usd($request->discount) : $request->discount;
         $product->attributes = json_encode($request->choice_attributes);
         $product->discount_type = $request->discount_type;
@@ -741,7 +753,7 @@ class ProductController extends BaseController
         }
     }
 
-    /*
+
     public function remove_image(Request $request)
     {
         ImageManager::delete('/product/' . $request['image']);
@@ -769,7 +781,7 @@ class ProductController extends BaseController
         Toastr::success('Product image removed successfully!');
         return back();
     }
-    */
+
 
     public function delete($id)
     {
@@ -883,51 +895,67 @@ class ProductController extends BaseController
             }
 
             $product = Product::where('name', 'LIKE', '%'.$collection['اسم المادة'].'%')->get()->first();
+            //dd($collection['العرض المميز']);
+
             if(isset($product))
             {
-
+                $product->unit_price=$collection['السعر'];
+                $product->current_stock=$collection['الكمية'];
+                $product->details=$collection['الملاحظات'];
+                $product->scientific_formula=$collection['التركيبة العلمية'];
+                $product->q_normal_offer=$collection['العرض لل'];
+                $product->normal_offer=$collection['العرض'];
+                $product->q_normal_offer=$collection['العرض لل'];
+                $product->q_featured_offer=$collection['العرض مميز لل'];
+                $product->featured_offer=$collection['العرض المميز'];
+                $product->expiry_date=$collection['تاريخ الصلاحية'];
+                $product->demand_limit=$collection['حد الطلب'];
+                $product->store_id=$store_id;
+                $product->save();
             }
             else
             {
 
-            // array_push($data, [
-            //     'brand_id' => $brand_id,
-            //     'name' => $collection['اسم المادة'],
-            //     'unit_price' => $collection['السعر'],
-            //     'current_stock' => $collection['الكمية'],
-            //     'details' => $collection['الملاحظات'],
-            //     'scientific_formula' => $collection['التركيبة العلمية'],
-            //     'q_normal_offer' => $collection['العرض لل'],
-            //     'q_featured_offer' => $collection['العرض مميز لل'],
-            //     'normal_offer' => $collection['العرض'],
-            //     'featured_offer' => $collection['العرض المميز'],
-            //     'demand_limit' => $collection['حد الطلب'],
-            //     'expiry_date' => $collection['تاريخ الصلاحية'],
+            array_push($data, [
+                'brand_id' => $brand_id,
+                'name' => $collection['اسم المادة'],
+                'unit_price' => $collection['السعر'],
+                'current_stock' => $collection['الكمية'],
+                'details' => $collection['الملاحظات'],
+                'scientific_formula' => $collection['التركيبة العلمية'],
+                'q_normal_offer' => $collection['العرض لل'],
+                'q_featured_offer' => $collection['العرض مميز لل'],
+                'normal_offer' => $collection['العرض'],
+                'featured_offer' => $collection['العرض المميز'],
+                'demand_limit' => $collection['حد الطلب'],
+                'expiry_date' => $collection['تاريخ الصلاحية'],
 
-            //     //By defult
-            //     'store_id' => $store_id,
-            //     'unit' => "pc",
-            //     'category_ids' => json_encode($category),
-            //     'refundable' => false,
-            //     'video_provider' => 'youtube',
-            //     'thumbnail' =>'def.png',
-            //     'images' => json_encode(['def.png']),
-            //     'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
-            //     'status' => 1,
-            //     'request_status' => 1,
-            //     'colors' => json_encode([]),
-            //     'attributes' => json_encode([]),
-            //     'choice_options' => json_encode([]),
-            //     'variation' => json_encode([]),
-            //     'featured_status' => 1,
-            //     'added_by' => 'admin',
-            //     'user_id' => 1,
-            // ]);
+                //By defult
+                'store_id' => $store_id,
+                'unit' => "pc",
+                'category_ids' => json_encode($category),
+                'refundable' => false,
+                'video_provider' => 'youtube',
+                'thumbnail' =>'def.png',
+                'images' => json_encode(['def.png']),
+                'slug' => Str::slug($collection['اسم المادة'], '-') . '-' . Str::random(6),
+                'status' => 1,
+                'request_status' => 1,
+                'colors' => json_encode([]),
+                'attributes' => json_encode([]),
+                'choice_options' => json_encode([]),
+                'variation' => json_encode([]),
+                'featured_status' => 1,
+                'added_by' => 'admin',
+                'user_id' => 1,
+            ]);
             }
 
         }
-        DB::table('products')->update($dataUpdate);
-        DB::table('products')->insert($data);
+        if(count($data)>0)
+        {
+            DB::table('products')->insert($data);
+        }
         Toastr::success(count($data) . ' - Products imported successfully!');
         return back();
     }

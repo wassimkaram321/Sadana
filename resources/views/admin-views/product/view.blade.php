@@ -4,6 +4,14 @@
 
 @push('css_or_js')
 <style>
+
+
+        h6{
+            margin-bottom: 0px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
     .checkbox-color label {
         width: 2.25rem;
         height: 2.25rem;
@@ -231,136 +239,125 @@
                         <!-- End Review Ratings -->
                     </ul>
                 </div>
-                <div class="col-12">
+                {{-- <div class="col-12">
                     <hr>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-12">
-                        <div class="flex-start">
-                            <h4 class="border-bottom">{{$product['name']}}</h4>
+                </div> --}}
+
+
+                <div class="mt-5">
+                    <h4 class="mb-2">Overview :</h4>
+                    <div class="row">
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Price')}} :</h6>
+                            <span>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product['unit_price']))}}</span>
                         </div>
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Price')}} : </span>
-                            <span
-                                class="mx-1">{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product['unit_price']))}}</span>
-                        </div>
-                        {{-- <div class="flex-start">
-                            <span>{{\App\CPU\translate('TAX')}} : </span>
-                            <span class="mx-1">{{($product['tax'])}} % </span>
-                        </div> --}}
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Discount')}} : </span>
-                            <span class="mx-1">{{
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Discount')}} :</h6>
+                            <span>{{
                                 $product->discount_type=='flat'?(\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product['discount']))):
                                 $product->discount.''.'%'}} </span>
                         </div>
-                        {{-- <div class="flex-start">
-                            <span>{{\App\CPU\translate('shipping Cost')}} : </span>
-                            <span class="mx-1">{{
-                                \App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product->shipping_cost))
-                                }}</span>
-                        </div> --}}
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Current Stock')}} : </span>
-                            <span class="mx-1">{{ $product->current_stock }}</span>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Current Stock')}} :</h6>
+                            <span>{{ $product->current_stock }}</span>
                         </div>
-
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Brand Name')}} : </span>
-                            <span class="mx-1">{{ $brand->name }}</span>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Brand Name')}} :</h6>
+                            <span>{{ $brand->name }}</span>
                         </div>
-
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Store Name')}} : </span>
-                            <span class="mx-1">{{ $store->store_name }}</span>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Store Name')}} :</h6>
+                            <span>{{ $store->store_name }}</span>
                         </div>
-
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Demand_limit')}} : </span>
-                            <span class="mx-1">{{ $product->demand_limit }}</span>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Demand_limit')}} :</h6>
+                            <span>{{ $product->demand_limit }}</span>
                         </div>
-
-
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Purchase price')}} : </span>
-                            <span class="mx-1">{{ $product->purchase_price }}</span>
-                        </div>
-
-
-
-                        {{-- offers --}}
-                        <div class="flex-start">
-                            <h4 class="border-bottom">{{\App\CPU\translate('Offers')}}</h4>
-                        </div>
-
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Normal')}} : </span>
-                            <span class="mx-1">{{\App\CPU\translate('Every')}}{{ $product->q_normal_offer }} =>
-                                {{$product->normal_offer}}</span>
-                        </div>
-                        <div class="flex-start">
-                            <span>{{\App\CPU\translate('Featured')}} : </span>
-                            <span class="mx-1">{{\App\CPU\translate('Every')}}{{ $product->q_featured_offer }} => {{
-                                $product->featured_offer }}</span>
-                        </div>
-                        {{-- end offers --}}
-
-
-                        <div class="flex-start">
-                            <h4 class="border-bottom">{{\App\CPU\translate('Scientific_formula')}}</h4>
-                        </div>
-                        <div class="flex-start">
-
-                            <span class="mx-1">{{ $product->scientific_formula }}</span>
-                        </div>
-
-
-
-                        <div class="flex-start">
-                            <h4 class="border-bottom">{{\App\CPU\translate('Details')}}</h4>
-                        </div>
-                        <div class="flex-start">
-
-                            <span class="mx-1">{{ $product->details }}</span>
-                        </div>
-
-
-                        <div class="flex-start">
-                            <h4 class="border-bottom">{{\App\CPU\translate('Production & expiry date')}}</h4>
-                        </div>
-                        <div class="flex-start">
-                            <span class="mx-1">{{ $product->production_date }} | </span>
-                            <span class="mx-1">{{ $product->expiry_date }}</span>
+                        <div class="col-md-3 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Purchase price')}} :</h6>
+                            <span>{{ $product->purchase_price }}</span>
                         </div>
 
 
                     </div>
-                    <div class="col-lg-8 col-md-8 col-sm-10 pt-2 border-left">
 
-                        <div class="row" style="margin-left: 9%;">
-                            {{\App\CPU\translate('Product Image')}}
+                    <hr>
+
+                    <h4 class="mb-2 mt-3">{{\App\CPU\translate('Offers')}} :</h4>
+                    <div class="row">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Normal')}} :</h6>
+                            <span>
+                                {{\App\CPU\translate('every (')}}{{ $product->q_normal_offer }}{{\App\CPU\translate(') product ')}}{{\App\CPU\translate(',offer( ')}}{{$product->normal_offer}}{{\App\CPU\translate(') products for free .')}}</span>
                         </div>
-                        <br>
-                        <div class="row" style="margin-left: 7%;">
-                            @foreach (json_decode($product->images) as $key => $photo)
-                            <div class="col-md-7">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <img style="width: 100%"
-                                            onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                                            src="{{asset(" storage/app/public/product/$photo")}}" alt="Product image">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <h6 class="mr-3">Featured :</h6>
+                            <span>{{\App\CPU\translate('every (')}}{{ $product->q_featured_offer  }}{{\App\CPU\translate(') product ')}}{{\App\CPU\translate(',offer( ')}}{{$product->featured_offer }}{{\App\CPU\translate(') products for free .')}}</span></span>
+                        </div>
+                    </div>
 
-                                    </div>
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-2 mt-3">{{\App\CPU\translate('Scientific_formula')}} :</h4>
+                            <div class="row">
+                                <div class="col-12 d-flex align-items-center">
+                                    <span>{{ $product->scientific_formula }}</span>
                                 </div>
                             </div>
-                            @endforeach
                         </div>
-                        </span>
+                        <div class="col-md-6">
+                            <h4 class="mb-2 mt-3">{{\App\CPU\translate('Details')}} :</h4>
+                            <div class="row">
+                                <div class="col-12 d-flex align-items-center">
+                                    <p>{{ $product->details }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <hr>
+
+
+                    <h4 class="mb-2 mt-3">{{\App\CPU\translate('Production & expiry date')}} :</h4>
+                    <div class="row">
+                        <div class="col-6 d-flex align-items-center">
+                            <h6 class="mr-3">{{\App\CPU\translate('Production date')}} :</h6>
+                            <span>{{ $product->production_date }}</span>
+                        </div>
+                        <div class="col-6 d-flex align-items-center">
+                            <h6 class="mr-3"> {{\App\CPU\translate('Expiry date')}}  :</h6>
+                            <span>{{$product->expiry_date }}</span>
+                        </div>
+                    </div>
+
                 </div>
 
 
 
+                {{-- <div class="row mt-5"> --}}
+
+                    {{-- <div class="row" style="margin-left: 9%;">
+                        {{\App\CPU\translate('Product Image')}}
+                    </div> --}}
+
+                    <div class="row mt-5">
+                        @foreach (json_decode($product->images) as $key => $photo)
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <img style="width: 100%"
+                                        onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
+                                        src="{{asset("storage/app/public/product/$photo")}}" alt="Product image">
+
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                {{-- </div> --}}
 
             </div>
         </div>

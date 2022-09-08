@@ -1920,4 +1920,5 @@
   'unassign' => 'Unassign',
   'Customer type : ' => 'Customer type : ',
   'PHARMACY' => 'PHARMACY',
+  'sold' => 'Sold',
 );

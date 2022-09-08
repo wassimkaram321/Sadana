@@ -245,7 +245,7 @@
 
 
                 <div class="mt-5">
-                    <h4 class="mb-2">Overview :</h4>
+                    <h4 class="mb-2">{{\App\CPU\translate('Overview')}} :</h4>
                     <div class="row">
                         <div class="col-md-3 d-flex align-items-center">
                             <h6 class="mr-3">{{\App\CPU\translate('Price')}} :</h6>

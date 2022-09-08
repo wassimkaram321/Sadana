@@ -282,18 +282,25 @@
 
                             <div class="row mt-2">
                                 <div class="form-group mt-1 col-12 w-i6">
-                                <select onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control">
+                                <select onchange="customer_change(this.value);" id='customer'
+                                 name="customer_id" data-placeholder="Walk In Customer"
+                                 class="js-data-example-ajax form-control">
                                     <option value="0">{{\App\CPU\translate('walking_customer')}}</option>
                                 </select>
-                                <!-- <button class="btn btn-sm btn-white btn-outline-primary ml-1" type="button" title="Add Customer">
+                                 {{-- <button class="btn btn-sm btn-white btn-outline-primary ml-1" type="button" title="Add Customer">
                                     <i class="tio-add-circle text-dark"></i>
-                                </button> -->
+                                </button> --}}
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="form-group mt-1 col-12 col-lg-6 mb-0">
+                                {{-- <div class="form-group mt-1 col-12 col-lg-6 mb-0">
                                     <button class="w-100 d-inline-block btn btn-success rounded" id="add_new_customer" type="button" data-toggle="modal" data-target="#add-customer" title="Add Customer">
                                        <i class="tio-add-circle-outlined"></i> {{ \App\CPU\translate('customer')}}
+                                    </button>
+                                </div> --}}
+                                 <div class="form-group mt-1 col-12 col-lg-6 mb-0">
+                                    <button class="w-100 d-inline-block btn btn-success rounded"  type="button" data-toggle="modal"  >
+                                       <a style="color: white" href="{{route('admin.pos.orders')}}"><i  class="tio-add-circle-outlined"></i> {{ \App\CPU\translate('pos orders')}}</a>
                                     </button>
                                 </div>
                                 <div class="form-group mt-1 col-12 col-lg-6 mb-0">
@@ -308,11 +315,11 @@
                                 </div>
                             </div>
                             <div class="row mb-2">
-                                <div class="form-group mt-1 col-12 col-lg-6 mt-2 mb-0">
+                                {{-- <div class="form-group mt-1 col-12 col-lg-6 mt-2 mb-0">
                                     <select id='cart_id' name="cart_id"
                                             class=" form-control js-select2-custom" onchange="cart_change(this.value);">
                                     </select>
-                                </div>
+                                </div> --}}
 
                                 <div class="form-group mt-1 col-12 col-lg-6 mt-2 mb-0">
                                     <a class="w-100 d-inline-block btn btn-danger rounded" onclick="clear_cart()">
@@ -354,8 +361,9 @@
                 <div class="modal-body row" style="font-family: emoji;">
                     <div class="col-md-12">
                         <center>
-                            <input id="print_invoice" type="button" class="btn btn-primary non-printable" onclick="printDiv('printableArea')"
-                                value="Proceed, If thermal printer is ready."/>
+                            {{-- <input id="print_invoice" type="button" class="btn btn-primary non-printable" onclick="printDiv('printableArea')"
+                                value="Proceed, If thermal printer is ready."/> --}}
+                            <a href={{ route('admin.pos.orders') }} type="button" class="btn btn-primary non-printable">{{\App\CPU\translate('View Orders')}}</a>
                             <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
                         </center>
                         <hr class="non-printable">

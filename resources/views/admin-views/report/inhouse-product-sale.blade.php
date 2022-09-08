@@ -70,6 +70,10 @@
                                     {{\App\CPU\translate('Total Sale')}} <label class="badge badge-success ml-3"
                                                       style="cursor: pointer">{{\App\CPU\translate('ASE/DESC')}}</label>
                                 </th>
+                                <th scope="col">
+                                    {{\App\CPU\translate('Total Sale offers')}} <label class="badge badge-success ml-3"
+                                                      style="cursor: pointer">{{\App\CPU\translate('ASE/DESC')}}</label>
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -78,6 +82,7 @@
                                     <th scope="row">{{$key+1}}</th>
                                     <td>{{$data['name']}}</td>
                                     <td>{{$data->order_delivered->sum('qty')}}</td>
+                                    <td>{{$data->order_delivered_offers->sum('total_qty')}}</td>
                                 </tr>
                             @endforeach
                             </tbody>

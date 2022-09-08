@@ -16,6 +16,7 @@ use App\Model\OrderDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\CPU\BackEndHelper;
+use App\Pharmacy;
 
 class POSController extends Controller
 {
@@ -25,7 +26,7 @@ class POSController extends Controller
         $search = $request['search'];
 
 
-        $orders = Order::with(['customer'])->where(['seller_is'=>'admin'])->where('order_status','delivered');
+        $orders = Order::with(['customer'])->where(['seller_is' => 'admin'])->where('order_status', 'delivered');
 
 
         if ($request->has('search')) {
@@ -42,8 +43,7 @@ class POSController extends Controller
 
 
         if ($request->has('customer_type')) {
-            if($request['customer_type']!='all')
-            {
+            if ($request['customer_type'] != 'all') {
                 $key = explode(' ', $request['customer_type']);
                 //dd($key);
                 $orders = $orders->where(function ($q) use ($key) {
@@ -56,7 +56,7 @@ class POSController extends Controller
         }
 
 
-        $orders = $orders->where('order_type','POS')->orderBy('id','desc')->paginate(Helpers::pagination_limit())->appends($query_param);
+        $orders = $orders->where('order_type', 'POS')->orderBy('id', 'desc')->paginate(Helpers::pagination_limit())->appends($query_param);
 
         return view('admin-views.pos.order.list', compact('orders', 'search'));
     }
@@ -67,7 +67,26 @@ class POSController extends Controller
     {
         $order = Order::with('details', 'shipping', 'seller')->where(['id' => $id])->first();
 
-        return view('admin-views.pos.order.order-details', compact('order'));
+        $customerDetails = User::where('id', $order->customer_id)->get()->first();
+
+        $status = false;
+
+        if ($customerDetails->user_type == "salesman") {
+
+            $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?', [$customerDetails->id]);
+            $arr = array();
+            foreach ($pharma_id as $idx) {
+                array_push($arr, $idx->pharmacy_id);
+            }
+            $pharmacies = Pharmacy::whereIn('id', $arr)->get();
+            $status = true;
+        }
+        else
+        {
+            $pharmacies=array();
+        }
+
+        return view('admin-views.pos.order.order-details', compact('order','status','pharmacies'));
     }
 
 
@@ -76,10 +95,10 @@ class POSController extends Controller
     {
         $category = $request->query('category_id', 0);
         $keyword = $request->query('search', false);
-        $categories = Category::where('position',0)->latest()->get();
+        $categories = Category::where('position', 0)->latest()->get();
 
         $key = explode(' ', $keyword);
-        $products = Product::where('added_by','admin')->where('status',1)
+        $products = Product::where('added_by', 'admin')->where('status', 1)
             ->when($request->has('category_id') && $request['category_id'] != 0, function ($query) use ($request) {
                 $query->whereJsonContains('category_ids', [['id' => (string)$request['category_id']]]);
             })
@@ -92,21 +111,19 @@ class POSController extends Controller
             })
             ->latest()->paginate(Helpers::pagination_limit());
 
-        $cart_id = 'wc-'.rand(10,1000);
+        $cart_id = 'wc-' . rand(10, 1000);
 
-        if(!session()->has('current_user')){
-            session()->put('current_user',$cart_id);
+        if (!session()->has('current_user')) {
+            session()->put('current_user', $cart_id);
         }
 
-        if(!session()->has('cart_name'))
-        {
-            if(!in_array($cart_id,session('cart_name')??[]))
-            {
+        if (!session()->has('cart_name')) {
+            if (!in_array($cart_id, session('cart_name') ?? [])) {
                 session()->push('cart_name', $cart_id);
             }
         }
 
-        return view('admin-views.pos.index',compact('categories','cart_id','category','keyword','products'));
+        return view('admin-views.pos.index', compact('categories', 'cart_id', 'category', 'keyword', 'products'));
     }
     public function search_product(Request $request)
     {
@@ -118,31 +135,30 @@ class POSController extends Controller
         ]);
 
         $key = explode(' ', $request['name']);
-        $products = Product::where('added_by','admin')->where('status',1)
-                                ->when($request->has('category_id') && $request['category_id'] != 0, function ($query) use ($request) {
-                                    $query->whereJsonContains('category_ids', [[['id' => (string)$request['category_id']]]]);
-                                })->where(function ($q) use ($key) {
-                                    foreach ($key as $value) {
-                                        $q->where('name', 'like', "%{$value}%");
-                                    }
-                                })->paginate(6);
+        $products = Product::where('added_by', 'admin')->where('status', 1)
+            ->when($request->has('category_id') && $request['category_id'] != 0, function ($query) use ($request) {
+                $query->whereJsonContains('category_ids', [[['id' => (string)$request['category_id']]]]);
+            })->where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->where('name', 'like', "%{$value}%");
+                }
+            })->paginate(6);
 
-        $count_p = $products->count();$count_p = $products->count();
+        $count_p = $products->count();
+        $count_p = $products->count();
 
-        if($count_p>0)
-        {
+        if ($count_p > 0) {
             return response()->json([
                 'count' => $count_p,
                 'id' => $products[0]->id,
                 'result' => view('admin-views.pos._search-result', compact('products'))->render(),
             ]);
-        }else{
+        } else {
             return response()->json([
                 'count' => $count_p,
                 'result' => view('admin-views.pos._search-result', compact('products'))->render(),
             ]);
         }
-
     }
     public function quick_view(Request $request)
     {
@@ -196,16 +212,14 @@ class POSController extends Controller
             'tax' => \App\CPU\Helpers::currency_converter($tax),
             'quantity' => $quantity
         ];
-
     }
     public function addToCart(Request $request)
     {
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
 
@@ -244,12 +258,10 @@ class POSController extends Controller
                 if (is_array($cartItem) && $cartItem['id'] == $request['id'] && $cartItem['variant'] == $str) {
                     return response()->json([
                         'data' => 1,
-                        'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                        'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
                     ]);
                 }
             }
-
-
         }
 
         //Check the string and decreases quantity for the stock
@@ -261,26 +273,23 @@ class POSController extends Controller
                 if (json_decode($product->variation)[$i]->type == $str) {
                     $p_qty = json_decode($product->variation)[$i]->qty;
                     $current_qty = $p_qty - $request['quantity'];
-                    if($current_qty<0)
-                    {
+                    if ($current_qty < 0) {
                         return response()->json([
                             'data' => 0,
-                            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
                         ]);
                     }
 
                     $price = json_decode($product->variation)[$i]->price;
-
                 }
             }
         } else {
             $p_qty = $product->current_stock;
             $current_qty = $p_qty - $request['quantity'];
-            if($current_qty<0)
-            {
+            if ($current_qty < 0) {
                 return response()->json([
                     'data' => 0,
-                    'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                    'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
                 ]);
             }
             $price = $product->unit_price;
@@ -306,7 +315,7 @@ class POSController extends Controller
 
         return response()->json([
             'data' => $data,
-            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
         ]);
     }
     public function cart_items()
@@ -319,15 +328,15 @@ class POSController extends Controller
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
         session()->forget($cart_id);
         return response()->json([
-            'user_type'=>$user_type,
-            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()], 200);
+            'user_type' => $user_type,
+            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+        ], 200);
     }
     public function removeFromCart(Request $request)
     {
@@ -335,9 +344,8 @@ class POSController extends Controller
         $user_id = 0;
         $user_type = 'wc';
 
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
 
@@ -345,7 +353,7 @@ class POSController extends Controller
         $cart_keeper = [];
 
         if (session()->has($cart_id) && count($cart) > 0) {
-            foreach ($cart as $key=>$cartItem) {
+            foreach ($cart as $key => $cartItem) {
                 if ($key != $request['key']) {
                     array_push($cart_keeper, $cartItem);
                 }
@@ -353,40 +361,36 @@ class POSController extends Controller
         }
         session()->put($cart_id, $cart_keeper);
 
-        return response()->json(['view' => view('admin-views.pos._cart',compact('cart_id'))->render()], 200);
+        return response()->json(['view' => view('admin-views.pos._cart', compact('cart_id'))->render()], 200);
     }
     public function updateQuantity(Request $request)
     {
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
 
-        if($request->quantity>0){
+        if ($request->quantity > 0) {
 
             $product = Product::find($request->key);
-            $product_qty =0;
+            $product_qty = 0;
             $cart = session($cart_id);
-            $keeper=[];
+            $keeper = [];
 
-            foreach ($cart as $item){
+            foreach ($cart as $item) {
 
                 if (is_array($item)) {
 
                     if ($item['id'] == $request->key) {
                         $str = '';
-                        if($item['variations'])
-                        {
-                            foreach($item['variations'] as $v)
-                            {
-                                if($str!=null)
-                                {
+                        if ($item['variations']) {
+                            foreach ($item['variations'] as $v) {
+                                if ($str != null) {
                                     $str .= '-' . str_replace(' ', '', $v);
-                                }else{
+                                } else {
                                     $str .= str_replace(' ', '', $v);
                                 }
                             }
@@ -400,38 +404,35 @@ class POSController extends Controller
                                 if (json_decode($product->variation)[$i]->type == $str) {
 
                                     $product_qty = json_decode($product->variation)[$i]->qty;
-
                                 }
                             }
-                        } else
-                        {
+                        } else {
                             $product_qty = $product->current_stock;
                         }
 
-                        $qty = $product_qty - $request->quantity ;
+                        $qty = $product_qty - $request->quantity;
 
-                        if($qty < 0)
-                        {
+                        if ($qty < 0) {
                             return response()->json([
-                                'qty' =>$qty,
-                                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
-                                ]);
+                                'qty' => $qty,
+                                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+                            ]);
                         }
                         $item['quantity'] = $request->quantity;
                     }
-                    array_push($keeper,$item);
+                    array_push($keeper, $item);
                 }
             }
             session()->put($cart_id, $keeper);
 
             return response()->json([
-                'qty_update'=>1,
-                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                'qty_update' => 1,
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
             ], 200);
-        }else{
+        } else {
             return response()->json([
-                'upQty'=>'zeroNegative',
-                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                'upQty' => 'zeroNegative',
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
             ]);
         }
     }
@@ -452,46 +453,41 @@ class POSController extends Controller
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
-        if($user_id !=0)
-        {
+        if ($user_id != 0) {
             $couponLimit = Order::where('customer_id', $user_id)
                 ->where('customer_type', 'customer')
                 ->where('coupon_code', $request['coupon_code'])->count();
 
             $coupon = Coupon::where(['code' => $request['coupon_code']])
-            ->where('limit', '>', $couponLimit)
-            ->where('status', '=', 1)
-            ->whereDate('start_date', '<=', now())
-            ->whereDate('expire_date', '>=', now())->first();
-        }else{
+                ->where('limit', '>', $couponLimit)
+                ->where('status', '=', 1)
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('expire_date', '>=', now())->first();
+        } else {
             $coupon = Coupon::where(['code' => $request['coupon_code']])
-            ->where('status', '=', 1)
-            ->whereDate('start_date', '<=', now())
-            ->whereDate('expire_date', '>=', now())->first();
+                ->where('status', '=', 1)
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('expire_date', '>=', now())->first();
         }
 
         $carts = session($cart_id);
         $total_product_price = 0;
         $product_discount = 0;
-        $product_tax =0;
+        $product_tax = 0;
         $ext_discount = 0;
 
-        if($coupon!=null)
-        {
-            if($carts!=null)
-            {
-                foreach($carts as $cart)
-                {
+        if ($coupon != null) {
+            if ($carts != null) {
+                foreach ($carts as $cart) {
                     if (is_array($cart)) {
-                    $product = Product::find($cart['id']);
-                    $total_product_price += $cart['price'] * $cart['quantity'];
-                    $product_discount += $cart['discount'] * $cart['quantity'];
-                    $product_tax += Helpers::tax_calculation($cart['price'], $product['tax'], $product['tax_type'])*$cart['quantity'];
+                        $product = Product::find($cart['id']);
+                        $total_product_price += $cart['price'] * $cart['quantity'];
+                        $product_discount += $cart['discount'] * $cart['quantity'];
+                        $product_tax += Helpers::tax_calculation($cart['price'], $product['tax'], $product['tax_type']) * $cart['quantity'];
                     }
                 }
                 if ($total_product_price >= $coupon['min_purchase']) {
@@ -503,16 +499,14 @@ class POSController extends Controller
                     }
                     if (isset($carts['ext_discount_type'])) {
                         $ext_discount = $this->extra_dis_calculate($carts, $total_product_price);
-
                     }
                     $total = $total_product_price - $product_discount + $product_tax - $discount - $ext_discount;
                     //return $total;
-                    if($total < 0)
-                    {
+                    if ($total < 0) {
                         return response()->json([
-                           'coupon' =>"amount_low",
-                           'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
-                    ]);
+                            'coupon' => "amount_low",
+                            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+                        ]);
                     }
 
                     $cart = session($cart_id, collect([]));
@@ -522,27 +516,26 @@ class POSController extends Controller
                     $request->session()->put($cart_id, $cart);
 
                     return response()->json([
-                           'coupon' =>'success',
-                           'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                        'coupon' => 'success',
+                        'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
                     ]);
                 }
-            }else{
+            } else {
                 return response()->json([
-                    'coupon' =>'cart_empty',
-                    'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                    'coupon' => 'cart_empty',
+                    'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
                 ]);
             }
 
             return response()->json([
-                'coupon' =>'coupon_invalid',
-                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                'coupon' => 'coupon_invalid',
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
             ]);
-
         }
 
         return response()->json([
-            'coupon' =>'coupon_invalid',
-            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+            'coupon' => 'coupon_invalid',
+            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
         ]);
     }
 
@@ -552,43 +545,39 @@ class POSController extends Controller
         if ($request->type == 'percent' && $request->discount < 0) {
             Toastr::error(\App\CPU\translate('Extra_discount_can_not_be_less_than_0_percent'));
             return response()->json([
-                'extra_discount' =>"amount_low",
-                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                'extra_discount' => "amount_low",
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
             ]);
         } elseif ($request->type == 'percent' && $request->discount > 100) {
             Toastr::error(\App\CPU\translate('Extra_discount_can_not_be_more_than_100_percent'));
             return response()->json([
-                'extra_discount' =>"amount_low",
-                'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
+                'extra_discount' => "amount_low",
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
             ]);
         }
 
 
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
 
         $cart = session($cart_id, collect([]));
-        if($cart!=null)
-        {
+        if ($cart != null) {
             $total_product_price = 0;
             $product_discount = 0;
-            $product_tax =0;
+            $product_tax = 0;
             $ext_discount = 0;
-            $coupon_discount = $cart['coupon_discount']??0;
+            $coupon_discount = $cart['coupon_discount'] ?? 0;
 
-            foreach($cart as $ct)
-            {
-                if(is_array($ct))
-                {
+            foreach ($cart as $ct) {
+                if (is_array($ct)) {
                     $product = Product::find($ct['id']);
                     $total_product_price += $ct['price'] * $ct['quantity'];
                     $product_discount += $ct['discount'] * $ct['quantity'];
-                    $product_tax += Helpers::tax_calculation($ct['price'], $product['tax'], $product['tax_type'])*$ct['quantity'];
+                    $product_tax += Helpers::tax_calculation($ct['price'], $product['tax'], $product['tax_type']) * $ct['quantity'];
                 }
             }
 
@@ -598,28 +587,26 @@ class POSController extends Controller
                 $ext_discount = $request->discount;
             }
             $total = $total_product_price - $product_discount + $product_tax - $coupon_discount - $ext_discount;
-            if($total < 0)
-            {
+            if ($total < 0) {
                 return response()->json([
-                        'extra_discount' =>"amount_low",
-                        'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
-                    ]);
-            }
-            else{
-                $cart['ext_discount'] = $request->type == 'percent'?$request->discount:BackEndHelper::currency_to_usd($request->discount);
+                    'extra_discount' => "amount_low",
+                    'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+                ]);
+            } else {
+                $cart['ext_discount'] = $request->type == 'percent' ? $request->discount : BackEndHelper::currency_to_usd($request->discount);
                 $cart['ext_discount_type'] = $request->type;
                 session()->put($cart_id, $cart);
 
                 return response()->json([
-                            'extra_discount' =>"success",
-                            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
-                        ]);
+                    'extra_discount' => "success",
+                    'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+                ]);
             }
-        }else{
+        } else {
             return response()->json([
-                            'extra_discount' =>"empty",
-                            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()
-                        ]);
+                'extra_discount' => "empty",
+                'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+            ]);
         }
     }
     public function get_customers(Request $request)
@@ -635,7 +622,7 @@ class POSController extends Controller
             })
             ->whereNotNull(['f_name', 'l_name', 'phone'])
             ->limit(8)
-            ->get([DB::raw('id,IF(id <> "0", CONCAT(f_name, " ", l_name, " (", phone ,")"),CONCAT(f_name, " ", l_name)) as text')]);
+            ->get([DB::raw('id,IF(id <> "0", CONCAT(f_name, " ", l_name, " (", phone ,")"," ",user_type),CONCAT(f_name, " ", l_name," ", user_type)) as text')]);
 
         //$data[] = (object)['id' => false, 'text' => 'walk_in_customer'];
 
@@ -646,9 +633,8 @@ class POSController extends Controller
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
         if (session()->has($cart_id)) {
@@ -672,17 +658,35 @@ class POSController extends Controller
         }
 
         $product_subtotal = 0;
-        foreach($cart as $c)
-        {
-            if(is_array($c))
-            {
+        foreach ($cart as $c) {
+            if (is_array($c)) {
                 $discount_on_product = 0;
                 $product_subtotal = ($c['price']) * $c['quantity'];
                 $discount_on_product += ($c['discount'] * $c['quantity']);
 
                 $product = Product::find($c['id']);
-                if($product)
-                {
+
+
+
+
+                $total_qty = 0;
+                $offerType = 'no offer';
+
+                if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
+                    $total_qty = ((int)($c['quantity'] / $product->q_featured_offer)) * $product->featured_offer;
+                    $offerType = 'featured';
+                }
+                if ($total_qty == 0) {
+                    if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                        $total_qty = ((int)($c['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                        $offerType = 'normal';
+                    }
+                }
+
+
+
+
+                if ($product) {
                     $price = $c['price'];
 
                     //$product = Helpers::product_data_formatting($product);
@@ -692,9 +696,11 @@ class POSController extends Controller
                         'product_details' => $product,
                         'qty' => $c['quantity'],
                         'price' => $price,
+                        'total_qty' => $total_qty,
+                         'offerType' => $offerType,
                         'seller_id' => $product['user_id'],
-                        'tax' => Helpers::tax_calculation($price, $product['tax'], $product['tax_type'])*$c['quantity'],
-                        'discount' => $c['discount']*$c['quantity'],
+                        'tax' => Helpers::tax_calculation($price, $product['tax'], $product['tax_type']) * $c['quantity'],
+                        'discount' => $c['discount'] * $c['quantity'],
                         'discount_type' => 'discount_on_product',
                         'delivery_status' => 'delivered',
                         'payment_status' => 'paid',
@@ -712,7 +718,7 @@ class POSController extends Controller
                         $type = $c['variant'];
                         $var_store = [];
 
-                        foreach (json_decode($product['variation'],true) as $var) {
+                        foreach (json_decode($product['variation'], true) as $var) {
                             if ($type == $var['type']) {
                                 $var['qty'] -= $c['quantity'];
                             }
@@ -724,7 +730,7 @@ class POSController extends Controller
                     }
 
                     Product::where(['id' => $product['id']])->update([
-                        'current_stock' => $product['current_stock'] - $c['quantity']
+                        'current_stock' => $product['current_stock'] - $c['quantity'] - $total_qty
                     ]);
 
                     DB::table('order_details')->insert($or_d);
@@ -737,7 +743,7 @@ class POSController extends Controller
             $extra_discount = $cart['ext_discount_type'] == 'percent' && $cart['ext_discount'] > 0 ? (($total_price * $cart['ext_discount']) / 100) : $cart['ext_discount'];
             $total_price -= $extra_discount;
         }
-        $user=User::where(['id' => $user_id])->get()->first();
+        $user = User::where(['id' => $user_id])->get()->first();
         $or = [
             'id' => $order_id,
             'customer_id' => $user_id,
@@ -746,14 +752,14 @@ class POSController extends Controller
             'order_status' => 'delivered',
             'seller_id' => auth('admin')->id(),
             'seller_is' => 'admin',
-            'checked' =>1,
+            'checked' => 1,
             'payment_method' => $request->type,
             'order_type' => 'POS',
-            'extra_discount' =>$cart['ext_discount']??0,
-            'extra_discount_type' => $cart['ext_discount_type']??null,
+            'extra_discount' => $cart['ext_discount'] ?? 0,
+            'extra_discount_type' => $cart['ext_discount_type'] ?? null,
             'order_amount' => BackEndHelper::currency_to_usd($request->amount),
-            'discount_amount' => $cart['coupon_discount']??0,
-            'coupon_code' => $cart['coupon_code']??null,
+            'discount_amount' => $cart['coupon_discount'] ?? 0,
+            'coupon_code' => $cart['coupon_code'] ?? null,
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -774,9 +780,8 @@ class POSController extends Controller
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
-        if(Str::contains(session('current_user'), 'sc'))
-        {
-            $user_id = explode('-',session('current_user'))[1];
+        if (Str::contains(session('current_user'), 'sc')) {
+            $user_id = explode('-', session('current_user'))[1];
             $user_type = 'sc';
         }
         $cart = session($cart_id);
@@ -786,20 +791,20 @@ class POSController extends Controller
                 array_push($cart_keeper, $cartItem);
             }
         }
-        session()->put(session('current_user') , $cart_keeper);
-        $user_id = explode('-',session('current_user'))[1];
-        $current_customer ='';
-        if(explode('-',session('current_user'))[0]=='wc')
-        {
+        session()->put(session('current_user'), $cart_keeper);
+        $user_id = explode('-', session('current_user'))[1];
+        $current_customer = '';
+        if (explode('-', session('current_user'))[0] == 'wc') {
             $current_customer = 'Walking Customer';
-        }else{
-            $current =User::where('id',$user_id)->first();
-            $current_customer = $current->f_name.' '.$current->l_name. ' (' .$current->phone.')';
+        } else {
+            $current = User::where('id', $user_id)->first();
+            $current_customer = $current->f_name . ' ' . $current->l_name . ' (' . $current->phone . ')';
         }
         return response()->json([
-            'current_user'=>session('current_user'),'cart_nam'=>session('cart_name')??'',
-            'current_customer'=>$current_customer,
-            'view'=> view('admin-views.pos._cart',compact('cart_id'))->render()]);
+            'current_user' => session('current_user'), 'cart_nam' => session('cart_name') ?? '',
+            'current_customer' => $current_customer,
+            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+        ]);
     }
     public function clear_cart_ids()
     {
@@ -811,9 +816,8 @@ class POSController extends Controller
     }
     public function remove_discount(Request $request)
     {
-        $cart_id = ($request->user_id!=0?'sc-'.$request->user_id:'wc-'.rand(10,1000));
-        if(!in_array($cart_id,session('cart_name')??[]))
-        {
+        $cart_id = ($request->user_id != 0 ? 'sc-' . $request->user_id : 'wc-' . rand(10, 1000));
+        if (!in_array($cart_id, session('cart_name') ?? [])) {
             session()->push('cart_name', $cart_id);
         }
 
@@ -823,58 +827,52 @@ class POSController extends Controller
         if (session()->has(session('current_user')) && count($cart) > 0) {
             foreach ($cart as $cartItem) {
 
-                    array_push($cart_keeper, $cartItem);
-
+                array_push($cart_keeper, $cartItem);
             }
         }
-        if(session('current_user') != $cart_id)
-        {
+        if (session('current_user') != $cart_id) {
             $temp_cart_name = [];
-                foreach(session('cart_name') as $cart_name)
-                {
-                    if($cart_name != session('current_user'))
-                    {
-                        array_push($temp_cart_name,$cart_name);
-                    }
+            foreach (session('cart_name') as $cart_name) {
+                if ($cart_name != session('current_user')) {
+                    array_push($temp_cart_name, $cart_name);
                 }
-                session()->put('cart_name',$temp_cart_name);
+            }
+            session()->put('cart_name', $temp_cart_name);
         }
-        session()->put('cart_name',$temp_cart_name);
+        session()->put('cart_name', $temp_cart_name);
         session()->forget(session('current_user'));
-        session()->put($cart_id , $cart_keeper);
-        session()->put('current_user',$cart_id);
-        $user_id = explode('-',session('current_user'))[1];
-        $current_customer ='';
-        if(explode('-',session('current_user'))[0]=='wc')
-        {
+        session()->put($cart_id, $cart_keeper);
+        session()->put('current_user', $cart_id);
+        $user_id = explode('-', session('current_user'))[1];
+        $current_customer = '';
+        if (explode('-', session('current_user'))[0] == 'wc') {
             $current_customer = 'Walking Customer';
-        }else{
-            $current =User::where('id',$user_id)->first();
-            $current_customer = $current->f_name.' '.$current->l_name. ' (' .$current->phone.')';
+        } else {
+            $current = User::where('id', $user_id)->first();
+            $current_customer = $current->f_name . ' ' . $current->l_name . ' (' . $current->phone . ')';
         }
 
         return response()->json([
-            'cart_nam'=>session('cart_name'),
-            'current_user'=>session('current_user'),
-            'current_customer'=>$current_customer,
-            'view' => view('admin-views.pos._cart',compact('cart_id'))->render()]);
+            'cart_nam' => session('cart_name'),
+            'current_user' => session('current_user'),
+            'current_customer' => $current_customer,
+            'view' => view('admin-views.pos._cart', compact('cart_id'))->render()
+        ]);
     }
     public function new_cart_id(Request $request)
     {
-        $cart_id = 'wc-'.rand(10,1000);
-        session()->put('current_user',$cart_id);
-        if(!in_array($cart_id,session('cart_name')??[]))
-        {
+        $cart_id = 'wc-' . rand(10, 1000);
+        session()->put('current_user', $cart_id);
+        if (!in_array($cart_id, session('cart_name') ?? [])) {
             session()->push('cart_name', $cart_id);
         }
 
         return redirect()->route('admin.pos.index');
-
     }
     public function change_cart(Request $request)
     {
 
-        session()->put('current_user',$request->cart_id);
+        session()->put('current_user', $request->cart_id);
 
         return redirect()->route('admin.pos.index');
     }
@@ -901,12 +899,11 @@ class POSController extends Controller
             'country' => $request['country'],
             'city' => $request['city'],
             'zip' => $request['zip_code'],
-            'street_address' =>$request['address'],
+            'street_address' => $request['address'],
             'is_active' => 1,
             'password' => bcrypt('password')
         ]);
         Toastr::success(\App\CPU\translate('customer added successfully'));
         return back();
     }
-
 }

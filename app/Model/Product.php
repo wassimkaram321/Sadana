@@ -32,7 +32,13 @@ class Product extends Model
         'shipping_cost'=>'float',
         'multiply_qty'=> 'integer',
         'temp_shipping_cost'=>'float',
-        'is_shipping_cost_updated'=>'integer'
+        'is_shipping_cost_updated'=>'integer',
+        'q_normal_offer'=>'integer',
+        'normal_offer'=>'integer',
+        'q_featured_offer'=>'integer',
+        'featured_offer'=>'integer',
+        'demand_limit'=>'integer',
+        'reviews_count'=>'integer'
     ];
 
     public function translations()
@@ -100,6 +106,14 @@ class Product extends Model
     }
 
     public function order_delivered()
+    {
+        return $this->hasMany(OrderDetail::class, 'product_id')
+                        ->where('delivery_status','delivered');
+
+    }
+
+
+    public function order_delivered_offers()
     {
         return $this->hasMany(OrderDetail::class, 'product_id')
                         ->where('delivery_status','delivered');

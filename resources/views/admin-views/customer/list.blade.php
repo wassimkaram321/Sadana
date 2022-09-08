@@ -203,7 +203,7 @@
                         <th>{{\App\CPU\translate('Phone')}}</th>
                         <th>{{\App\CPU\translate('Customer Type')}}</th>
                         <th>{{\App\CPU\translate('Total')}} {{\App\CPU\translate('Order')}} </th>
-                        <th>{{\App\CPU\translate('block')}} / {{\App\CPU\translate('unblock')}}</th>
+                        <th>{{\App\CPU\translate('Confirmation')}}</th>
                         <th>{{\App\CPU\translate('Action')}}</th>
                     </tr>
                     </thead>

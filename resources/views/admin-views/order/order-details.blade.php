@@ -90,16 +90,16 @@
                                href={{route('admin.orders.generate-excel',[$order['id']])}}>
                                 <i class="tio-print mr-1"></i> {{\App\CPU\translate('Export')}} {{\App\CPU\translate('excel')}}
                             </a>
-                        
 
-                        @if (isset($shipping_address['latitude']) && isset($shipping_address['longitude']))
+
+                        {{-- @if (isset($shipping_address['latitude']) && isset($shipping_address['longitude']))
                             <button class="btn btn-xs btn-secondary" data-toggle="modal" data-target="#locationModal"><i
                                     class="tio-map"></i> {{\App\CPU\translate('show_locations_on_map')}}</button>
                         @else
                             <button class="btn btn-xs btn-warning"><i
                                     class="tio-map"></i> {{\App\CPU\translate('shipping_address_has_been_given_below')}}
                             </button>
-                        @endif
+                        @endif --}}
                     </div>
 
                     <div class="row">
@@ -191,16 +191,16 @@
                                     </p>
                                 @endif
                             </div>
-                            <div class="col-6 pt-2">
+                             <div class="col-6 pt-2">
                                 <div class="text-right">
                                     <h6 class="" style="color: #8a8a8a;">
                                         {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('Method')}}
                                         : {{str_replace('_',' ',$order['payment_method'])}}
                                     </h6>
-                                    <h6 class="" style="color: #8a8a8a;">
+                                    {{-- <h6 class="" style="color: #8a8a8a;">
                                         {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('reference')}}
                                         : {{str_replace('_',' ',$order['transaction_ref'])}}
-                                    </h6>
+                                    </h6> --}}
                                 </div>
                             </div>
                         </div>
@@ -210,13 +210,13 @@
                     <!-- Body -->
                     <div class="card-body">
                         <div class="media">
-                            <div class="avatar avatar-xl mr-3">
+                            {{-- <div class="avatar avatar-xl mr-3">
                                 <p>{{\App\CPU\translate('image')}}</p>
-                            </div>
+                            </div> --}}
 
                             <div class="media-body">
                                 <div class="row">
-                                    <div class="col-md-4 product-name">
+                                    <div class="col-md-3 product-name">
                                         <p> {{\App\CPU\translate('Name')}}</p>
                                     </div>
 
@@ -227,10 +227,17 @@
                                     <div class="col col-md-1 align-self-center">
                                         <p>Q</p>
                                     </div>
-                                    <div class="col col-md-1 align-self-center  p-0 product-name">
+                                    {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
                                         <p> {{\App\CPU\translate('TAX')}}</p>
+                                    </div> --}}
+                                     {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
+                                        <p> {{\App\CPU\translate('Offer Type')}}</p>
+                                    </div> --}}
+                                     <div class="col col-md-1 align-self-center  p-0 product-name">
+                                        <p> {{\App\CPU\translate('Q_Offer')}}</p>
                                     </div>
-                                    <div class="col col-md-2 align-self-center  p-0 product-name">
+
+                                    <div class="col col-md-2 d-flex align-self-center justify-content-end p-0 product-name">
                                         <p> {{\App\CPU\translate('Discount')}}</p>
                                     </div>
 
@@ -249,8 +256,8 @@
 
                             @if($detail->product)
                                 @if ($key==0)
-                                    @if($detail->product->added_by=='admin')
-                                        <div class="row">
+                                     @if($detail->product->added_by=='admin')
+                                        {{-- <div class="row">
                                             <img
                                                 class="avatar-img" style="width: 55px;height: 55px; border-radius: 50%;"
                                                 onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
@@ -262,10 +269,10 @@
                                                     {{ \App\CPU\Helpers::get_business_settings('company_name')}}
                                                 </a>
                                             </p>
-                                        </div>
+                                        </div> --}}
                                     @else
 
-                                    @php($shop = \App\Model\Shop::where('seller_id','=',$detail->seller_id)->first())
+                                    {{-- @php($shop = \App\Model\Shop::where('seller_id','=',$detail->seller_id)->first())
                                         @if (isset($shop))
                                             <div class="row">
                                                 <img
@@ -282,9 +289,9 @@
                                                     aria-expanded="false"></i>
                                                 </p>
                                             </div>
-                                        @endif
+                                        @endif --}}
 
-                                        @php($seller = App\Model\Seller::with('shop')->find($detail->seller_id))
+                                        {{-- @php($seller = App\Model\Seller::with('shop')->find($detail->seller_id))
                                         @if (isset($seller))
                                             <div class="collapse" id="sellerInfoCollapse-{{ $detail->id }}">
                                                 <div class="row card-body mb-3">
@@ -310,29 +317,29 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif
+                                        @endif --}}
                                     @endif
                                 @endif
                             <!-- Media -->
                                 <div class="media">
-                                    <div class="avatar avatar-xl mr-3">
+                                    {{-- <div class="avatar avatar-xl mr-3">
                                         <img class="img-fluid"
                                              onerror="this.src='{{asset('public/assets/back-end/img/160x160/img2.jpg')}}'"
                                              src="{{\App\CPU\ProductManager::product_image_path('thumbnail')}}/{{$detail->product['thumbnail']}}"
                                              alt="Image Description">
-                                    </div>
+                                    </div> --}}
 
                                     <div class="media-body">
                                         <div class="row">
-                                            <div class="col-md-4 mb-3 mb-md-0 product-name">
-                                                <p>
-                                                    {{substr($detail->product['name'],0,30)}}{{strlen($detail->product['name'])>10?'...':''}}</p>
-                                                <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong>
+                                            <div class="col-md-3 mb-3 mb-md-0 product-name">
 
-                                                <div class="font-size-sm text-body">
+                                                <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank" rel="noopener noreferrer">{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</a>
+                                                {{-- <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong> --}}
+
+                                                {{-- <div class="font-size-sm text-body">
 
                                                     <span class="font-weight-bold">{{$detail['variant']}}</span>
-                                                </div>
+                                                </div> --}}
                                             </div>
 
                                             <div class="col col-md-2 align-self-center p-0 ">
@@ -343,11 +350,21 @@
 
                                                 <h5>{{$detail->qty}}</h5>
                                             </div>
-                                            <div class="col col-md-1 align-self-center  p-0 product-name">
+                                            {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
 
                                                 <h5>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($detail['tax']))}}</h5>
+                                            </div> --}}
+
+                                              {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
+
+                                                <h5>{{$detail['offerType']}}</h5>
+                                            </div> --}}
+
+                                             <div class="col col-md-1 align-self-center  p-0 product-name">
+
+                                                <h5>{{$detail['total_qty']}}</h5>
                                             </div>
-                                            <div class="col col-md-2 align-self-center  p-0 product-name">
+                                            <div class="col col-md-2 align-self-center d-flex  justify-content-end p-0 product-name">
 
                                                 <h5>
                                                     {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($detail['discount']))}}</h5>
@@ -411,7 +428,7 @@
                     </div>
                     <div class="card-body text-capitalize">
                         <ul class="list-unstyled list-unstyled-py-2">
-                            <li>
+                            {{-- <li>
                                 <h6 class="" style="color: #8a8a8a;">
                                     {{\App\CPU\translate('shipping_type')}}
                                     : {{str_replace('_',' ',$order->shipping_type)}}
@@ -424,7 +441,7 @@
                                     : {{$order->shipping ? $order->shipping->title :'No shipping method selected'}}
                                 </h6>
                             </li>
-                            @endif
+                            @endif --}}
                             <li>
                                 <select class="form-control text-capitalize" name="delivery_type" onchange="choose_delivery_type(this.value)">
                                     <option value="0">
@@ -454,7 +471,7 @@
                                     @endforeach
                                 </select>
                             </li>
-                            <li class=" mt-2" id="by_third_party_delivery_service_info">
+                            {{-- <li class=" mt-2" id="by_third_party_delivery_service_info">
                                 <span>
                                     {{\App\CPU\translate('delivery_service_name')}} : {{$order->delivery_service_name}}
                                 </span>
@@ -467,7 +484,7 @@
                                 <span>
                                     {{\App\CPU\translate('tracking_id')}} : {{$order->third_party_delivery_tracking_id}}
                                 </span>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                 </div>
@@ -475,7 +492,12 @@
                 <div class="card">
                     <!-- Header -->
                     <div class="card-header">
-                        <h4 class="card-header-title">{{\App\CPU\translate('Customer type : ')}}{{$order['customer_type']}}</h4>
+                        @if ($status==true)
+                        <h4 class="card-header-title">{{\App\CPU\translate('Sales Man Details :')}}</h4>
+                        @else
+                        <h4 class="card-header-title">{{\App\CPU\translate('Pharmacy Details :')}}</h4>
+                        @endif
+
                     </div>
                     <!-- End Header -->
 
@@ -539,7 +561,7 @@
 
                             <hr>
 
-                            @if($order->customer_type=="مندوب" || $order->customer_type=="representative" || $customerDetails!=null)
+                            @if($status==false && $customerDetails!=null)
 
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5>{{\App\CPU\translate('pharmacy')}} {{\App\CPU\translate('info')}} </h5>

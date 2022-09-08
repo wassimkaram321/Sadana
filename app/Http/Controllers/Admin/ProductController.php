@@ -895,6 +895,7 @@ class ProductController extends BaseController
             $product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
             //dd($collection['العرض المميز']);
 
+            $countUpdate=0;
             if (isset($product)) {
                 $product->unit_price = $collection['السعر'];
                 $product->current_stock = $collection['الكمية'];
@@ -909,6 +910,7 @@ class ProductController extends BaseController
                 $product->demand_limit = $collection['حد الطلب'];
                 $product->store_id = $store_id;
                 $product->save();
+                $countUpdate++;
             } else {
 
                 array_push($data, [
@@ -949,7 +951,7 @@ class ProductController extends BaseController
         if (count($data) > 0) {
             DB::table('products')->insert($data);
         }
-        Toastr::success(count($data) . ' - Products imported successfully!');
+        Toastr::success(count($data) . ' - Products imported successfully! and ('.$countUpdate.') Products updated successfully!');
         return back();
     }
 
@@ -1024,7 +1026,7 @@ class ProductController extends BaseController
 
 
         $data = [];
-        $dataUpdate = [];
+        $statusUpdate=0;
         $skip = ['youtube_video_url', 'details', 'thumbnail'];
 
         foreach ($collections as $collection) {
@@ -1040,10 +1042,11 @@ class ProductController extends BaseController
             if (isset($product)) {
                 $product->purchase_price = $collection['السعر'];
                 $product->save();
+                $statusUpdate++;
             }
         }
 
-        Toastr::success(count($data) . ' - Products purchase_price imported successfully!');
+        Toastr::success('('.$statusUpdate. ') Products purchase price updated successfully!');
         return back();
     }
 }

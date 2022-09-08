@@ -53,10 +53,8 @@ class PassportAuthController extends Controller
             'password' => bcrypt($request->password),
             //'temporary_token' => $temporary_token,
         ]);
-
-
-
-
+        $user->user_type="pharmacist";
+        $user->save();
         $pharmacy=Pharmacy::create([
             'name' => $request->pharmacy_name,
             'land_number' => $request->land_number,
@@ -74,7 +72,7 @@ class PassportAuthController extends Controller
 
         $user->pharmacy()->save($pharmacy);
 
-    
+
         // $phone_verification = Helpers::get_business_settings('phone_verification');
         // $email_verification = Helpers::get_business_settings('email_verification');
         // if ($phone_verification && !$user->is_phone_verified) {

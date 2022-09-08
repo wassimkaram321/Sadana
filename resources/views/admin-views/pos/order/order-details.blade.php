@@ -127,10 +127,10 @@
                                         {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('Method')}}
                                         : {{str_replace('_',' ',$order['payment_method'])}}
                                     </h6>
-                                    <h6 class="" style="color: #8a8a8a;">
+                                    {{-- <h6 class="" style="color: #8a8a8a;">
                                         {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('reference')}}
                                         : {{str_replace('_',' ',$order['transaction_ref'])}}
-                                    </h6>
+                                    </h6> --}}
                                 </div>
                             </div>
                         </div>
@@ -140,13 +140,13 @@
                     <!-- Body -->
                     <div class="card-body">
                         <div class="media">
-                            <div class="avatar avatar-xl mr-3">
+                            {{-- <div class="avatar avatar-xl mr-3">
                                 <p>{{\App\CPU\translate('image')}}</p>
-                            </div>
+                            </div> --}}
 
                             <div class="media-body">
                                 <div class="row">
-                                    <div class="col-md-4 product-name">
+                                    <div class="col-md-3 product-name">
                                         <p> {{\App\CPU\translate('Name')}}</p>
                                     </div>
 
@@ -158,9 +158,9 @@
                                         <p>Q</p>
                                     </div>
                                     <div class="col col-md-1 align-self-center  p-0 product-name">
-                                        <p> {{\App\CPU\translate('TAX')}}</p>
+                                        <p> {{\App\CPU\translate('Q_offer')}}</p>
                                     </div>
-                                    <div class="col col-md-2 align-self-center  p-0 product-name">
+                                    <div class="col col-md-2 d-flex align-self-center justify-content-end p-0 product-name">
                                         <p> {{\App\CPU\translate('Discount')}}</p>
                                     </div>
 
@@ -185,24 +185,24 @@
 
                             <!-- Media -->
                                 <div class="media">
-                                    <div class="avatar avatar-xl mr-3">
+                                    {{-- <div class="avatar avatar-xl mr-3">
                                         <img class="img-fluid"
                                              onerror="this.src='{{asset('public/assets/back-end/img/160x160/img2.jpg')}}'"
                                              src="{{\App\CPU\ProductManager::product_image_path('thumbnail')}}/{{$detail->product['thumbnail']}}"
                                              alt="Image Description">
-                                    </div>
+                                    </div> --}}
 
                                     <div class="media-body">
                                         <div class="row">
-                                            <div class="col-md-4 mb-3 mb-md-0 product-name">
-                                                <p>
-                                                    {{substr($detail->product['name'],0,30)}}{{strlen($detail->product['name'])>10?'...':''}}</p>
-                                                <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong>
+                                            <div class="col-md-3 mb-3 mb-md-0 product-name">
+                                                {{-- <p>{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</p> --}}
+                                                <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank" rel="noopener noreferrer">{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</a>
+                                                {{-- <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong> --}}
 
-                                                <div class="font-size-sm text-body">
+                                                {{-- <div class="font-size-sm text-body">
 
                                                     <span class="font-weight-bold">{{$detail['variant']}}</span>
-                                                </div>
+                                                </div> --}}
                                             </div>
 
                                             <div class="col col-md-2 align-self-center p-0 ">
@@ -215,9 +215,9 @@
                                             </div>
                                             <div class="col col-md-1 align-self-center  p-0 product-name">
 
-                                                <h5>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($detail['tax']))}}</h5>
+                                                <h5>{{$detail['total_qty']}}</h5>
                                             </div>
-                                            <div class="col col-md-2 align-self-center  p-0 product-name">
+                                            <div class="col col-md-2 d-flex align-self-center justify-content-end  p-0 product-name">
 
                                                 <h5>
                                                     {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($detail['discount']))}}</h5>
@@ -283,13 +283,53 @@
                 <!-- End Card -->
             </div>
 
+
+
+
+
+
+            {{-- selsect pharma --}}
             <div class="col-lg-4">
+                @if($status==true)
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h4>{{\App\CPU\translate('Choose a pharmacy')}}</h4>
+                    </div>
+                    <div class="card-body text-capitalize">
+                        <ul class="list-unstyled list-unstyled-py-2">
+                            <li id="choose_delivery_man">
+                                <select class="form-control text-capitalize js-select2-custom" name="pharmacy_man_id" onchange="addPharmacy(this.value)">
+                                    <option
+                                        value="0">{{\App\CPU\translate('select')}}</option>
+                                    @foreach($pharmacies as $pharmacy)
+                                        <option
+                                            value="{{$pharmacy['id']}}" {{$order['orderBy_id']==$pharmacy['id']?'selected':''}}>
+                                            {{$pharmacy['name'].' ('.$pharmacy['land_number'].' )'}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </li>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
+
+
                 <!-- Card -->
                 <div class="card">
                     <!-- Header -->
+                    @if ($status==true)
                     <div class="card-header">
-                        <h4 class="card-header-title">{{\App\CPU\translate('Customer')}}</h4>
+                        <h4 class="card-header-title">{{\App\CPU\translate('Sales Man details :')}}</h4>
                     </div>
+                    @else
+                    <div class="card-header">
+                        <h4 class="card-header-title">{{\App\CPU\translate('Pharmacy Details :')}}</h4>
+                    </div>
+                    @endif
+
                     <!-- End Header -->
 
                     <!-- Body -->
@@ -304,9 +344,21 @@
                                         alt="Image">
                                 </div>
                                 <div class="media-body">
-                                <span
-                                    class="text-body text-hover-primary">{{$order->customer['f_name'].' '.$order->customer['l_name']}}</span>
+
+                                    @if($status==true)
+                                    <a
+                                    href="{{route('admin.sales-man.preview',[$order->customer['id']])}}">
+                                    {{$order->customer['f_name'].' '.$order->customer['l_name']}}
+                                   </a>
+                                   @else
+                                   <a href="{{route('admin.customer.view',[$order->customer['id']])}}">
+                                    {{\Illuminate\Support\Str::limit($order->customer['f_name']." ".$order->customer['l_name'],20)}}
+                                   </a>
+                                    @endif
                                 </div>
+
+
+
                                 <div class="media-body text-right">
                                     {{--<i class="tio-chevron-right text-body"></i>--}}
                                 </div>
@@ -497,22 +549,24 @@
     </script>
 
     <script>
-        function addDeliveryMan(id) {
+
+
+        function addPharmacy(id) {
             $.ajax({
                 type: "GET",
-                url: '{{url('/')}}/admin/orders/add-delivery-man/{{$order['id']}}/' + id,
+                url: '{{url('/')}}/admin/orders/add-pharmacy-man/{{$order['id']}}/' + id,
                 data: {
                     'order_id': '{{$order['id']}}',
-                    'delivery_man_id': id
+                    'pharmacy_man_id': id
                 },
                 success: function (data) {
                     if (data.status == true) {
-                        toastr.success('Delivery man successfully assigned/changed', {
+                        toastr.success('pharmacy successfully assigned/changed', {
                             CloseButton: true,
                             ProgressBar: true
                         });
                     } else {
-                        toastr.error('Deliveryman man can not assign/change in that status', {
+                        toastr.error('pharmacy man can not assign/change in that status', {
                             CloseButton: true,
                             ProgressBar: true
                         });
@@ -526,6 +580,10 @@
                 }
             });
         }
+
+
+
+
 
         function last_location_view() {
             toastr.warning('Only available when order is out for delivery!', {

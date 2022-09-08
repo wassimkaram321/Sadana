@@ -266,24 +266,23 @@ class OrderManager
         $seller_data = Cart::where(['cart_group_id' => $cart_group_id])->first();
 
         $shipping_method = CartShipping::where(['cart_group_id' => $cart_group_id])->first();
-        if(isset($shipping_method))
-        {
+        if (isset($shipping_method)) {
             $shipping_method_id = $shipping_method->shipping_method_id;
-        }else{
+        } else {
             $shipping_method_id = 0;
         }
 
         $shipping_model = Helpers::get_business_settings('shipping_method');
         if ($shipping_model == 'inhouse_shipping') {
-            $admin_shipping = ShippingType::where('seller_id',0)->first();
-            $shipping_type = isset($admin_shipping)==true? $admin_shipping->shipping_type:'order_wise';
+            $admin_shipping = ShippingType::where('seller_id', 0)->first();
+            $shipping_type = isset($admin_shipping) == true ? $admin_shipping->shipping_type : 'order_wise';
         } else {
-            if($seller_data->seller_is == 'admin'){
-                $admin_shipping = ShippingType::where('seller_id',0)->first();
-                $shipping_type = isset($admin_shipping)==true? $admin_shipping->shipping_type:'order_wise';
-            }else{
-                $seller_shipping = ShippingType::where('seller_id',$seller_data->seller_id)->first();
-                $shipping_type = isset($seller_shipping)==true? $seller_shipping->shipping_type:'order_wise';
+            if ($seller_data->seller_is == 'admin') {
+                $admin_shipping = ShippingType::where('seller_id', 0)->first();
+                $shipping_type = isset($admin_shipping) == true ? $admin_shipping->shipping_type : 'order_wise';
+            } else {
+                $seller_shipping = ShippingType::where('seller_id', $seller_data->seller_id)->first();
+                $shipping_type = isset($seller_shipping) == true ? $seller_shipping->shipping_type : 'order_wise';
             }
         }
 
@@ -319,12 +318,32 @@ class OrderManager
 
         foreach (CartManager::get_cart($data['cart_group_id']) as $c) {
             $product = Product::where(['id' => $c['product_id']])->first();
+
+
+
+            $total_qty = 0;
+            $offerType='no offer';
+
+            if ($product->q_featured_offer!=0 &&  $product->featured_offer != 0) {
+                $total_qty = ((int)($c['quantity'] / $product->q_featured_offer)) * $product->featured_offer;
+                $offerType='featured';
+            }
+            if($total_qty==0)
+            {
+                if ($product->q_normal_offer!=0 && $product->normal_offer !=0) {
+                    $total_qty = ((int)($c['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                    $offerType='normal';
+                }
+            }
+
             $or_d = [
                 'order_id' => $order_id,
                 'product_id' => $c['product_id'],
                 'seller_id' => $c['seller_id'],
                 'product_details' => $product,
                 'qty' => $c['quantity'],
+                'total_qty' => $total_qty,
+                'offerType' => $offerType,
                 'price' => $c['price'],
                 'tax' => $c['tax'] * $c['quantity'],
                 'discount' => $c['discount'] * $c['quantity'],
@@ -353,11 +372,10 @@ class OrderManager
             }
 
             Product::where(['id' => $product['id']])->update([
-                'current_stock' => $product['current_stock'] - $c['quantity']
+                'current_stock' => $product['current_stock'] - $c['quantity'] - $total_qty
             ]);
 
             DB::table('order_details')->insert($or_d);
-
         }
 
         if ($or['payment_method'] != 'cash_on_delivery') {
@@ -433,7 +451,6 @@ class OrderManager
             //     $seller = Admin::where(['admin_role_id' => 1])->first();
             // }
             Mail::to($seller->email)->send(new \App\Mail\OrderReceivedNotifySeller($order_id));
-
         } catch (\Exception $exception) {
         }
 

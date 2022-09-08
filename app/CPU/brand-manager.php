@@ -20,10 +20,10 @@ class BrandManager
                     'added_by', 'user_id', 'category_ids', 'slug',
                     'flash_deal', 'video_provider', 'video_url', 'colors',
                     'variant_product', 'attributes', 'choice_options', 'variation',
-                    'published', 'purchase_price', 'tax', 'tax_type','attachment',
+                    'published', 'tax', 'tax_type','attachment',
                     'meta_title', 'meta_description', 'meta_image', 'request_status','denied_note',
                     'temp_shipping_cost', 'is_shipping_cost_updated', 'store_id', 'num_id',
-                    'created_at', 'updated_at','min_qty'
+                    'created_at', 'updated_at','min_qty','multiply_qty','shipping_cost',
                 ]
             )
         , true);

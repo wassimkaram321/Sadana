@@ -562,6 +562,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('update-deliver-info', 'OrderController@update_deliver_info')->name('update-deliver-info');
             Route::get('add-delivery-man/{order_id}/{d_man_id}', 'OrderController@add_delivery_man')->name('add-delivery-man');
 
+            Route::get('add-pharmacy-man/{order_id}/{d_man_id}', 'OrderController@add_pharmacy_man')->name('add-pharmacy-man');
+
            //generate excel file
             Route::get('generate-excel/{order_id}', 'OrderController@generate_excel')->name('generate-excel');
         });

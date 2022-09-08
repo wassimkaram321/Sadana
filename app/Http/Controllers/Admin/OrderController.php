@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-
 use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
@@ -11,7 +10,6 @@ use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
 use App\Model\Product;
-
 use App\Model\Seller;
 use App\Model\ShippingAddress;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -19,6 +17,8 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Pharmacy;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -29,8 +29,7 @@ class OrderController extends Controller
         $query_param = [];
         $search = $request['search'];
 
-        if (session()->has('show_inhouse_orders') && session('show_inhouse_orders') == 1)
-        {
+        if (session()->has('show_inhouse_orders') && session('show_inhouse_orders') == 1) {
             $query = Order::whereHas('details', function ($query) {
                 $query->whereHas('product', function ($query) {
                     $query->where('added_by', 'admin');
@@ -42,10 +41,8 @@ class OrderController extends Controller
             } else {
                 $orders = $query;
             }
-        } else
-        {
-            if ($status != 'all')
-            {
+        } else {
+            if ($status != 'all') {
                 $orders = Order::with(['customer'])->where(['order_status' => $status]);
             } else {
                 $orders = Order::with(['customer']);
@@ -54,8 +51,7 @@ class OrderController extends Controller
 
         Order::where(['checked' => 0])->update(['checked' => 1]);
 
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $orders = $orders->where(function ($q) use ($key) {
                 foreach ($key as $value) {
@@ -68,8 +64,7 @@ class OrderController extends Controller
         }
 
         if ($request->has('customer_type')) {
-            if($request['customer_type']!='all')
-            {
+            if ($request['customer_type'] != 'all') {
                 $key = explode(' ', $request['customer_type']);
                 //dd($key);
                 $orders = $orders->where(function ($q) use ($key) {
@@ -106,24 +101,25 @@ class OrderController extends Controller
         })->get();
 
         $shipping_address = ShippingAddress::find($order->shipping_address);
+        $customerDetails = User::where('id', $order->customer_id)->get()->first();
 
-        if($order->orderBy_id!=null)
-        {
-            $customerDetails=User::where('id',$order->customer_id)->get()->first();
+        $status=false;
+        if ($order->orderBy_id != null) {
 
+            $pharmacy = User::where('id',$order->orderBy_id)->get()->first();
+            $status=true;
             if ($order->order_type == 'default_type') {
-                return view('admin-views.order.order-details', compact('shipping_address', 'order', 'linked_orders', 'delivery_men','customerDetails'));
+                return view('admin-views.order.order-details', compact('pharmacy','status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'customerDetails'));
             } else {
-                return view('admin-views.pos.order.order-details', compact('order','shipping_address'));
+                return view('admin-views.pos.order.order-details', compact('pharmacy','status','order', 'shipping_address'));
             }
         }
 
-
         if ($order->order_type == 'default_type') {
-            $customerDetails=User::where('id',$order->customer_id)->get()->first();
-            return view('admin-views.order.order-details', compact('shipping_address', 'order', 'linked_orders', 'delivery_men','customerDetails'));
+            $status=false;
+            return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'customerDetails'));
         } else {
-            return view('admin-views.pos.order.order-details', compact('order','shipping_address'));
+            return view('admin-views.pos.order.order-details', compact('status','order', 'shipping_address'));
         }
     }
 
@@ -156,6 +152,26 @@ class OrderController extends Controller
             }
         } catch (\Exception $e) {
             Toastr::warning(\App\CPU\translate('Push notification failed for DeliveryMan!'));
+        }
+
+        return response()->json(['status' => true], 200);
+    }
+
+
+    public function add_pharmacy_man($order_id, $pharmacy_man_id)
+    {
+        if ($pharmacy_man_id == 0) {
+            return response()->json([], 401);
+        }
+
+        try {
+            $order = Order::find($order_id);
+            $order->orderBy_id = $pharmacy_man_id;
+            $order->save();
+
+        }catch (\Exception $e) {
+            Toastr::warning(\App\CPU\translate('failed for Pharmacy!'));
+            return response()->json([], 401);
         }
 
         return response()->json(['status' => true], 200);
@@ -259,49 +275,52 @@ class OrderController extends Controller
     }
 
 
-     public function  generate_excel(Request $request)
+    public function  generate_excel(Request $request)
     {
 
         $orderDetails = OrderDetail::where('order_id', $request->order_id)->get();
         $storage = [];
         foreach ($orderDetails as $item) {
             $orderProduct = Product::where('id', $item->product_id)->get()->first();
-            $product_details=json_decode($item->product_details);
-            $qtyOffers=0;
+            $product_details = json_decode($item->product_details);
+            $qtyOffers = 0;
 
-            if($orderProduct->q_normal_offer!=0)
-            {
-                $qtyOffers=((int)($item->qty/$orderProduct->q_normal_offer))*$orderProduct->normal_offer;
+            if (isset($orderProduct->q_normal_offer) && $orderProduct->q_normal_offer != 0) {
+                $qtyOffers = ((int)($item->qty / $orderProduct->q_normal_offer)) * $orderProduct->normal_offer;
             }
 
-            if($orderProduct->q_featured_offer!=0)
-            {
-                $qtyOffers=((int)($item->qty/$orderProduct->q_featured_offer))*$orderProduct->featured_offer;
-
+            if (isset($orderProduct->q_featured_offer) &&  $orderProduct->q_featured_offer != 0) {
+                $qtyOffers = ((int)($item->qty / $orderProduct->q_featured_offer)) * $orderProduct->featured_offer;
             }
-            $storage[] = [
-                'اسم المادة' =>  $orderProduct->name,
-                'كمية المادة' => $item->qty,
-                'بونص المادة' => $qtyOffers,
-                'سعر المادة' => $item->price,
-                'تاريخ انتهاء الصلاحية' => $orderProduct->expiry_date,
-            ];
+            if (isset($orderProduct->name) && isset($orderProduct->expiry_date)) {
+                $storage[] = [
+                    'اسم المادة' =>  $orderProduct->name,
+                    'كمية المادة' => $item->qty,
+                    'بونص المادة' => $qtyOffers,
+                    'سعر المادة' => $item->price,
+                    'تاريخ انتهاء الصلاحية' => $orderProduct->expiry_date,
+                ];
+            } else {
+                $storage[] = [
+                    'اسم المادة' =>  "غير معروف",
+                    'كمية المادة' => $item->qty,
+                    'بونص المادة' => $qtyOffers,
+                    'سعر المادة' => $item->price,
+                    'تاريخ انتهاء الصلاحية' => "0000-00-00",
+                ];
+            }
         }
 
         $userName = User::where('id', $product_details->user_id)->get()->first();
-        $xlsx=".xlsx";
-        if(isset($userName->name))
-        {
-            $result = $userName->name.''.now().''.$xlsx;
-        }
-        else
-        {
-            $result = $orderProduct->name.'-'.now().''.$xlsx;
+        $xlsx = ".xlsx";
+        if (isset($userName->name)) {
+            $result = $userName->name . '' . now() . '' . $xlsx;
+        } elseif (isset($orderProduct->name)) {
+            $result = $orderProduct->name . '-' . now() . '' . $xlsx;
+        } else {
+            $result = now() . '' . $xlsx;
         }
 
         return (new FastExcel($storage))->download($result);
     }
-
-
-
 }

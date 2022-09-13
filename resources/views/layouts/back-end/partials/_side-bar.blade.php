@@ -436,10 +436,16 @@
                                 </a>
                             </li>
                             -->
+
+
+
+
+
+
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/product/list/in_house') || Request::is('admin/product/bulk-import') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
-                                <i class="fa fa-medkit nav-icon"></i>
+                                <i class="fa fa-plus-square nav-icon"></i>
                                 <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
                                     <span class="text-truncate">{{ \App\CPU\translate('InHouse Products') }}</span>
                                 </span>
@@ -475,6 +481,40 @@
                                 </li>
                             </ul>
                         </li>
+
+
+
+
+                        {{-- Bag Products --}}
+                        <li
+                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/bag/add-new') || Request::is('admin/bag/list') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
+                                <i class="fa fa-medkit nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                    <span class="text-truncate">{{ \App\CPU\translate('Bag Products') }}</span>
+                                </span>
+                            </a>
+                            <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
+                                style="display: {{ Request::is('admin/bag*') ? 'block' : 'none' }}">
+                                <li class="nav-item {{ Request::is('admin/bag/add-new') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.bag.add-new') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('add_new') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/product/bag-list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.bag.list') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('List') }}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+
+
+
+
                         {{-- <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/product/list/seller*')?'active':''}}">
                         <li
@@ -1046,7 +1086,7 @@
                                     </a>
                                 </li>
 
-                               <li
+                                <li
                                     class="nav-item {{Request::is('admin/business-settings/privacy-policy')?'active':''}}">
                                     <a class="nav-link" href="{{route('admin.business-settings.privacy-policy')}}">
                                         <span class="tio-circle nav-indicator-icon"></span>
@@ -1114,60 +1154,65 @@
                         <!--web & app settings ends here-->
 
                         @if (\App\CPU\Helpers::module_permission_check('report'))
-                         <li class="nav-item {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') || Request::is('admin/report/order') || Request::is('admin/report/earning') ? 'scroll-here' : '' }}">
-                                <small class="nav-subtitle" title="">
-                                    {{ \App\CPU\translate('Report') }}& {{ \App\CPU\translate('Analytics') }}
-                                </small>
-                                <small class="tio-more-horizontal nav-subtitle-replacer"></small>
-                            </li>
+                        <li
+                            class="nav-item {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') || Request::is('admin/report/order') || Request::is('admin/report/earning') ? 'scroll-here' : '' }}">
+                            <small class="nav-subtitle" title="">
+                                {{ \App\CPU\translate('Report') }}& {{ \App\CPU\translate('Analytics') }}
+                            </small>
+                            <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+                        </li>
 
-                            <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/earning') ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link"
-                                   href="{{ route('admin.report.earning') }}">
-                                    <i class="tio-chart-pie-1 nav-icon"></i>
-                                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                                       {{ \App\CPU\translate('Earning') }} {{ \App\CPU\translate('Report') }}
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/order') ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link"
-                                   href="{{ route('admin.report.order') }}">
-                                    <i class="tio-chart-bar-1 nav-icon"></i>
-                                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                                     {{ \App\CPU\translate('Order') }} {{ \App\CPU\translate('Report') }}
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') ? 'active' : '' }}">
-                                <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle"
-                                   href="javascript:">
-                                    <i class="tio-chart-bar-4 nav-icon"></i>
-                                    <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                                        {{ \App\CPU\translate('sale_report') }}
-                                    </span>
-                                </a>
-                                <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
-                                    style="display: {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') ? 'block' : 'none' }}">
-                                    <li class="nav-item {{ Request::is('admin/report/inhoue-product-sale') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('admin.report.inhoue-product-sale') }}">
-                                            <span class="tio-circle nav-indicator-icon"></span>
-                                            <span class="text-truncate">
-                                                {{ \App\CPU\translate('inhouse') }} {{ \App\CPU\translate('sale') }}
-                                            </span>
-                                        </a>
-                                    </li>
-                                    {{-- <li class="nav-item {{ Request::is('admin/report/seller-product-sale') ? 'active' : '' }}">
-                                        <a class="nav-link" href="{{ route('admin.report.seller-product-sale') }}">
-                                            <span class="tio-circle nav-indicator-icon"></span>
-                                            <span class="text-truncate text-capitalize">
-                                                {{ \App\CPU\translate('seller') }} {{ \App\CPU\translate('sale') }}
-                                            </span>
-                                        </a>
-                                    </li> --}}
-                                </ul>
-                            </li>
-@endif
+                        <li
+                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/earning') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link"
+                                href="{{ route('admin.report.earning') }}">
+                                <i class="tio-chart-pie-1 nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                    {{ \App\CPU\translate('Earning') }} {{ \App\CPU\translate('Report') }}
+                                </span>
+                            </a>
+                        </li>
+                        <li
+                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/order') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link"
+                                href="{{ route('admin.report.order') }}">
+                                <i class="tio-chart-bar-1 nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                    {{ \App\CPU\translate('Order') }} {{ \App\CPU\translate('Report') }}
+                                </span>
+                            </a>
+                        </li>
+                        <li
+                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
+                                <i class="tio-chart-bar-4 nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                    {{ \App\CPU\translate('sale_report') }}
+                                </span>
+                            </a>
+                            <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
+                                style="display: {{ Request::is('admin/report/inhoue-product-sale') || Request::is('admin/report/seller-product-sale') ? 'block' : 'none' }}">
+                                <li
+                                    class="nav-item {{ Request::is('admin/report/inhoue-product-sale') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.report.inhoue-product-sale') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">
+                                            {{ \App\CPU\translate('inhouse') }} {{ \App\CPU\translate('sale') }}
+                                        </span>
+                                    </a>
+                                </li>
+                                {{-- <li
+                                    class="nav-item {{ Request::is('admin/report/seller-product-sale') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.report.seller-product-sale') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate text-capitalize">
+                                            {{ \App\CPU\translate('seller') }} {{ \App\CPU\translate('sale') }}
+                                        </span>
+                                    </a>
+                                </li> --}}
+                            </ul>
+                        </li>
+                        @endif
 
                         <!--reporting and analysis ends here-->
 
@@ -1305,7 +1350,7 @@
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/sales-man*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
-                                <i class="tio-user nav-icon"></i>
+                                <i class="fa fa-user-md nav-icon"></i>
                                 <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
                                     {{ \App\CPU\translate('sales-man') }}
                                 </span>

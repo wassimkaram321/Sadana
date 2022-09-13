@@ -93,6 +93,13 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('products/{brand_id}', 'BrandController@get_products');
     });
 
+    Route::group(['prefix' => 'bags'], function () {
+        Route::get('list', 'BagController@get_bags');
+        Route::get('products/list', 'BagController@get_bag_products');
+
+    });
+
+
     Route::group(['prefix' => 'attributes'], function () {
         Route::get('/', 'AttributeController@get_attributes');
     });

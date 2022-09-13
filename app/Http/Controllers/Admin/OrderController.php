@@ -106,18 +106,20 @@ class OrderController extends Controller
         $status=false;
         if ($order->orderBy_id != null) {
 
-            $pharmacy = User::where('id',$order->orderBy_id)->get()->first();
+             $pharmacy = Pharmacy::where('id',$order->orderBy_id)->get()->first();
+             $UserPharmacy = User::where('id',$pharmacy->user_id)->get()->first();
+
             $status=true;
             if ($order->order_type == 'default_type') {
-                return view('admin-views.order.order-details', compact('pharmacy','status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'customerDetails'));
+                return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy','UserPharmacy'));
             } else {
-                return view('admin-views.pos.order.order-details', compact('pharmacy','status','order', 'shipping_address'));
+                return view('admin-views.pos.order.order-details', compact('status','order', 'shipping_address', 'pharmacy','UserPharmacy'));
             }
         }
 
         if ($order->order_type == 'default_type') {
             $status=false;
-            return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'customerDetails'));
+            return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men'));
         } else {
             return view('admin-views.pos.order.order-details', compact('status','order', 'shipping_address'));
         }

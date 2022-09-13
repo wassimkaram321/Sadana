@@ -14,7 +14,7 @@ class AddColOfferTypeToOrderDetails extends Migration
     public function up()
     {
         Schema::table('order_details', function (Blueprint $table) {
-            $table->string('offerType')->default(0);
+            $table->string('offerType');
         });
     }
 

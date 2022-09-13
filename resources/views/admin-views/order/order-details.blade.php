@@ -493,9 +493,9 @@
                     <!-- Header -->
                     <div class="card-header">
                         @if ($status==true)
-                        <h4 class="card-header-title">{{\App\CPU\translate('Sales Man Details :')}}</h4>
+                        <h4 class="card-header-title">{{\App\CPU\translate('Sales Man info :')}}</h4>
                         @else
-                        <h4 class="card-header-title">{{\App\CPU\translate('Pharmacy Details :')}}</h4>
+                        <h4 class="card-header-title">{{\App\CPU\translate('Pharmacy info :')}}</h4>
                         @endif
 
                     </div>
@@ -561,21 +561,25 @@
 
                             <hr>
 
-                            @if($status==false && $customerDetails!=null)
+                            @if($status==true && $UserPharmacy!=null && $pharmacy!=null)
 
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5>{{\App\CPU\translate('pharmacy')}} {{\App\CPU\translate('info')}} </h5>
+                                <h5>{{\App\CPU\translate('pharmacy')}} {{\App\CPU\translate('info :')}}{{$pharmacy['name']}}</h5>
+
                             </div>
 
                             <ul class="list-unstyled list-unstyled-py-2">
                                 <li>
                                     <i class="tio-online mr-2"></i>
-                                    {{$customerDetails['f_name']}}{{$customerDetails['l_name']}}
+                                    <span>{{\App\CPU\translate('Name: ')}}</span>
+                                    {{$UserPharmacy['name']}}
                                 </li>
                                 <li>
                                     <i class="tio-android-phone-vs mr-2"></i>
-                                    {{$customerDetails['phone']}}
+                                    <span>{{\App\CPU\translate('phone: ')}}</span>
+                                    {{$UserPharmacy['phone']}}
                                 </li>
+
                             </ul>
                             <hr>
                             @else

@@ -163,7 +163,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('add-new', 'StoresController@add_new')->name('add-new');
             Route::post('add-new', 'StoresController@store');
             Route::get('list', 'StoresController@list')->name('list');
-            Route::get('update/{id}', 'StoresController@edit')->name('update');
+            Route::get('edit/{id}', 'StoresController@edit')->name('update');
             Route::post('update/{id}', 'StoresController@update');
             Route::post('delete', 'StoresController@delete')->name('delete');
         });
@@ -357,15 +357,42 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('bulk-export', 'ProductController@bulk_export_data')->name('bulk-export');
 
             Route::post('bulk-import-price', 'ProductController@bulk_import_data_purchase_price')->name('bulk-import-price');
+
         });
 
 
-        //transaction
+
+        //Bags routes details
+        Route::group(['prefix' => 'bag', 'as' => 'bag.', 'middleware' => ['module:product_management']], function () {
+
+            //bag routes
+           Route::get('list', 'BagController@bag_list')->name('list');
+           Route::get('add-new', 'BagController@bag_add_new')->name('add-new');
+           Route::post('store', 'BagController@bag_store')->name('store');
+
+
+           Route::get('edit/{id}', 'BagController@bag_edit')->name('edit');
+           Route::post('update/{id}', 'BagController@bag_update')->name('update');
+
+           Route::post('delete', 'BagController@bag_delete')->name('delete');
+
+
+           //bag products routes
+           Route::get('products/list/{id}', 'BagController@bag_products_list')->name('products-list');
+           Route::post('products/store/{bag_id}', 'BagController@bag_products_store')->name('products-store');
+           Route::post('products/delete', 'BagController@bag_products_delete')->name('products-delete');
+
+       });
+
+
+
+
+
+
         Route::group(['prefix' => 'transaction', 'as' => 'transaction.', 'middleware' => ['module:business_section']], function () {
             Route::get('list', 'TransactionController@list')->name('list');
             Route::get('refund-list', 'RefundTransactionController@list')->name('refund-list');
         });
-
 
 
         //business-settings

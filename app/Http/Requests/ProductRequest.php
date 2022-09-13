@@ -19,31 +19,25 @@ class ProductRequest extends FormRequest
     public function rules()
     {
             $rules = [
+                'products.*.store_name' => ['required','string'],
+                'products.*.brand' => ['required','string'],
+                'products.*.brand_id' => ['numeric'],
+                'products.*.store_id' => ['numeric'],
                 'products.*.name' => ['required','string'],
-                'products.*.description' => ['required','string'],
-                'products.*.unit' => ['required','string'],
-                'products.*.brand_id' =>  ['required', 'numeric'],
-                'products.*.discount_type' => ['required', 'string'],
-
-                'products.*.discount' =>  ['required', 'numeric'],
                 'products.*.unit_price' => ['required', 'numeric'],
-                //'products.*.lang' => ['required', 'string'],
-                'products.*.store_id' => ['required', 'numeric'],
-
-                'products.*.current_stock' => ['required', 'numeric'],
                 'products.*.purchase_price' => ['required', 'numeric'],
-                'products.*.tax' => ['required', 'numeric'],
-                'products.*.tax_type' => ['required', 'string'],
-
-                'products.*.shipping_cost' => ['required', 'numeric'],
-
+                'products.*.quantity' => ['required', 'numeric'],
+                'products.*.notes' => ['required','string'],
+                'products.*.Scientific_formula' => ['required','string'],
+                'products.*.q_normal_offer' => ['required', 'numeric'],
+                'products.*.q_featured_offer' => ['required', 'numeric'],
+                'products.*.normal_offer' => ['required', 'numeric'],
+                'products.*.featured_offer' => ['required', 'numeric'],
                 'products.*.production_date' => ['required', 'date'],
                 'products.*.expiry_date' => ['required', 'date'],
+                'products.*.demand_limit' => ['required', 'numeric'],
                 'products.*.num_id' => ['required', 'numeric'],
 
-                'products.*.image' => ['file','mimes:jpg,jpeg,png', 'max:3000'],
-
-                'products.*.thumbnail_image' => ['file','mimes:jpg,jpeg,png', 'max:3000'],
             ];
 
         switch ($this->method()) {

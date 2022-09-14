@@ -382,6 +382,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
            Route::post('products/store/{bag_id}', 'BagController@bag_products_store')->name('products-store');
            Route::post('products/delete', 'BagController@bag_products_delete')->name('products-delete');
 
+
+           Route::post('status-update', 'BagController@status_update')->name('status-update');
        });
 
 

@@ -118,6 +118,12 @@ class BagController extends BaseController
                 'products_bag.product_price', 'products_bag.product_total_price',
             ]);
 
+        $price = DB::table('products_bag')->where('bag_id', $id)->sum('product_total_price');
+        $bag = Bag::findOrFail($id);
+        $bag->total_price_offer = $price;
+        $bag->save();
+
+
         $br = Product::get();
         $users = DB::table('products')
             ->select('id', 'name')
@@ -144,9 +150,9 @@ class BagController extends BaseController
         $bagProduct->product_total_price = $product->unit_price * $request->product_count;
         $bagProduct->save();
 
-        $price = DB::table('products_bag')->where('bag_id',$bag_id)->sum('product_total_price');
-        $bag =Bag::findOrFail($bag_id);
-        $bag->total_price_offer=$price;
+        $price = DB::table('products_bag')->where('bag_id', $bag_id)->sum('product_total_price');
+        $bag = Bag::findOrFail($bag_id);
+        $bag->total_price_offer = $price;
         $bag->save();
         Toastr::success('Product added successfully!');
         return back();
@@ -157,5 +163,20 @@ class BagController extends BaseController
         $bag = BagProduct::findOrFail($request->id);
         $bag->delete();
         Toastr::success('Product deleted successfully!');
+    }
+
+    public function status_update(Request $request)
+    {
+        $bag = Bag::where(['id' => $request['id']])->get()->first();
+        $success = 1;
+        if ($request['status'] == 1) {
+                $bag->bag_status = $request['status'];
+        }else{
+            $bag->bag_status = $request['status'];
+        }
+        $bag->save();
+        return response()->json([
+            'success' => $success,
+        ], 200);
     }
 }

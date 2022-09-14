@@ -26,12 +26,12 @@
 
 
 
-                    <div >
-                        <form class="row" action="{{route('admin.bag.products-store',[$bag_id])}}" method="post" enctype="multipart/form-data">
+                    {{-- <div > --}}
+                        <form class="row w-100 align-items-center" action="{{route('admin.bag.products-store',[$bag_id])}}" method="post" enctype="multipart/form-data">
                             @csrf
-                            <div class="col-md-6">
+                            <div class="col-md-4 w-100">
                                 <select
-                                    class="js-example-basic-multiple js-states js-example-responsive form-control"
+                                    class="w-100 js-example-basic-multiple js-states js-example-responsive form-control"
                                     name="product_id" required>
                                     <option value="{{null}}" selected disabled>---{{\App\CPU\translate('Select')}}---</option>
                                     @foreach($br as $b)
@@ -40,21 +40,27 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6 d-flex align-items-center">
+                            <div class="col-md-4 d-flex align-items-center w-100">
                                 <input type="number" min="0" value="0" step="0.01"
-                                placeholder="Count"
-                                    name="product_count" class="js-example-basic-multiple form-control"
+                                    placeholder="Count"
+                                    name="product_count" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;">
                             </div>
 
 
-                            <button class="col-md-6" type="submit" class="btn btn-primary">{{
-                                \App\CPU\translate('Add_product')}}
-                            </button>
+                            {{-- <a class="btn btn-primary" id="{{$b['id']}}">
+                                {{ \App\CPU\translate('Add_product')}}
+                            </a> --}}
+                            <div class="col-md-4 w-100">
+                                <button type="submit" class="btn btn-primary w-100" style="border: none;appearance: none;border-radius: 5px;height:40px">
+                                    {{\App\CPU\translate('Add_product')}}
+                                </button>
+                            </div>
+
 
                         </form>
 
-                    </div>
+                    {{-- </div> --}}
                 </div>
 
 

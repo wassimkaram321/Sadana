@@ -66,7 +66,16 @@
                                         <td>{{$b['bag_name']}}</td>
                                         <td>{{$b['bag_description']}}</td>
                                         <td>{{$b['total_price_offer']}}</td>
-                                        <td>{{$b['bag_status']}}</td>
+
+
+                                        <td>
+                                            <label class="switch switch-status">
+                                                <input type="checkbox" class="status"
+                                                       id="{{$b['id']}}" {{$b['bag_status'] == 1?'checked':''}}>
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </td>
+
                                         <td>{{$b['end_date']}}</td>
 
                                         <td>
@@ -148,5 +157,42 @@
                 }
             })
         });
+
+
+        $(document).on('change', '.status', function () {
+            var id = $(this).attr("id");
+            if ($(this).prop("checked") == true) {
+                var status = 1;
+            } else if ($(this).prop("checked") == false) {
+                var status = 0;
+            }
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "{{route('admin.bag.status-update')}}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    status: status
+                },
+                success: function (data) {
+                    if(data.success == true) {
+                        toastr.success('{{\App\CPU\translate('Status updated successfully')}}');
+                    }
+                    else if(data.success == false) {
+                        toastr.error('{{\App\CPU\translate('Status updated failed. Product must be approved')}}');
+                        setTimeout(function(){
+                            location.reload();
+                        }, 2000);
+                    }
+                }
+            });
+        });
+
+
+
     </script>
 @endpush

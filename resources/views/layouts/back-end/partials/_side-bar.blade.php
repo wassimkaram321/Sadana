@@ -48,6 +48,7 @@
     }
 </style>
 
+
 <div id="sidebarMain" class="d-none">
     <aside
         style="background: #ffffff!important; text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};"
@@ -341,7 +342,9 @@
                                     </a>
                                 </li>
 
-                                {{-- <li
+
+
+                                <li
                                     class="nav-item {{ Request::is('admin/pharmacy/bulk-import') ? 'active' : '' }}">
                                     <a class="nav-link " href="{{ route('admin.pharmacy.bulk-import') }}">
                                         <span class="tio-circle nav-indicator-icon"></span>
@@ -349,7 +352,7 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item {{ Request::is('admin/pharmacy/bulk-export') ? 'active' : '' }}">
+                                {{-- <li class="nav-item {{ Request::is('admin/pharmacy/bulk-export') ? 'active' : '' }}">
                                     <a class="nav-link " href="{{ route('admin.pharmacy.bulk-export') }}">
                                         <span class="tio-circle nav-indicator-icon"></span>
                                         <span class="text-truncate">{{ \App\CPU\translate('bulk_export') }}</span>
@@ -664,6 +667,31 @@
                                 </span>
                             </a>
                         </li>
+
+
+                        {{-- bag --}}
+                        <li
+                        class="navbar-vertical-aside-has-menu {{  Request::is('admin/city/list') ? 'active' : '' }}">
+                        <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
+                          <i class="tio-photo-square-outlined nav-icon"></i>
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                <span class="text-truncate">{{ \App\CPU\translate('Cities') }}</span>
+                            </span>
+                        </a>
+                        <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
+                            style="display: {{ Request::is('admin/city*') ? 'block' : 'none' }}">
+
+                            <li class="nav-item {{ Request::is('admin/product/city-list') ? 'active' : '' }}">
+                                <a class="nav-link " href="{{ route('admin.city.list') }}">
+                                    <span class="tio-circle nav-indicator-icon"></span>
+                                    <span class="text-truncate">{{ \App\CPU\translate('List') }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+
+
                         {{-- <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/stock/product-in-wishlist')?'active':''}}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"

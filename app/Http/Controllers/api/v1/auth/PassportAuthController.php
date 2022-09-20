@@ -5,6 +5,8 @@ namespace App\Http\Controllers\api\v1\auth;
 use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\User;
+use App\Model\City;
+use App\Model\Area;
 use App\Pharmacy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -30,8 +32,8 @@ class PassportAuthController extends Controller
             'to' => 'required',
             'statusToday' => 'required',
             'Address' => 'required',
-            'city' => 'required',
-            'region' => 'required',
+            'city_id' => 'required',
+            'region_id' => 'required',
             'lat' => 'required',
             'lng' => 'required',
         ]);
@@ -40,17 +42,24 @@ class PassportAuthController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 404);
         }
 
+        $area=Area::where('id', $request->region_id)->get()->first();
+        $city=City::where('id',$area->city_id)->get()->first();
+
         //$temporary_token = Str::random(40);
+
+        //return response()->json(['token' => $area], 200);
         $user = User::create([
             'name'=> $request->f_name.' '.$request->l_name,
             'f_name' => $request->f_name,
             'l_name' => $request->l_name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'city' => $request->city,
+            'city' => $city->city_name,
+            'country'=>"syria",
             'is_active' => 0,
             'is_phone_verified'=>1,
             'password' => bcrypt($request->password),
+            'area_id' => $area->id,
             //'temporary_token' => $temporary_token,
         ]);
         $user->user_type="pharmacist";
@@ -62,11 +71,11 @@ class PassportAuthController extends Controller
             'to' => $request->to,
             'statusToday' => $request->statusToday,
             'Address' => $request->Address,
-            'city' => $request->city,
+            'city' => $city->city_name,
             'user_type_id' => "pharmacist",
             'lat' => $request->lat,
             'lan' => $request->lng,
-            'region'=> $request->region,
+            'region'=> $area->area_name,
             'user_id'=>$user->id
         ]);
 

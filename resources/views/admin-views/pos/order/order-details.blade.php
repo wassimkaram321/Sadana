@@ -196,7 +196,8 @@
                                         <div class="row">
                                             <div class="col-md-3 mb-3 mb-md-0 product-name">
                                                 {{-- <p>{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</p> --}}
-                                                <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank" rel="noopener noreferrer">{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</a>
+                                                {{-- <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank" rel="noopener noreferrer">{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</a> --}}
+                                                <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank" rel="noopener noreferrer">{{$detail->product['name']}}</a>
                                                 {{-- <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong> --}}
 
                                                 {{-- <div class="font-size-sm text-body">

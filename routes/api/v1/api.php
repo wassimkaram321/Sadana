@@ -87,6 +87,24 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::post('update', 'PharmacyController@edit')->name('update');
     });
 
+    Route::group(['prefix' => 'pharmacy'], function () {
+        Route::post('store', 'PharmacyController@store')->name('store');
+        Route::post('update', 'PharmacyController@edit')->name('update');
+    });
+
+
+
+    Route::group(['prefix' => 'city'], function () {
+        Route::get('areas', 'RegionsController@get_areas');
+    });
+
+    Route::group(['prefix' => 'cities'], function () {
+        Route::get('/', 'RegionsController@get_cities');
+    });
+
+
+
+
 
     Route::group(['prefix' => 'brands'], function () {
         Route::get('/', 'BrandController@get_brands');

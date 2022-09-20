@@ -4,20 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\User;
 use function App\CPU\translate;
-
 use App\Http\Controllers\Controller;
 use App\Pharmacy;
 use Illuminate\Http\Request;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\DB;
+use App\Model\City;
+use App\Model\Area;
 
 class SalesManController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
         //
@@ -70,24 +67,60 @@ class SalesManController extends Controller
     {
         $sm= User::where(['id' => $id])->first();
         $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?',[$id]);
+        $area_id  = DB::select('select area_id from sales_area where sales_id = ?',[$id]);
+        // $city_id  = DB::select('select city_id from sales_city where sales_id = ?',[$id]);
 
         $arr = array();
         foreach($pharma_id as $idx){
             array_push($arr,$idx->pharmacy_id);
         }
 
+        $arrArea = array();
+        foreach($area_id as $idx){
+            array_push($arrArea,$idx->area_id);
+        }
+
+        // $arrCity = array();
+        // foreach($city_id as $idc){
+        //     array_push($arrCity,$idc->city_id);
+        // }
+
         $pharmacies = Pharmacy::whereIn('id' ,$arr)->paginate(5);
+        $areas = Area::whereIn('id' ,$arrArea)->paginate(5);
+        // $cities = City::whereIn('id' ,$arrCity)->paginate(5);
+
         if(count($arr) >0){
             $all_pharmacies = Pharmacy::whereNotIn('id',$arr)->get();
         }
         else{
             $all_pharmacies = Pharmacy::all();
         }
-        return view('admin-views.sales-man.view', compact('sm','pharmacies','all_pharmacies'));
 
+        if(count($arrArea) >0){
+            $all_areas = Area::whereNotIn('id',$arrArea)->get();
+
+            $all_areas_assign = Area::join("cities", "cities.id", "=", "areas.city_id")
+            ->where("areas.id", $arrArea)
+            ->get();
+
+        }
+        else{
+            $all_areas = Area::all();
+        }
+
+        // if(count($arrCity) >0){
+        //     $all_cities = City::whereNotIn('id',$arrCity)->get();
+        // }
+        // else{
+        //     $all_cities = City::all();
+        // }
+
+        return view('admin-views.sales-man.view', compact('sm','pharmacies','all_pharmacies','all_areas','all_areas_assign'));
     }
 
 
+
+    //Pharmecy
     public function unassign($id){
         DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
         return redirect()->back();
@@ -103,6 +136,52 @@ class SalesManController extends Controller
     }
 
 
+
+
+    //Area
+    public function unassign_area($id){
+        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
+        return redirect()->back();
+    }
+
+
+    public function assign_area(Request $request , $id){
+        $areas_id = $request->assigned_areas;
+        foreach($areas_id as $area_id){
+            DB::insert('insert into sales_area (sales_id, area_id) values (?, ?)', [$id, $area_id]);
+            $users = User::with(['pharmacy'])->where('area_id', $area_id)->where('user_type','pharmacist')->get();
+            foreach($users as $user){
+                $pharmacy = Pharmacy::where('user_id',$user->id)->get()->first();
+                DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
+            }
+        }
+        return redirect()->back();
+    }
+
+
+    //City
+    // public function unassign_city($id){
+    //     DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
+    //     return redirect()->back();
+    // }
+
+
+    // public function assign_city(Request $request , $id){
+    //     $pharmacies = $request->assigned_pharmacies;
+    //     foreach($pharmacies as $pharma){
+    //         $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
+    //     }
+    //     return redirect()->back();
+    // }
+
+
+
+
+
+
+
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -111,9 +190,14 @@ class SalesManController extends Controller
             'phone' => 'required',
             'email' => 'required|unique:users',
             'phone' => 'required|unique:users',
+            'area_id' => 'required',
+            'city_id' => 'required',
         ], [
             'f_name.required' => 'First name is required!'
         ]);
+
+        $area=Area::where('id', $request->area_id)->get()->first();
+        $city=City::where('id',$area->city_id)->get()->first();
 
         $sm = new User();
         $sm->user_type= 'salesman';
@@ -121,6 +205,11 @@ class SalesManController extends Controller
         $sm->f_name = $request->f_name;
         $sm->l_name = $request->l_name;
         $sm->email = $request->email;
+
+        $sm->area_id = $request->area_id;
+        $sm->city = $city->city_name;
+        $sm->country = "syria";
+
         $sm->phone = $request->phone;
         $sm->password = bcrypt($request->password);
         $sm->save();
@@ -150,6 +239,8 @@ class SalesManController extends Controller
             'f_name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
             'phone' => 'required|unique:users,phone,'.$id,
+            'area_id' => 'required',
+            'city_id' => 'required',
         ], [
             'f_name.required' => 'First name is required!'
         ]);
@@ -161,12 +252,18 @@ class SalesManController extends Controller
             ]);
         }
 
+        $area=Area::where('id', $request->region_id)->get()->first();
+        $city=City::where('id',$area->city_id)->get()->first();
 
         $sales_man->user_type = 'salesman';
         $sales_man->f_name = $request->f_name;
         $sales_man->l_name = $request->l_name;
         $sales_man->email = $request->email;
         $sales_man->phone = $request->phone;
+
+        $sales_man->area_id = $request->area_id;
+        $sales_man->city = $city->city_name;
+
         $sales_man->password = strlen($request->password) > 1 ? bcrypt($request->password) : $sales_man['password'];
         $sales_man->save();
 
@@ -184,5 +281,22 @@ class SalesManController extends Controller
         $sales_man->delete();
         Toastr::success(translate('Sales-man removed!'));
         return back();
+    }
+
+
+    public function areas(Request $request,$catId)
+    {
+        if(isset($request->city_id))
+        {
+            $city_id = $request->city_id;
+        }else
+        {
+            $city_id = $catId;
+        }
+
+        $areas = Area::where('city_id',$city_id)->get();
+        return response()->json([
+            'areas' => $areas
+        ]);
     }
 }

@@ -387,6 +387,21 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
        });
 
 
+       Route::group(['prefix' => 'city', 'as' => 'city.', 'middleware' => ['module:business_section']], function () {
+       //city
+       Route::get('list', 'CityController@city_list')->name('list');
+       Route::post('store', 'CityController@city_store')->name('store');
+       Route::post('delete', 'CityController@city_delete')->name('delete');
+       Route::post('status-update', 'BagController@city_status_update')->name('status-update');
+
+       //area
+       Route::get('areas/list/{id}', 'AreaController@city_areas_list')->name('area-list');
+       Route::post('area/store/{bag_id}', 'AreaController@area_store')->name('area-store');
+       Route::post('area/delete', 'AreaController@area_delete')->name('area-delete');
+
+   });
+
+
 
 
 
@@ -701,11 +716,23 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('edit/{id}', 'SalesManController@edit')->name('edit');
             Route::post('update/{id}', 'SalesManController@update')->name('update');
             Route::get('preview/{id}', 'SalesManController@preview')->name('preview');
+
+            Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
+
+
             Route::post('unassign/{id}', 'SalesManController@unassign')->name('unassign');
             Route::post('assign/{id}', 'SalesManController@assign')->name('assign');
 
-        });
 
+            Route::post('unassign-area/{id}', 'SalesManController@unassign_area')->name('unassign-area');
+            Route::post('assign-area/{id}', 'SalesManController@assign_area')->name('assign-area');
+
+
+            // Route::post('unassign-city/{id}', 'SalesManController@unassign_city')->name('unassign-city');
+            // Route::post('assign-city/{id}', 'SalesManController@assign_city')->name('assign-city');
+
+
+        });
 
 
 
@@ -723,6 +750,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
     /*Route::get('login', 'testController@login')->name('login');*/
 });
+
+
+
+
 
 
 

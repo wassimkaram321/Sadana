@@ -160,7 +160,7 @@
 
                                     <div class="col-md-4">
                                         <label for="name">{{ \App\CPU\translate('Scientific formula') }}</label>
-                                        <input type="text" value={{$product->scientific_formula}} name="scientific_formula"
+                                        <input type="text" value="{{$product->scientific_formula}}" name="scientific_formula"
                                             class="js-example-basic-multiple form-control" style="width: 100%;">
                                     </div>
 

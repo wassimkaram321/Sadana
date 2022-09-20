@@ -39,13 +39,32 @@ class BagController extends BaseController
             });
             $query_param = ['search' => $request['search']];
         } else {
-            $br = new bag();
+            $br = new Bag();
         }
         $br = $br->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
         return view('admin-views.bag.list', compact('br', 'search'));
     }
 
+//Done
+public function bag_add_new()
+{
+    $br = Bag::latest()->paginate(Helpers::pagination_limit());
+    return view('admin-views.bag.add-new', compact('br'));
+}
 
+//Done
+public function bag_store(Request $request)
+{
+    $bag = new Bag;
+    $bag->bag_name = $request->bag_name;
+    $bag->bag_description = $request->bag_description;
+    $bag->end_date = $request->end_date;
+    $bag->bag_image = ImageManager::upload('bag/', 'png', $request->file('bag_image'));
+    $bag->bag_status = 1;
+    $bag->save();
+    Toastr::success('bag added successfully!');
+    return back();
+}
     //Done
     public function bag_edit($id)
     {
@@ -82,33 +101,13 @@ class BagController extends BaseController
         return response()->json();
     }
 
-    //Done
-    public function bag_add_new()
-    {
-        $br = Bag::latest()->paginate(Helpers::pagination_limit());
-        return view('admin-views.bag.add-new', compact('br'));
-    }
 
-    //Done
-    public function bag_store(Request $request)
-    {
-        $bag = new Bag;
-        $bag->bag_name = $request->bag_name;
-        $bag->bag_description = $request->bag_description;
-        $bag->end_date = $request->end_date;
-        $bag->bag_image = ImageManager::upload('bag/', 'png', $request->file('bag_image'));
-        $bag->bag_status = 1;
-        $bag->save();
-        Toastr::success('store added successfully!');
-        return back();
-    }
 
 
     //Bag produts fun
     //Done
     public function bag_products_list(Request $request, $id)
     {
-
         $bag_products = BagProduct::join("products", "products.id", "=", "products_bag.product_id")
             ->where("products_bag.bag_id", $id)
             ->get([

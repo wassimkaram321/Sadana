@@ -1,6 +1,6 @@
 @extends('layouts.back-end.app')
 
-@section('title', \App\CPU\translate('bag products List'))
+@section('title', \App\CPU\translate('City Areas List'))
 
 @push('css_or_js')
 <link href="{{asset('public/assets/back-end/css/tags-input.min.css')}}" rel="stylesheet">
@@ -12,7 +12,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-2">
-        <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('bag_products_list')}} </h1>
+        <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('city_areas_list')}} </h1>
     </div>
 
     <div class="row" style="margin-top: 20px">
@@ -22,36 +22,27 @@
                 <div class="card-header">
 
                     {{-- <div > --}}
-                        <form class="row w-100 align-items-center" action="{{route('admin.bag.products-store',[$bag_id])}}" method="post" enctype="multipart/form-data">
+                        <form class="row w-100 align-items-center" action="{{route('admin.city.area-store',[$city_id])}}" method="post" enctype="multipart/form-data">
                             @csrf
-                            <div class="col-md-4 w-100">
-                                <select
-                                    class="w-100 js-example-basic-multiple js-states js-example-responsive form-control"
-                                    name="product_id" required>
-                                    <option value="{{null}}" selected disabled>---{{\App\CPU\translate('Select')}}---</option>
-                                    @foreach($br as $b)
-                                        <option value="{{$b['id']}}">{{$b['name']}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
 
                             <div class="col-md-4 d-flex align-items-center w-100">
-                                <input type="number" min="0" value="0" step="0.01"
-                                    placeholder="Count"
-                                    name="product_count" class="w-100 js-example-basic-multiple form-control"
+                                <input type="text"
+                                  placeholder="Area name"
+                                    name="area_name" class="w-100 js-example-basic-multiple form-control"
+                                    style="width: 100%;">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center w-100">
+                                <input type="number"
+                                    placeholder="Number"
+                                    name="area_num" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;">
                             </div>
 
-
-                            {{-- <a class="btn btn-primary" id="{{$b['id']}}">
-                                {{ \App\CPU\translate('Add_product')}}
-                            </a> --}}
                             <div class="col-md-4 w-100">
                                 <button type="submit" class="btn btn-primary w-100" style="border: none;appearance: none;border-radius: 5px;height:40px">
-                                    {{\App\CPU\translate('Add_product')}}
+                                    {{\App\CPU\translate('Add_Area')}}
                                 </button>
                             </div>
-
 
                         </form>
 
@@ -72,11 +63,8 @@
                                         {{ \App\CPU\translate('bag')}} {{ \App\CPU\translate('ID')}}
                                     </th>
                                     <th scope="col">{{ \App\CPU\translate('Name')}}</th>
-                                    <th scope="col">{{ \App\CPU\translate('price')}}</th>
-                                    <th scope="col">{{ \App\CPU\translate('Count')}}</th>
-                                    <th scope="col">{{ \App\CPU\translate('Total_price')}}</th>
-                                    <th scope="col">{{ \App\CPU\translate('Image')}}</th>
-                                    <th scope="col" style="width: 100px" class="text-center">
+                                    <th scope="col">{{ \App\CPU\translate('Num')}}</th>
+                                    <th>
                                         {{ \App\CPU\translate('Action')}}
                                     </th>
                                 </tr>
@@ -87,28 +75,13 @@
                                 $i=1;
                                 @endphp
 
-                                @foreach($bag_products as $b)
+                                @foreach($city_areas as $b)
                                 <tr>
                                     <td class="text-center">{{$i}}</td>
                                     <td>
-                                        <a href="{{route('admin.product.view',[$b['product_id']])}}">
-                                            {{\Illuminate\Support\Str::limit($b['name'],30)}}
-                                        </a>
+                                            {{$b['area_name']}}
                                     </td>
-
-                                    <td>{{$b['product_price']}}</td>
-                                    <td>{{$b['product_count']}}</td>
-                                    <td>{{$b['product_total_price']}}</td>
-
-                                    <td>
-                                        <img style="width: 60px;height: 60px"
-                                            onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                                            src="{{asset('storage/app/public/product/thumbnail')}}/{{$b['"
-                                            thumbnail"']}}">
-                                    </td>
-
-
-
+                                    <td>{{$b['area_num']}}</td>
                                     <td>
                                         <a class="btn btn-danger btn-sm delete" id="{{$b['id']}}">
                                             <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete')}}
@@ -153,11 +126,11 @@
                         }
                     });
                     $.ajax({
-                        url: "{{route('admin.bag.products-delete')}}",
+                        url: "{{route('admin.city.area-delete')}}",
                         method: 'POST',
                         data: {id: id},
                         success: function () {
-                            toastr.success('{{ \App\CPU\translate('Product_deleted_successfully')}}');
+                            toastr.success('{{ \App\CPU\translate('Area_deleted_successfully')}}');
                             location.reload();
                         }
                     });

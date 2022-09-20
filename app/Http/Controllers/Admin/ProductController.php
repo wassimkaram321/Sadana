@@ -555,6 +555,7 @@ class ProductController extends BaseController
             'q_normal_offer' => 'required|numeric',
             'normal_offer' => 'required|numeric',
             'scientific_formula' => 'required',
+            'store_id' => 'required'
 
 
         ], [
@@ -600,6 +601,7 @@ class ProductController extends BaseController
         }
         $product->category_ids = json_encode($category);
         $product->brand_id = $request->brand_id;
+        $product->store_id = $request->store_id;
         $product->unit = $request->unit;
         $product->details = $request->description[array_search('en', $request->lang)];
 

@@ -2062,4 +2062,35 @@
   'Area' => 'Area',
   'REGION' => 'REGION',
   'Regions' => 'Regions',
+  'Group' => 'Group',
+  'City groups List' => 'City groups List',
+  'city_groups_list' => 'City groups list',
+  'Add_Group' => 'Add Group',
+  'group' => 'Group',
+  'group_deleted_successfully' => 'Group deleted successfully',
+  'group_areas_list' => 'Group areas list',
+  'area' => 'Area',
+  'Confirmation' => 'Confirmation',
+  'You can download the example file to understand how the data must be
+                    filled' => 'You can download the example file to understand how the data must be
+                    filled',
+  'Once you have downloaded and filled the format file, upload it in the form
+                    below and submit' => 'Once you have downloaded and filled the format file  upload it in the form
+                    below and submit',
+  'After uploading products you need to edit them and set product images and
+                    choices' => 'After uploading products you need to edit them and set product images and
+                    choices',
+  'You can get brand and category id from their list, please input the right
+                    ids' => 'You can get brand and category id from their list  please input the right
+                    ids',
+  'pharmacy__list ' => 'Pharmacy  list ',
+  'Active : ' => 'Active : ',
+  'Out_of_service : ' => 'Out of service : ',
+  'pharmacies' => 'Pharmacies',
+  'pharmacies_table' => 'Pharmacies table',
+  'Search pharmacy Name' => 'Search pharmacy Name',
+  'Out_of_service' => 'Out of service',
+  'InActive' => 'InActive',
+  'Active :' => 'Active :',
+  'InActive:' => 'InActive:',
 );

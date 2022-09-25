@@ -19,21 +19,18 @@ class PharmicesRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'Pharmacies.*.f_name' => ['required', 'string'],
-            'Pharmacies.*.l_name' => ['required', 'string'],
+            'Pharmacies.*.num_id' => ['required','numeric'],
+            'Pharmacies.*.f_name' => ['string'],
+            'Pharmacies.*.l_name' => ['string'],
             'Pharmacies.*.phone' => ['required', 'numeric'],
-            'Pharmacies.*.email' => ['required', 'string','email'],
-            'Pharmacies.*.password' => ['required', 'string'],
             'Pharmacies.*.name' => ['required', 'string'],
             'Pharmacies.*.land_number' => ['required', 'numeric'],
-            'Pharmacies.*.from' => ['required', 'string'],
-            'Pharmacies.*.to' => ['required', 'string'],
-            'Pharmacies.*.statusToday' => ['required', 'string'],
-            'Pharmacies.*.Address' => ['required', 'string'],
+            'Pharmacies.*.address' => ['required', 'string'],
+            'Pharmacies.*.card_number' => ['required', 'numeric'],
             'Pharmacies.*.city' => ['required', 'string'],
-            'Pharmacies.*.lat' => ['required', 'string'],
-            'Pharmacies.*.lan' => ['required', 'string'],
             'Pharmacies.*.region' => ['required', 'string'],
+            'Pharmacies.*.group' => ['required', 'string'],
+            'Pharmacies.*.is_active' => ['required', 'string'],
 
         ];
 

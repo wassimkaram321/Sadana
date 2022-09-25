@@ -6,6 +6,7 @@ use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Model\City;
+use App\Model\Group;
 use App\Model\Area;
 use App\Pharmacy;
 use Illuminate\Http\Request;
@@ -42,7 +43,9 @@ class PassportAuthController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 404);
         }
 
-        $area=Area::where('id', $request->region_id)->get()->first();
+
+        $area = Area::where('id',$request->region_id)->get()->first();
+        $group = Group::where('id',$area->group_id)->get()->first();
         $city=City::where('id',$area->city_id)->get()->first();
 
         //$temporary_token = Str::random(40);
@@ -55,7 +58,7 @@ class PassportAuthController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'city' => $city->city_name,
-            'country'=>"syria",
+            'country'=>$group->group_name,
             'is_active' => 0,
             'is_phone_verified'=>1,
             'password' => bcrypt($request->password),

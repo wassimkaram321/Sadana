@@ -17,8 +17,8 @@ class CreateUserImportTable extends Migration
             $table->text('password');
             $table->string('street_address');
             $table->bigInteger('city_id');
-            $table->bigInteger('area_id');
             $table->bigInteger('group_id');
+            $table->bigInteger('area_id');
             $table->boolean('is_active');
             $table->text('lat');
             $table->text('lng');
@@ -30,10 +30,29 @@ class CreateUserImportTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('users', function (Blueprint $table) {
+        Schema::create('group_area', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('city_id');
+            $table->string('group_name');
+            $table->boolean('group_status')->default(1);
+            $table->bigInteger('group_num')->default(0);
+            $table->timestamps();
+            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
+        });
+
+        Schema::create('areas', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('group_id');
+            $table->string('area_name');
+            $table->boolean('area_status')->default(1);
+            $table->bigInteger('area_num')->default(0);
+            $table->timestamps();
+            $table->foreign('group_id')->references('id')->on('group_area')->onDelete('cascade');
+
+        });
+
+        Schema::table('pharmacies', function (Blueprint $table) {
             $table->double('card_number');
-            $table->bigInteger('group_id');
-            $table->foreign('area_id')->references('id')->on('areas')->onDelete('cascade');
         });
     }
 

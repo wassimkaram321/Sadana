@@ -19,24 +19,19 @@ class ProductRequest extends FormRequest
     public function rules()
     {
             $rules = [
-                'products.*.store_name' => ['required','string'],
-                'products.*.brand' => ['required','string'],
-                'products.*.brand_id' => ['numeric'],
-                'products.*.store_id' => ['numeric'],
+                'products.*.brand_id' => ['numeric','required'],
+                'products.*.store_id' => ['numeric','required'],
                 'products.*.name' => ['required','string'],
                 'products.*.unit_price' => ['required', 'numeric'],
                 'products.*.purchase_price' => ['required', 'numeric'],
-                'products.*.quantity' => ['required', 'numeric'],
-                'products.*.notes' => ['required','string'],
-                'products.*.Scientific_formula' => ['required','string'],
-                'products.*.q_normal_offer' => ['required', 'numeric'],
-                'products.*.q_featured_offer' => ['required', 'numeric'],
-                'products.*.normal_offer' => ['required', 'numeric'],
-                'products.*.featured_offer' => ['required', 'numeric'],
-                'products.*.production_date' => ['required', 'date'],
-                'products.*.expiry_date' => ['required', 'date'],
-                'products.*.demand_limit' => ['required', 'numeric'],
-                'products.*.num_id' => ['required', 'numeric'],
+                'products.*.quantity' => ['numeric'],
+                'products.*.notes' => ['string'],
+                'products.*.Scientific_formula' => ['string'],
+                'products.*.normal_offer' => ['string'],
+                'products.*.featured_offer' => ['string'],
+                'products.*.expiry_date' => ['date'],
+                'products.*.demand_limit' => ['numeric'],
+                'products.*.num_id' => ['required','numeric'],
 
             ];
 

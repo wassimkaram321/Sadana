@@ -67,7 +67,7 @@
                                     </th>
                                     <th scope="col">{{ \App\CPU\translate('Name')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Status')}}</th>
-                                    <th scope="col">{{ \App\CPU\translate('Areas')}}</th>
+                                    <th scope="col">{{ \App\CPU\translate('Group')}}</th>
                                     <th scope="col" style="width: 100px" class="text-center">
                                         {{ \App\CPU\translate('Action')}}
                                     </th>
@@ -89,7 +89,7 @@
 
                                         <td>
                                             <a class="btn btn-success btn-sm"
-                                               href="{{route('admin.city.area-list',[$b['id']])}}">
+                                               href="{{route('admin.city.group-list',[$b['id']])}}">
                                                 <i class="fa fa-eye"></i> {{ \App\CPU\translate('view')}}
                                             </a>
                                         </td>

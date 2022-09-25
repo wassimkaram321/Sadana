@@ -1,6 +1,6 @@
 @extends('layouts.back-end.app')
 
-@section('title', \App\CPU\translate('City Areas List'))
+@section('title', \App\CPU\translate('City groups List'))
 
 @push('css_or_js')
 <link href="{{asset('public/assets/back-end/css/tags-input.min.css')}}" rel="stylesheet">
@@ -12,7 +12,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-2">
-        <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('group_areas_list')}} </h1>
+        <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('city_groups_list')}} </h1>
     </div>
 
     <div class="row" style="margin-top: 20px">
@@ -22,25 +22,25 @@
                 <div class="card-header">
 
                     {{-- <div > --}}
-                        <form class="row w-100 align-items-center" action="{{route('admin.city.area-store',[$group_id])}}" method="post" enctype="multipart/form-data">
+                        <form class="row w-100 align-items-center" action="{{route('admin.city.group-store',[$city_id])}}" method="post" enctype="multipart/form-data">
                             @csrf
 
                             <div class="col-md-4 d-flex align-items-center w-100">
                                 <input type="text"
-                                  placeholder="Area name"
-                                    name="area_name" class="w-100 js-example-basic-multiple form-control"
+                                  placeholder="Group name"
+                                    name="group_name" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;">
                             </div>
                             <div class="col-md-4 d-flex align-items-center w-100">
                                 <input type="number"
                                     placeholder="Number"
-                                    name="area_num" class="w-100 js-example-basic-multiple form-control"
+                                    name="group_num" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;">
                             </div>
 
                             <div class="col-md-4 w-100">
                                 <button type="submit" class="btn btn-primary w-100" style="border: none;appearance: none;border-radius: 5px;height:40px">
-                                    {{\App\CPU\translate('Add_Area')}}
+                                    {{\App\CPU\translate('Add_Group')}}
                                 </button>
                             </div>
 
@@ -50,9 +50,6 @@
                 </div>
 
 
-
-
-
                 <div class="card-body" style="padding: 0">
                     <div class="table-responsive">
                         <table style="text-align: {{Session::get('direction') === " rtl" ? 'right' : 'left' }};"
@@ -60,10 +57,11 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col" style="width: 100px">
-                                        {{ \App\CPU\translate('area')}} {{ \App\CPU\translate('ID')}}
+                                        {{ \App\CPU\translate('group')}} {{ \App\CPU\translate('ID')}}
                                     </th>
                                     <th scope="col">{{ \App\CPU\translate('Name')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Num')}}</th>
+                                    <th scope="col">{{ \App\CPU\translate('Area')}}</th>
                                     <th>
                                         {{ \App\CPU\translate('Action')}}
                                     </th>
@@ -75,13 +73,21 @@
                                 $i=1;
                                 @endphp
 
-                                @foreach($group_areas as $b)
+                                @foreach($city_groups as $b)
                                 <tr>
                                     <td class="text-center">{{$i}}</td>
                                     <td>
-                                            {{$b['area_name']}}
+                                            {{$b['group_name']}}
                                     </td>
-                                    <td>{{$b['area_num']}}</td>
+                                    <td>{{$b['group_num']}}</td>
+
+                                    <td>
+                                        <a class="btn btn-success btn-sm"
+                                               href="{{route('admin.city.area-list',[$b['id']])}}">
+                                                <i class="fa fa-eye"></i> {{ \App\CPU\translate('view')}}
+                                            </a>
+                                    </td>
+
                                     <td>
                                         <a class="btn btn-danger btn-sm delete" id="{{$b['id']}}">
                                             <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete')}}
@@ -126,11 +132,11 @@
                         }
                     });
                     $.ajax({
-                        url: "{{route('admin.city.area-delete')}}",
+                        url: "{{route('admin.city.group-delete')}}",
                         method: 'POST',
                         data: {id: id},
                         success: function () {
-                            toastr.success('{{ \App\CPU\translate('Area_deleted_successfully')}}');
+                            toastr.success('{{ \App\CPU\translate('group_deleted_successfully')}}');
                             location.reload();
                         }
                     });

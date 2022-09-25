@@ -10,16 +10,16 @@ class Area extends Model
 
     protected $table = "areas";
 
-    protected $fillable = ["id" ,"area_name", "area_status", "city_id","area_num"];
+    protected $fillable = ["id" ,"area_name", "area_status", "group_id","area_num"];
 
     protected $casts = [
         'id' => 'integer',
         'area_status' => 'integer',
-        'city_id' => 'integer',
+        'group_id' => 'integer',
         'area_num' => 'integer',
     ];
 
-    public function city() {
-      return $this->belongsTo(City::class, 'city_id', 'id');
+    public function group() {
+      return $this->belongsTo(Group::class, 'group_id', 'id');
     }
 }

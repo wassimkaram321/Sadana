@@ -186,6 +186,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         Route::group(['prefix' => 'pharmacy', 'as' => 'pharmacy.', 'middleware' => ['module:product_management']], function () {
             Route::get('list/{status}', 'PharmacyController@list')->name('list');
             Route::post('delete', 'PharmacyController@destroy')->name('delete');
+
             Route::get('vip/{id}/{status}', 'PharmacyController@vip')->name('vip');
 
             Route::get('activation/{id}/{status}', 'PharmacyController@activation')->name('activation');
@@ -193,9 +194,17 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('export/{id}', 'PharmacyController@generate_excel')->name('export');
 
             Route::get('bulk-import', 'PharmacyController@bulk_import_index')->name('bulk-import');
-            Route::post('bulk-import', 'PharmacyController@bulk_import_data');
+            Route::post('bulk-import', 'PharmacyController@bulk_import_data')->name('bulk-import-excel');
             Route::get('bulk-export', 'PharmacyController@bulk_export_data')->name('bulk-export');
 
+
+        });
+
+        Route::group(['prefix' => 'pharmacyImport', 'as' => 'pharmacyImport.', 'middleware' => ['module:product_management']], function () {
+            Route::get('edit/{id}', 'PharmacyController@pharmacy_Import_edit')->name('edit');
+            Route::post('update/{id}', 'PharmacyController@pharmacy_Import_update')->name('update');
+            Route::post('delete', 'PharmacyController@pharmacy_Import_destroy')->name('delete');
+            Route::get('activation-export', 'PharmacyController@activation_export')->name('activation-export');
         });
 
 
@@ -281,6 +290,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('update/{id}', 'CustomerController@update')->name('update');
             Route::delete('delete/{id}', 'CustomerController@delete')->name('delete');
 
+
+            Route::get('groups/{cityId}', 'CustomerController@groups')->name('groups');
+            Route::get('areas/{groupId}', 'CustomerController@areas')->name('areas');
 
         });
 
@@ -394,9 +406,16 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
        Route::post('delete', 'CityController@city_delete')->name('delete');
        Route::post('status-update', 'BagController@city_status_update')->name('status-update');
 
+
+       //group
+       Route::get('groups/list/{id}', 'GroupController@city_groups_list')->name('group-list');
+       Route::post('group/store/{city_id}', 'GroupController@group_store')->name('group-store');
+       Route::post('group/delete', 'GroupController@group_delete')->name('group-delete');
+
+
        //area
-       Route::get('areas/list/{id}', 'AreaController@city_areas_list')->name('area-list');
-       Route::post('area/store/{bag_id}', 'AreaController@area_store')->name('area-store');
+       Route::get('areas/list/{id}', 'AreaController@group_areas_list')->name('area-list');
+       Route::post('area/store/{group_id}', 'AreaController@area_store')->name('area-store');
        Route::post('area/delete', 'AreaController@area_delete')->name('area-delete');
 
    });

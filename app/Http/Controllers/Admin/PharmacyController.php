@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Pharmacy;
 use App\CPU\Helpers;
+use App\Model\Product;
 use App\User;
+use App\Model\UserImportExcel;
+use App\Model\Group;
+use App\Model\City;
+use App\Model\Area;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -140,95 +145,155 @@ class PharmacyController extends Controller
     }
 
 
-    public function bulk_import_index()
+    public function bulk_import_index(Request $request)
     {
-        return view('admin-views.pharmacy.bulk-import');
+
+        $query_param = [];
+        $search = $request['search'];
+
+        $pending = false;
+
+        if ($request->has('search')) {
+            $key = explode(' ', $request['search']);
+            $pharmacies = UserImportExcel::where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->orWhere('pharmacy_name', 'like', "%{$value}%");
+                }
+            });
+            $query_param = ['search' => $request['search']];
+        } else {
+            $pharmacies = UserImportExcel::whereNotIn('id', [-2]);
+        }
+        $pharmacies = $pharmacies->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
+
+        return view('admin-views.pharmacy.bulk-import', compact('pharmacies', 'search'));
     }
 
 
     public function bulk_import_data(Request $request)
     {
-        //Toastr::success('Comming soon!');
-        // try {
-        //     $collections = (new FastExcel)->import($request->file('Customer_file'));
-        // } catch (\Exception $exception) {
-        //     Toastr::error('You have uploaded a wrong format file, please upload the right file.');
-        //     return back();
-        // }
+
+        try {
+            $collections = (new FastExcel)->import($request->file('products_file'));
+        } catch (\Exception $exception) {
+            Toastr::error('You have uploaded a wrong format file, please upload the right file.');
+            return back();
+        }
+
+        $data = [];
+        $statusUpdate = 0;
+        $statusCreate = 0;
+        $skip = ['youtube_video_url', 'details', 'thumbnail'];
+
+        foreach ($collections as $collection) {
+
+            $city_id = $this->compare_city($collection['المدينة']);
+            $group_id = $this->compare_group($collection['الكتلة'], $city_id);
+            $area_id = $this->compare_area($collection['المنطقة'], $group_id);
+            $is_active = $this->compare_active($collection['وضع الزبون']);
+
+            $name1 = trim($collection['رقم البطاقة'], " \t.");
+            $user = UserImportExcel::where('card_number', '=', $name1)->get()->first();
+            if (isset($user)) {
+                $user->card_number = $collection['رقم البطاقة'];
+                $user->pharmacy_name = $collection['الاسم'];
+                $user->land_number = $collection['هاتف 1'];
+                $user->phone2 = $collection['هاتف 2'];
+                $user->phone1 = $collection['خليوي'];
+                $user->city_id = $city_id;
+                $user->group_id = $group_id;
+                $user->area_id = $area_id;
+                $user->street_address = $collection['العنوان'];
+                $user->is_active = $is_active;
+                $user->save();
+                $statusUpdate++;
+            } else {
+                array_push($data, [
+                    'card_number' => $collection['رقم البطاقة'],
+                    'pharmacy_name' => $collection['الاسم'],
+                    'land_number' => $collection['هاتف 1'],
+                    'phone1' => $collection['هاتف 2'],
+                    'phone2' => $collection['خليوي'],
+                    'group_id' => $group_id,
+                    'city_id' => $city_id,
+                    'area_id' => $area_id,
+                    'street_address' => $collection['العنوان'],
+                    'is_active' => $is_active,
+                ]);
+                $statusCreate++;
+            }
+        }
+
+        try {
+            DB::table('user_import_excel')->insert($data);
+            Toastr::success('(' . $statusCreate . ') - Pharmacise imported successfully! & (' . $statusUpdate . ')Pharmacise updated successfully!');
+            return back();
+        } catch (\Exception $exception) {
+            Toastr::error('You have uploaded a wrong , please try again.');
+            return back();
+        }
+    }
 
 
-        // $data = [];
-        // $skip = ['التصنيف', 'ملاحظات', 'thumbnail'];
+    public function  compare_city($city)
+    {
+        $name1 = trim($city, " \t.");
+        $cityDB = City::where('city_name', '=', $name1)->get()->first();
+        if (isset($cityDB)) {
+            return $cityDB->id;
+        } else {
+            $cityNew = new City();
+            $cityNew->city_name = $city;
+            $cityNew->city_status = 1;
+            $cityNew->save();
+            return $cityNew->id;
+        }
+    }
 
-        // foreach ($collections as $collection) {
+    public function  compare_group($group, $cityId)
+    {
+        $name1 = trim($group, " \t.");
+        $groupDB = Group::where('group_name', '=',$name1)->get()->first();
+        if (isset($groupDB)) {
+            return $groupDB->id;
+        } else {
+            $groupNew = new Group();
+            $groupNew->group_name = $group;
+            $groupNew->group_status = 1;
+            $groupNew->city_id = $cityId;
+            $groupNew->save();
+            return $groupNew->id;
+        }
+    }
+    public function  compare_area($area, $groupId)
+    {
+        $name1 = trim($area, " \t.");
+        $areaDB = Area::where('area_name', '=', $name1)->get()->first();
+        if (isset($areaDB)) {
+            return $areaDB->id;
+        } else {
+            $areaNew = new Area();
+            $areaNew->area_name = $area;
+            $areaNew->area_status = 1;
+            $areaNew->group_id = $groupId;
+            $areaNew->save();
+            return $areaNew->id;
+        }
+    }
 
-        //     foreach ($collection as $key => $value) {
-        //         if ($key!="" && $value === "" && !in_array($key, $skip)) {
-        //             Toastr::error('Please fill ' . $key . ' fields');
-        //             return back();
-        //         }
-        //     }
 
-        //     if(isset($collection['اسم المستودع']))
-        //     {
-        //         $store = Store::where('store_name', 'LIKE', '%'.$collection['اسم المستودع'].'%')->get()->first();
-        //         if(isset($store))
-        //         {
-        //               $store_id=$store->id;
-        //         }else
-        //         {
-        //             $NewStore = new Store();
-        //             $NewStore->store_name = $collection['اسم المستودع'];
-        //             $NewStore->store_image='def.png';
-        //             $NewStore->store_status=1;
-        //             $NewStore->save();
-        //             $store_id=$NewStore->id;
-        //         }
-        //     }
-        //     else{
-        //         $store = Store::take(1)->first();
-        //         if(isset($store))
-        //         {
-        //             $store_id=$store->id;
-        //         }
-        //         else
-        //         {
-        //             Toastr::error('Please create a store first or Add the store name field to the uploaded file');
-        //             return back();
-        //         }
-        //     }
+    public function  compare_active($active)
+    {
+        // Declaration of strings
+        $name1 = $active;
+        $name1 = trim($name1, " \t.");
+        // Use strcmp() function
+        if (strcmp($name1, "مغلق") == 0 || strcmp($name1, "خارج الخدمة") == 0 || strcmp($name1, "خارج الخدمه") == 0) {
+            return 0;
+        } else {
+            return 1;
+        }
 
-        //     $category = [];
-        //     array_push($category, [
-        //         'id' => 9999999,
-        //         'position' => 10,
-        //     ]);
-
-        //     $brand = Brand::where('name', 'LIKE', '%'.$collection['المجموعة'].'%')->get()->first();
-        //     if(isset($brand))
-        //     {
-        //           $brand_id=$brand->id;
-        //     }else
-        //     {
-        //         $NewBrand = new Brand();
-        //         $NewBrand->name = $collection['المجموعة'];
-        //         $NewBrand->image='def.png';
-        //         $NewBrand->status=1;
-        //         $NewBrand->save();
-        //         $brand_id=$NewBrand->id;
-        //     }
-
-        //     array_push($data, [
-        //         'brand_id' => $brand_id,
-        //         'name' => $collection['اسم المادة'],
-        //         'unit_price' => $collection['السعر'],
-        //         'current_stock' => $collection['الكمية'],
-        //         'details' => $collection['الملاحظات'],
-        //     ]);
-        // }
-        // DB::table('products')->insert($data);
-        // Toastr::success(count($data) . ' - Products imported successfully!');
-        // return back();
     }
 
 
@@ -319,5 +384,26 @@ class PharmacyController extends Controller
         $xlsx = ".xlsx";
         $result = $user->name . '-' . now() . '' . $xlsx;
         return (new FastExcel($storage))->download($result);
+    }
+
+
+
+    public function pharmacy_Import_edit(Request $request,$id)
+    {
+        $pharmacy=UserImportExcel::findOrFail($id);
+
+
+        $cus_area = Area::where('id',$pharmacy->area_id)->get()->first();
+        $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
+        $cus_city = City::where('id',$cus_group->city_id)->get()->first();
+
+
+        return view('admin-views.pharmacy-import.edit', compact('pharmacy','cus_area','cus_group','cus_city'));
+    }
+
+
+    public function pharmacy_Import_update()
+    {
+
     }
 }

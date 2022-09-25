@@ -11,27 +11,29 @@ use Exception;
 
 class AreaController extends Controller
 {
-    public function city_areas_list(Request $request, $id)
+    public function group_areas_list(Request $request, $id)
     {
-        $city_areas = Area::join("cities", "cities.id", "=", "areas.city_id")
-            ->where("areas.city_id", $id)
+        $group_areas = Area::join("group_area", "group_area.id", "=", "areas.group_id")
+            ->where("areas.group_id", $id)
             ->get();
-        $city_id=$id;
-        return view('admin-views.area.list', compact('city_areas','city_id'));
+        $group_id=$id;
+        return view('admin-views.area.list', compact('group_areas','group_id'));
     }
 
-    public function area_store(Request $request, $city_id)
+    public function area_store(Request $request, $group_id)
     {
+
         try {
             $area = new Area();
-            $area->city_id = $city_id;
+            $area->group_id = $group_id;
             $area->area_name = $request->area_name;
             $area->area_num = $request->area_num;
-            $area->area_status = $request->area_num;
+            $area->area_status = 1;
             $area->save();
             Toastr::success('Area added successfully!');
             return back();
         } catch (Exception $e) {
+            return back();
             Toastr::success('Area added Failure!');
         }
     }
@@ -43,5 +45,5 @@ class AreaController extends Controller
         Toastr::success('Area deleted successfully!');
     }
 
-    
+
 }

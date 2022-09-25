@@ -68,8 +68,6 @@
 
                             <div class="col-md-6 col-12">
 
-
-
                                     <div class="form-group">
                                         <label for="">Choose City</label>
                                         <select name="city_id" class="form-control @error('city') is-invalid @enderror">
@@ -88,12 +86,12 @@
                                     <div class="form-group">
                                         <label for="">Choose area</label>
                                         <select name="area_id"
-                                            class="form-control @error('subcategory') is-invalid @enderror">
+                                            class="form-control @error('area') is-invalid @enderror">
                                             <option value="">select</option>
                                         </select>
                                     </div>
 
-                                {{-- </div> --}}
+
                             </div>
 
 
@@ -203,7 +201,6 @@
     $("document").ready(function () {
         $('select[name="city_id"]').on('change', function () {
             var catId = $(this).val();
-            console.log(catId);
             if (catId) {
                 $.ajax({
                     url: '/admin/sales-man/areas/' + catId,

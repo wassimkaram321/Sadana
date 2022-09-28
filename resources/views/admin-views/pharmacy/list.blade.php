@@ -61,10 +61,10 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody >
 
                                     @foreach ($pharmacies as $p)
-                                        <tr>
+                                        <tr style="height: 80px !important;">
                                             <td>{{ $p->pharmacy->id }}</td>
                                             <td class="table-column-pl-0">
                                                 <a href="{{route('admin.customer.view',[$p['id']])}}">

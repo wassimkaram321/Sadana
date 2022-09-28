@@ -38,7 +38,10 @@ class Review extends Model
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id');
+
     }
+
+
 
     public function delivery()
     {

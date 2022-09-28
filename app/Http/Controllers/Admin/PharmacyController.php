@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Pharmacy;
+use Illuminate\Support\Facades\Validator;
 use App\CPU\Helpers;
 use App\Model\Product;
 use App\User;
@@ -19,7 +20,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Illuminate\Support\Facades\DB;
-
+use Throwable;
 class PharmacyController extends Controller
 {
 
@@ -128,7 +129,8 @@ class PharmacyController extends Controller
 
         $pharmacy->save();
 
-        return response()->json('Pharmacy Updated', 200);
+        Toastr::success('Pharmacy updated successfully.');
+        return back();
     }
 
 
@@ -166,6 +168,7 @@ class PharmacyController extends Controller
         }
         $pharmacies = $pharmacies->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
 
+       
         return view('admin-views.pharmacy.bulk-import', compact('pharmacies', 'search'));
     }
 
@@ -386,24 +389,158 @@ class PharmacyController extends Controller
         return (new FastExcel($storage))->download($result);
     }
 
-
-
     public function pharmacy_Import_edit(Request $request,$id)
     {
-        $pharmacy=UserImportExcel::findOrFail($id);
 
+            $pharmacy=UserImportExcel::findOrFail($id);
+            $cus_area = Area::where('id',$pharmacy->area_id)->get()->first();
+            $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
+            $cus_city = City::where('id',$cus_group->city_id)->get()->first();
+            $email="Hiba_Store".$id."@hiba.sy";
 
-        $cus_area = Area::where('id',$pharmacy->area_id)->get()->first();
-        $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
-        $cus_city = City::where('id',$cus_group->city_id)->get()->first();
-
-
-        return view('admin-views.pharmacy-import.edit', compact('pharmacy','cus_area','cus_group','cus_city'));
+            return view('admin-views.pharmacy-import.edit', compact('email','pharmacy','cus_area','cus_group','cus_city'));
     }
 
 
-    public function pharmacy_Import_update()
+    public function pharmacy_Import_update(Request $request,$id)
     {
 
+        $validator = Validator::make($request->all(), [
+             'pharmacy_name' => 'required|string',
+             'f_name' => 'required|string',
+             'l_name' => 'required|string',
+             'lat' => 'between:-90,90',
+             'lng' => 'between:-90,90',
+             'to' => 'required|date_format:H:i',
+             'from' => 'required|date_format:H:i',
+             'city_id' => 'required|numeric',
+             'area_id' => 'required|numeric',
+             'group_id' => 'required|numeric',
+             'password' => 'required',
+             'phone1' => 'required|unique:user_import_excel,phone1,'.$id,
+             'phone2' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            Toastr::success($validator->errors());
+            return back();
+        }
+
+        $pharmacy = UserImportExcel::find($id);
+        $pharmacy->pharmacy_name = $request->pharmacy_name;
+        $pharmacy->password = $request->password;
+        $pharmacy->f_name = $request->f_name;
+        $pharmacy->l_name = $request->l_name;
+        $pharmacy->lat = $request->lat;
+        $pharmacy->lng = $request->lng;
+        $pharmacy->phone1 = $request->phone1;
+        $pharmacy->phone2 = $request->phone2;
+        $pharmacy->to = $request->to;
+        $pharmacy->from = $request->from;
+        $pharmacy->land_number = $request->land_number;
+        $pharmacy->city_id = $request->city_id;
+        $pharmacy->area_id = $request->area_id;
+        $pharmacy->group_id = $request->group_id;
+        $pharmacy->save();
+
+        Toastr::success('Pharmacy updated successfully.');
+        return back();
+    }
+
+    public function pharmacy_Import_destroy(Request $request,$id)
+    {
+        try {
+            $pharama = UserImportExcel::findOrFail($id);
+            $pharama->delete();
+            Toastr::success('Pharmacy deleted successfully.');
+            return back();
+        } catch (Throwable $e) {
+            Toastr::error($e);
+            return back();
+        }
+
+    }
+
+    public function activation_export($id)
+    {
+
+        try {
+            $pharma = UserImportExcel::findOrFail($id);
+            if(isset($pharma->phone1) && $pharma->phone1==0)
+            {
+                Toastr::success('Please enter the missing data before activating:(phone1)');
+                return back();
+            }
+            if(!isset($pharma->phone1))
+            {
+                Toastr::success('Please enter the missing data before activating:(phone1)');
+                return back();
+            }
+
+            if(isset($pharma->l_name) && $pharma->l_name=="")
+            {
+                Toastr::success('Please enter the missing data before activating:(Last Name)');
+                return back();
+            }
+            if(!isset($pharma->l_name))
+            {
+                Toastr::success('Please enter the missing data before activating:(Last Name)');
+                return back();
+            }
+
+            if(isset($pharma->f_name) && $pharma->f_name=="")
+            {
+                Toastr::success('Please enter the missing data before activating:(First Name)');
+                return back();
+            }
+            if(!isset($pharma->f_name))
+            {
+                Toastr::success('Please enter the missing data before activating:(First Name)');
+                return back();
+            }
+
+            $user = new User();
+            $Pharmacy = new Pharmacy();
+
+            $cityDB = City::where('id', '=',$pharma->city_id)->get()->first();
+            $groupDB = Group::where('id', '=',$pharma->group_id)->get()->first();
+            $areaDB = Area::where('id', '=',$pharma->area_id)->get()->first();
+            $emailNew="Hiba_Store".$id."@hiba.sy";
+                $user->name = $pharma->f_name.' '.$pharma->l_name;
+                $user->f_name = $pharma->f_name;
+                $user->l_name = $pharma->l_name;
+                $user->phone = $pharma->phone1;
+                $user->email = $emailNew;
+                $user->password = bcrypt($pharma->password);
+                $user->user_type = "pharmacist";
+                $user->area_id = $pharma->area_id;
+                $user->is_phone_verified =1;
+                $user->is_active =1;
+                $user->street_address=$pharma->street_address;
+                $user->country= $groupDB->group_name;    //group name
+                $user->city=$cityDB->city_name;          //city name
+                $user->save();
+
+                $Pharmacy->name =$pharma->pharmacy_name;
+                $Pharmacy->lat =$pharma->lat;
+                $Pharmacy->lan =$pharma->lng;
+                $Pharmacy->city =$cityDB->city_name;
+                $Pharmacy->region =$areaDB->area_name;
+                $Pharmacy->user_id =$user->id;
+                $Pharmacy->user_type_id ="pharmacist";
+                $Pharmacy->from =$pharma->from;
+                $Pharmacy->to =$pharma->to;
+                $Pharmacy->Address =$pharma->street_address;
+                $Pharmacy->land_number =$pharma->land_number;
+                $Pharmacy->card_number =$pharma->card_number;
+                $Pharmacy->save();
+
+            $pharma->delete();
+            Toastr::success('Pharmacy activation successfully.');
+            return back();
+        } catch (Throwable $e) {
+            Toastr::error($e);
+            return back();
+        }
     }
 }

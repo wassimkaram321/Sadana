@@ -203,8 +203,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         Route::group(['prefix' => 'pharmacyImport', 'as' => 'pharmacyImport.', 'middleware' => ['module:product_management']], function () {
             Route::get('edit/{id}', 'PharmacyController@pharmacy_Import_edit')->name('edit');
             Route::post('update/{id}', 'PharmacyController@pharmacy_Import_update')->name('update');
-            Route::post('delete', 'PharmacyController@pharmacy_Import_destroy')->name('delete');
-            Route::get('activation-export', 'PharmacyController@activation_export')->name('activation-export');
+            Route::delete('delete/{id}', 'PharmacyController@pharmacy_Import_destroy')->name('delete');
+            Route::get('activation-export/{id}', 'PharmacyController@activation_export')->name('activation-export');
         });
 
 
@@ -454,8 +454,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
             Route::get('terms-condition', 'BusinessSettingsController@terms_condition')->name('terms-condition');
             Route::post('terms-condition', 'BusinessSettingsController@updateTermsCondition')->name('update-terms');
-            // Route::get('privacy-policy', 'BusinessSettingsController@privacy_policy')->name('privacy-policy');
-            // Route::post('privacy-policy', 'BusinessSettingsController@privacy_policy_update')->name('privacy-policy');
+            Route::get('privacy-policy', 'BusinessSettingsController@privacy_policy')->name('privacy-policy');
+            Route::post('privacy-policy', 'BusinessSettingsController@privacy_policy_update')->name('update-privacy-policy');
 
 
 
@@ -735,6 +735,11 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('edit/{id}', 'SalesManController@edit')->name('edit');
             Route::post('update/{id}', 'SalesManController@update')->name('update');
             Route::get('preview/{id}', 'SalesManController@preview')->name('preview');
+
+            //Work Plan
+            Route::get('work-plans', 'SalesManController@work_plan_list')->name('work-plans');
+
+
 
             Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
 

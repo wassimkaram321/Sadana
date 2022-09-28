@@ -2093,4 +2093,12 @@
   'InActive' => 'InActive',
   'Active :' => 'Active :',
   'InActive:' => 'InActive:',
+  'Product Id not found' => 'Product Id not found',
+  'phone1' => 'Phone1',
+  'phone2' => 'Phone2',
+  'first *' => 'First *',
+  'name *' => 'Name *',
+  'Password Account' => 'Password Account',
+  'Work_plans' => 'Work plans',
+  'Salers list' => 'Salers list',
 );

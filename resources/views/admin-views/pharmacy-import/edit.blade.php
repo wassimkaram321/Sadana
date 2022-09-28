@@ -32,18 +32,18 @@
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('first')}}
-                                        {{\App\CPU\translate('name')}}</label>
+                                        {{\App\CPU\translate('name')}}<span style="color: red;">*</span></label>
                                     <input type="text" value="{{$pharmacy['f_name']}}" name="f_name" class="form-control"
-                                        placeholder="First Name" required>
+                                        placeholder="First Name" >
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('last')}}
-                                        {{\App\CPU\translate('name')}}</label>
+                                        {{\App\CPU\translate('name')}}<span style="color: red;">*</span></label>
                                     <input type="text" value="{{$pharmacy['l_name']}}" name="l_name" class="form-control"
-                                        placeholder="Last Name" required>
+                                        placeholder="Last Name" >
                                 </div>
                             </div>
                         </div>
@@ -52,37 +52,39 @@
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('phone')}}</label>
-                                    <input type="number" value="{{$pharmacy['phone']}}" name="phone" class="form-control"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('phone1')}}<span style="color: red;">*</span></label>
+                                    <input type="number" value="{{$pharmacy['phone1']}}" name="phone1" class="form-control"
                                         placeholder="Phone" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('email')}}</label>
-                                    <input type="email" value="{{$pharmacy['email']}}" name="email" class="form-control"
-                                        placeholder="Email" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('phone2')}}</label>
+                                    <input type="number" value="{{$pharmacy['phone2']}}" name="phone2" class="form-control"
+                                        placeholder="Phone" >
                                 </div>
                             </div>
+
+
                         </div>
+
 
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('street_address')}}</label>
-                                    <input type="text" value="{{$pharmacy['street_address']}}" name="street_address"
-                                        class="form-control" placeholder="Street address" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('email')}}</label>
+                                    <input type="email" value="{{$email}}" name="email" class="form-control"
+                                        placeholder="Email" >
                                 </div>
                             </div>
-
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('land_number')}}</label>
-                                    <input type="number" value="{{$pharmacy['land_number']}}" name="land_number"
-                                        class="form-control" placeholder="Land_number" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('street_address')}}<span style="color: red;">*</span></label>
+                                    <input type="text" value="{{$pharmacy['street_address']}}" name="street_address"
+                                        class="form-control" placeholder="Street address" required>
                                 </div>
                             </div>
 
@@ -95,16 +97,17 @@
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('latitude')}}</label>
-                                    <input type="text" value="{{$pharmacy['lat']}}" name="lat"
-                                        class="form-control" placeholder="Latitude" required>
+                                    <input type="number" placeholder="33.51289470802381" value="{{$pharmacy['lat']}}" name="lat"
+                                        class="form-control" placeholder="Latitude" >
+
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('longitude')}}</label>
-                                    <input type="text" value="{{$pharmacy['lan']}}" name="lan"
-                                        class="form-control" placeholder="Longitude" required>
+                                    <input type="number" placeholder="36.282898280422735" value="{{$pharmacy['lng']}}" name="lng"
+                                        class="form-control" placeholder="Longitude" >
                                 </div>
                             </div>
 
@@ -115,29 +118,29 @@
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('pharmacy name')}}</label>
-                                    <input type="text" value="{{$pharmacy['name']}}" name="name"
-                                        class="form-control" placeholder="Pharmacy name" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('pharmacy name')}}<span style="color: red;">*</span></label>
+                                    <input type="text" value="{{$pharmacy['pharmacy_name']}}" name="pharmacy_name"
+                                        class="form-control"   required>
                                 </div>
                             </div>
+
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('address')}}</label>
-                                    <input type="text" value="{{$pharmacy['Address']}}" name="Address"
-                                        class="form-control" placeholder="Address" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('card_number')}}<span style="color: red;">*</span></label>
+                                    <input type="text" value="{{$pharmacy['card_number']}}" name="card_number"
+                                        class="form-control" placeholder="card_number" required>
                                 </div>
                             </div>
 
                         </div>
-
 
                         <div class="row">
 
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_start_time')}}</label>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_start_time')}}<span style="color: red;">*</span></label>
                                     <input type="time" value="{{$pharmacy['from']}}" name="from"
                                         class="form-control" placeholder="9:00AM" required>
                                 </div>
@@ -145,7 +148,7 @@
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_end_time')}}</label>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_end_time')}}<span style="color: red;">*</span></label>
                                     <input type="time" value="{{$pharmacy['to']}}" name="to" class="form-control"
                                         placeholder="" required>
                                 </div>
@@ -157,7 +160,7 @@
                             <div class="col-md-6 col-12">
 
                                 <div class="form-group">
-                                    <label for="">Choose City</label>
+                                    <label for="">Choose City<span style="color: red;">*</span></label>
                                     <select name="city_id" class="form-control @error('city') is-invalid @enderror" required>
                                         <option value="0" selected disabled>select</option>
                                         @foreach(App\Model\City::all() as $key=> $city)
@@ -178,7 +181,7 @@
                             <div class="col-md-6 col-12">
 
                                 <div class="form-group">
-                                    <label for="">Choose group</label>
+                                    <label for="">Choose group<span style="color: red;">*</span></label>
                                     <select name="group_id" class="form-control @error('group') is-invalid @enderror" required>
                                         <option value="0" selected disabled>select</option>
                                         <option value="{{$cus_group->id}}" {{ $cus_group->id==$cus_group->id ?
@@ -193,7 +196,7 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label for="">Choose area</label>
+                                    <label for="">Choose area<span style="color: red;">*</span></label>
                                     <select name="area_id" class="form-control @error('area') is-invalid @enderror" required>
                                         {{-- <option value="">select</option> --}}
                                         <option value="{{$cus_area->id}}">{{$cus_area->area_name}}</option>
@@ -204,18 +207,26 @@
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('card_number')}}</label>
-                                    <input type="number" step="0.001" value="{{$pharmacy['card_number']}}" name="card_number"
-                                        class="form-control" placeholder="card_number" required>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('land_number')}}<span style="color: red;">*</span></label>
+                                    <input type="number" value="{{$pharmacy['land_number']}}" name="land_number"
+                                        class="form-control" placeholder="Land_number" required>
                                 </div>
                             </div>
 
                         </div>
 
+                        <div class="row">
 
+                            <div class="col-md-6 col-12">
+                                <div class="form-group">
+                                    <label class="input-label"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Password Account')}}<span style="color: red;">*</span></label>
+                                    <input type="password"  name="password" value="{{$pharmacy['password']}}"
+                                        class="form-control" placeholder="FGR4543yt" required>
+                                </div>
+                            </div>
 
-
-
+                        </div>
 
                         <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>
                     </form>

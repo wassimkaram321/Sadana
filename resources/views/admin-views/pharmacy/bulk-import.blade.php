@@ -47,14 +47,14 @@
                 <div class="card mt-2 rest-part">
                     <div class="card-header">
                         <h4>{{\App\CPU\translate('Import Pharmacies File')}}</h4>
-                        <a href="{{asset('public/assets/product_bulk_format2.xlsx')}}" download=""
+                        <a href="{{asset('public/assets/pharmacy_format.xlsx')}}" download=""
                             class="btn btn-secondary">{{\App\CPU\translate('Download Format')}}</a>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <input type="file" name="products_file">
+                                    <input type="file" name="pharmacies_file">
                                 </div>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                                         <input id="datatableSearch_" type="search" name="search" class="form-control"
                                                placeholder="{{\App\CPU\translate('Search pharmacy Name')}}" aria-label="Search orders"
                                                aria-label="Search pharmacies" value="{{ $search }}" required>
-                                        <input type="hidden" value="" name="search">
+
                                         <button type="submit" class="btn btn-primary">{{\App\CPU\translate('search')}}</button>
                                     </div>
                                 </form>
@@ -154,8 +154,7 @@
                                         <td> {{\Illuminate\Support\Str::limit($p->street_address,30)}}</td>
                                         <td>
                                             <label class="toggle-switch toggle-switch-sm">
-                                                <input type="checkbox" class="toggle-switch-input"
-                                                    onclick="location.href='{{ route('admin.pharmacy.vip', [$p->id, $p->is_active ? 0 : 1]) }}'"
+                                                <input type="checkbox" disabled class="toggle-switch-input"
                                                     class="toggle-switch-input" {{ $p->is_active ? 'checked' : '' }}>
                                                 <span class="toggle-switch-label">
                                                     <span class="toggle-switch-indicator"></span>
@@ -171,19 +170,19 @@
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                                                    <a class="dropdown-item" href={{route('admin.pharmacyImport.activation-export',[$p['id']])}}>
+                                                    <a class="dropdown-item" href={{route('admin.pharmacyImport.activation-export',[$p->id])}}>
                                                         <i class="fa fa-plus-square"></i> {{\App\CPU\translate('activation')}}
                                                     </a>
                                                     <a class="dropdown-item"
-                                                        href="{{route('admin.pharmacyImport.edit',[$p['id']])}}">
+                                                        href="{{route('admin.pharmacyImport.edit',[$p->id])}}">
                                                         <i class="tio-visible"></i> {{\App\CPU\translate('Edit')}}
                                                     </a>
                                                     <a class="dropdown-item" href="javascript:"
-                                                        onclick="form_alert('pharmacy-{{$p['id']}}','Want to delete this pharmacy ?')">
+                                                        onclick="form_alert('pharmacy-{{$p->id}}','Want to delete this pharmacy ?')">
                                                         <i class="tio-delete"></i> {{\App\CPU\translate('delete')}}
                                                     </a>
-                                                    <form action="{{route('admin.pharmacyImport.delete',[$p['id']])}}"
-                                                        method="post" id="pharmacy-{{$p['id']}}">
+                                                    <form action="{{route('admin.pharmacyImport.delete',[$p->id])}}"
+                                                        method="post" id="pharmacy-{{$p->id}}">
                                                         @csrf @method('delete')
                                                     </form>
                                                 </div>

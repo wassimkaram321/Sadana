@@ -99,7 +99,7 @@ class SalesManController extends Controller
         if(count($arrArea) >0){
             $all_areas = Area::whereNotIn('id',$arrArea)->get();
 
-            $all_areas_assign = Area::join("cities", "cities.id", "=", "areas.city_id")
+            $all_areas_assign = Area::join("group_area", "group_area.id", "=", "areas.group_id")
             ->where("areas.id", $arrArea)
             ->get();
 

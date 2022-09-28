@@ -692,7 +692,7 @@
 
 
 
-                        {{-- <li
+                         <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/stock/product-in-wishlist')?'active':''}}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{route('admin.stock.product-in-wishlist')}}">
@@ -702,7 +702,7 @@
                                     {{\App\CPU\translate('wish_list')}}
                                 </span>
                             </a>
-                        </li> --}}
+                        </li>
                         {{-- <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/transaction/list')?'active':''}}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -1084,7 +1084,7 @@
                                 </span>
                             </a>
                         </li> --}}
-                        {{-- <li
+                        <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/fcm-index') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{ route('admin.business-settings.fcm-index') }}">
@@ -1093,8 +1093,8 @@
                                     {{ \App\CPU\translate('notification') }}
                                 </span>
                             </a>
-                        </li> --}}
-                        {{-- <li
+                        </li>
+                        <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/terms-condition') || Request::is('admin/business-settings/privacy-policy') || Request::is('admin/business-settings/about-us') || Request::is('admin/helpTopic/list') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
                                 <i class="tio-pages-outlined nav-icon"></i>
@@ -1143,7 +1143,10 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li> --}}
+                        </li>
+
+
+
                         {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/social-media') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -1154,6 +1157,9 @@
                                 </span>
                             </a>
                         </li> --}}
+
+
+
                         {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/map-api*') ? 'active' : '' }}">
                             <a class="nav-link " href="{{ route('admin.business-settings.map-api') }}"
@@ -1162,7 +1168,10 @@
                                 <span class="text-truncate">{{ \App\CPU\translate('third_party_apis') }}</span>
                             </a>
                         </li> --}}
-                        {{-- <li
+
+
+
+                        <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/file-manager*') ? 'active' : '' }}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{ route('admin.file-manager.index') }}">
@@ -1171,11 +1180,8 @@
                                     {{ \App\CPU\translate('gallery') }}
                                 </span>
                             </a>
-                        </li> --}}
+                        </li>
                         {{-- @endif --}}
-
-
-
 
 
 
@@ -1391,10 +1397,18 @@
                                         <span class="text-truncate">{{ \App\CPU\translate('add_new') }}</span>
                                     </a>
                                 </li>
+
+                                <li class="nav-item {{ Request::is('admin/sales-man/work-plans') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.sales-man.work-plans') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Work_plans') }}</span>
+                                    </a>
+                                </li>
+
                                 <li class="nav-item {{ Request::is('admin/sales-man/list') ? 'active' : '' }}">
                                     <a class="nav-link" href="{{ route('admin.sales-man.list') }}">
                                         <span class="tio-circle nav-indicator-icon"></span>
-                                        <span class="text-truncate">{{ \App\CPU\translate('List') }}</span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Salers list') }}</span>
                                     </a>
                                 </li>
                             </ul>

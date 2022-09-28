@@ -7,6 +7,7 @@ use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\Controller;
 use App\Model\Order;
+use App\Model\Product;
 use App\Model\OrderDetail;
 use App\Model\ShippingAddress;
 use App\Model\SupportTicket;
@@ -82,22 +83,32 @@ class CustomerController extends Controller
         $validator = Validator::make($request->all(), [
             'product_id' => 'required',
         ]);
-
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $wishlist = Wishlist::where('customer_id', $request->user()->id)->where('product_id', $request->product_id)->first();
 
-        if (empty($wishlist)) {
-            $wishlist = new Wishlist;
-            $wishlist->customer_id = $request->user()->id;
-            $wishlist->product_id = $request->product_id;
-            $wishlist->save();
-            return response()->json(['message' => translate('successfully added!')], 200);
+        $product=Product::find($request->product_id);
+        if(isset($product))
+        {
+            $wishlist = Wishlist::where('customer_id', $request->user()->id)->where('product_id', $request->product_id)->first();
+
+            if (empty($wishlist)) {
+                $wishlist = new Wishlist;
+                $wishlist->customer_id = $request->user()->id;
+                $wishlist->product_id = $request->product_id;
+                $wishlist->save();
+                return response()->json(['message' => translate('successfully added!')], 200);
+            }
+
+            return response()->json(['message' => translate('Already in your wishlist')], 409);
+        }
+        else
+        {
+            return response()->json(['message' => translate('Product Id not found')], 409);
         }
 
-        return response()->json(['message' => translate('Already in your wishlist')], 409);
+
     }
 
     public function remove_from_wishlist(Request $request)

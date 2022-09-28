@@ -20,8 +20,14 @@ class User extends Authenticatable
     ];
 
 
-    protected $hidden = [
+   
+
+    protected $hidden=[
         'password', 'remember_token',
+        "email_verified_at","created_at","updated_at","zip","house_no",
+        "apartment_no","cm_firebase_token","payment_card_last_four","payment_card_brand","payment_card_fawry_token","login_medium",
+        "social_id","is_phone_verified","temporary_token","is_email_verified","pharmacy_id","area_id"
+
     ];
 
     protected $casts = [

@@ -16,9 +16,17 @@ class ProductManager
         return Product::active()->with(['rating'])->where('id', $id)->first();
     }
 
-    public static function get_latest_products($limit = 10, $offset = 1)
+    public static function get_latest_products($limit = 10, $offset = 1,$brand_id)
     {
-        $paginator = Product::active()->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
+        if(isset($brand_id))
+        {
+            $paginator = Product::active()->where('brand_id','=',$brand_id)->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
+        }
+        else
+        {
+            $paginator = Product::active()->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
+        }
+
         /*$paginator->count();*/
         return [
             'total_size' => $paginator->total(),
@@ -28,13 +36,24 @@ class ProductManager
         ];
     }
 
-    public static function get_featured_products($limit = 10, $offset = 1)
+    public static function get_featured_products($limit = 10, $offset = 1,$brand_id)
     {
         //change review to ratting
-        $paginator = Product::with(['rating'])->active()
+        if(isset($brand_id))
+        {
+            $paginator = Product::with(['rating'])->active()
+            ->where('featured', 1)
+            ->where('brand_id','=', $brand_id)
+            ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
+            ->paginate($limit, ['*'], 'page', $offset);
+        }
+        else
+        {
+            $paginator = Product::with(['rating'])->active()
             ->where('featured', 1)
             ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
             ->paginate($limit, ['*'], 'page', $offset);
+        }
 
         return [
             'total_size' => $paginator->total(),
@@ -44,7 +63,7 @@ class ProductManager
         ];
     }
 
-    public static function get_top_rated_products($limit = 10, $offset = 1)
+    public static function get_top_rated_products($limit = 10, $offset = 1,$brand_id)
     {
         // $reviews = Review::with('product')
         //     ->whereHas('product', function ($query) {
@@ -60,10 +79,22 @@ class ProductManager
         //     array_push($data, $review->product);
         // }
         //change review to ratting
-        $reviews = Product::with(['rating'])->active()
-        ->where('featured', 1)
-        ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
-        ->paginate($limit, ['*'], 'page', $offset);
+        if(isset($brand_id))
+        {
+            $reviews = Product::with(['rating'])->active()
+            ->where('featured', 1)
+            ->where('brand_id','=', $brand_id)
+            ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
+            ->paginate($limit, ['*'], 'page', $offset);
+
+        }
+        else
+        {
+            $reviews = Product::with(['rating'])->active()
+            ->where('featured', 1)
+            ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
+            ->paginate($limit, ['*'], 'page', $offset);
+        }
 
         return [
             'total_size' => $reviews->total(),
@@ -73,7 +104,7 @@ class ProductManager
         ];
     }
 
-    public static function get_best_selling_products($limit = 10, $offset = 1)
+    public static function get_best_selling_products($limit = 10, $offset = 1,$brand_id)
     {
         //change reviews to rattings
         $paginator = OrderDetail::with('product.rating')
@@ -87,11 +118,22 @@ class ProductManager
 
         $data = [];
         foreach ($paginator as $order) {
-            array_push($data, $order->product);
+
+            if(isset($brand_id))
+            {
+                if($order->product->brand_id==$brand_id)
+                {
+                    array_push($data, $order->product);
+                }
+            }
+            else
+            {
+                array_push($data, $order->product);
+            }
         }
 
         return [
-            'total_size' => $paginator->total(),
+            'total_size' => count($data),
             'limit' => (integer)$limit,
             'offset' => (integer)$offset,
             'products' => $data
@@ -109,8 +151,8 @@ class ProductManager
 
     public static function search_products($name, $limit = 10, $offset = 1)
     {
-        /*$key = explode(' ', $name);*/
-        $key = [base64_decode($name)];
+        $key = explode(' ', $name);
+       // $key = [base64_decode($name)];
 
         $paginator = Product::active()->with(['rating'])->where(function ($q) use ($key) {
             foreach ($key as $value) {

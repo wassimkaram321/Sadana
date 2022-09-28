@@ -23,21 +23,21 @@ class ProductController extends Controller
 {
     public function get_latest_products(Request $request)
     {
-        $products = ProductManager::get_latest_products($request['limit'], $request['offset']);
+        $products = ProductManager::get_latest_products($request['limit'], $request['offset'],$request['brand_id']);
         $products['products'] = Helpers::product_data_formatting($products['products'], true);
         return response()->json($products, 200);
     }
 
     public function get_featured_products(Request $request)
     {
-        $products = ProductManager::get_featured_products($request['limit'], $request['offset']);
+        $products = ProductManager::get_featured_products($request['limit'], $request['offset'],$request['brand_id']);
         $products['products'] = Helpers::product_data_formatting($products['products'], true);
         return response()->json($products, 200);
     }
 
     public function get_top_rated_products(Request $request)
     {
-        $products = ProductManager::get_top_rated_products($request['limit'], $request['offset']);
+        $products = ProductManager::get_top_rated_products($request['limit'], $request['offset'],$request['brand_id']);
         $products['products'] = Helpers::product_data_formatting($products['products'], true);
         return response()->json($products, 200);
     }
@@ -63,6 +63,7 @@ class ProductController extends Controller
     public function get_product($slug)
     {
         $product = Product::with(['reviews.customer'])->where(['slug' => $slug])->first();
+
         if (isset($product)) {
             $product = Helpers::product_data_formatting($product, false);
         }
@@ -71,7 +72,7 @@ class ProductController extends Controller
 
     public function get_best_sellings(Request $request)
     {
-        $products = ProductManager::get_best_selling_products($request['limit'], $request['offset']);
+        $products = ProductManager::get_best_selling_products($request['limit'], $request['offset'],$request['brand_id']);
         $products['products'] = Helpers::product_data_formatting($products['products'], true);
         return response()->json($products, 200);
     }
@@ -100,7 +101,12 @@ class ProductController extends Controller
 
     public function get_product_reviews($id)
     {
-        $reviews = Review::with(['customer'])->where(['product_id' => $id])->get();
+        $reviews = Review::with(['customer'])
+        ->where(['product_id' => $id])
+        ->get()
+        ->makeHidden("email_verified_at","created_at","updated_at","zip","house_no",
+        "apartment_no","cm_firebase_token","payment_card_last_four","payment_card_brand","payment_card_fawry_token","login_medium",
+        "social_id","is_phone_verified","temporary_token","is_email_verified","pharmacy_id","area_id");
 
         $storage = [];
         foreach ($reviews as $item) {

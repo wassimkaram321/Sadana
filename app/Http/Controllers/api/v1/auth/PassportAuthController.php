@@ -33,7 +33,6 @@ class PassportAuthController extends Controller
             'to' => 'required',
             'statusToday' => 'required',
             'Address' => 'required',
-            'city_id' => 'required',
             'region_id' => 'required',
             'lat' => 'required',
             'lng' => 'required',
@@ -46,7 +45,7 @@ class PassportAuthController extends Controller
 
         $area = Area::where('id',$request->region_id)->get()->first();
         $group = Group::where('id',$area->group_id)->get()->first();
-        $city=City::where('id',$area->city_id)->get()->first();
+        $city=City::where('id',$group->city_id)->get()->first();
 
         //$temporary_token = Str::random(40);
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\CPU\Helpers;
 use App\Model\Area;
 use App\Model\City;
+use App\Model\Group;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -30,14 +31,14 @@ class RegionsController extends Controller
     {
 
         try {
-
-            $city_areas = Area::join("cities", "cities.id", "=", "areas.city_id")
-            ->where("areas.city_id",$request->city_id)
+            $city_areas = City::join("group_area", "group_area.city_id", "=", "cities.id")
+            ->join("areas", "areas.group_id", "=", "group_area.id")
+            ->where("cities.id", $request->city_id)
             ->get()->makeHidden(
                 [
-                    'updated_at', 'created_at', 'deleted_at','city_id','city_name','city_status'
-                ]
-            );
+                    'city_status', 'city_name', 'created_at','updated_at','city_id','group_name',
+                    'group_status', 'group_num', 'group_id'
+                ]);
 
         } catch (\Exception $e) {
             return response()->json(['errors' => $e], 403);

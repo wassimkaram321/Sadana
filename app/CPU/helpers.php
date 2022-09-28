@@ -190,52 +190,52 @@ class Helpers
         $storage = [];
         if ($multi_data == true) {
             foreach ($data as $item) {
-                $variation = [];
-                $item['category_ids'] = json_decode($item['category_ids']);
+                // $variation = [];
+                // $item['category_ids'] = json_decode($item['category_ids']);
                 $item['images'] = json_decode($item['images']);
-                $item['colors'] = Color::whereIn('code', json_decode($item['colors']))->get(['name', 'code']);
-                $attributes = [];
-                if (json_decode($item['attributes']) != null) {
-                    foreach (json_decode($item['attributes']) as $attribute) {
-                        array_push($attributes, (integer)$attribute);
-                    }
-                }
-                $item['attributes'] = $attributes;
-                $item['choice_options'] = json_decode($item['choice_options']);
-                foreach (json_decode($item['variation'], true) as $var) {
-                    array_push($variation, [
-                        'type' => $var['type'],
-                        'price' => (double)$var['price'],
-                        'sku' => $var['sku'],
-                        'qty' => (integer)$var['qty'],
-                    ]);
-                }
-                $item['variation'] = $variation;
+                // $item['colors'] = Color::whereIn('code', json_decode($item['colors']))->get(['name', 'code']);
+                // $attributes = [];
+                // if (json_decode($item['attributes']) != null) {
+                //     foreach (json_decode($item['attributes']) as $attribute) {
+                //         array_push($attributes, (integer)$attribute);
+                //     }
+                // }
+                // $item['attributes'] = $attributes;
+                // $item['choice_options'] = json_decode($item['choice_options']);
+                // foreach (json_decode($item['variation'], true) as $var) {
+                //     array_push($variation, [
+                //         'type' => $var['type'],
+                //         'price' => (double)$var['price'],
+                //         'sku' => $var['sku'],
+                //         'qty' => (integer)$var['qty'],
+                //     ]);
+                // }
+                //$item['variation'] = $variation;
                 array_push($storage, $item);
             }
             $data = $storage;
         } else {
-            $variation = [];
-            $data['category_ids'] = json_decode($data['category_ids']);
+            // $variation = [];
+            // $data['category_ids'] = json_decode($data['category_ids']);
             $data['images'] = json_decode($data['images']);
-            $data['colors'] = Color::whereIn('code', json_decode($data['colors']))->get(['name', 'code']);
-            $attributes = [];
-            if (json_decode($data['attributes']) != null) {
-                foreach (json_decode($data['attributes']) as $attribute) {
-                    array_push($attributes, (integer)$attribute);
-                }
-            }
-            $data['attributes'] = $attributes;
-            $data['choice_options'] = json_decode($data['choice_options']);
-            foreach (json_decode($data['variation'], true) as $var) {
-                array_push($variation, [
-                    'type' => $var['type'],
-                    'price' => (double)$var['price'],
-                    'sku' => $var['sku'],
-                    'qty' => (integer)$var['qty'],
-                ]);
-            }
-            $data['variation'] = $variation;
+            // $data['colors'] = Color::whereIn('code', json_decode($data['colors']))->get(['name', 'code']);
+            // $attributes = [];
+            // if (json_decode($data['attributes']) != null) {
+            //     foreach (json_decode($data['attributes']) as $attribute) {
+            //         array_push($attributes, (integer)$attribute);
+            //     }
+            // }
+            // $data['attributes'] = $attributes;
+            // $data['choice_options'] = json_decode($data['choice_options']);
+            // foreach (json_decode($data['variation'], true) as $var) {
+            //     array_push($variation, [
+            //         'type' => $var['type'],
+            //         'price' => (double)$var['price'],
+            //         'sku' => $var['sku'],
+            //         'qty' => (integer)$var['qty'],
+            //     ]);
+            // }
+            //$data['variation'] = $variation;
         }
 
         return $data;

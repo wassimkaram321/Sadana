@@ -49,6 +49,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('check-shipping-type','ShippingMethodController@check_shipping_type');
     });
 
+    //Done
     Route::group(['prefix' => 'cart','middleware'=>'auth:api'], function () {
         Route::get('/', 'CartController@cart');
         Route::post('add', 'CartController@add_to_cart');
@@ -57,23 +58,26 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::delete('remove-all','CartController@remove_all_from_cart');
 
     });
+    //End Done
 
     Route::get('faq', 'GeneralController@faq');
 
     Route::group(['prefix' => 'products'], function () {
-        Route::get('latest', 'ProductController@get_latest_products');
-        Route::get('featured', 'ProductController@get_featured_products');
+        Route::get('latest', 'ProductController@get_latest_products');     //Done
+        Route::get('featured', 'ProductController@get_featured_products'); //Done
         Route::get('top-rated', 'ProductController@get_top_rated_products');
-        Route::any('search', 'ProductController@get_searched_products');
-        Route::get('details/{slug}', 'ProductController@get_product');
+        Route::any('search', 'ProductController@get_searched_products');  //Done
+        Route::get('details/{slug}', 'ProductController@get_product');   //Done
         Route::get('related-products/{product_id}', 'ProductController@get_related_products');
-        Route::get('reviews/{product_id}', 'ProductController@get_product_reviews');
-        Route::get('rating/{product_id}', 'ProductController@get_product_rating');
+
+
+        Route::get('reviews/{product_id}', 'ProductController@get_product_reviews'); //Done
+        Route::get('rating/{product_id}', 'ProductController@get_product_rating'); //Done
         Route::get('counter/{product_id}', 'ProductController@counter');
         Route::get('shipping-methods', 'ProductController@get_shipping_methods');
         Route::get('social-share-link/{product_id}', 'ProductController@social_share_link');
-        Route::post('reviews/submit', 'ProductController@submit_product_review')->middleware('auth:api');
-        Route::get('best-sellings', 'ProductController@get_best_sellings');
+        Route::post('reviews/submit', 'ProductController@submit_product_review')->middleware('auth:api');//Done
+        Route::get('best-sellings', 'ProductController@get_best_sellings');  //Done
         Route::get('home-categories', 'ProductController@get_home_categories');
         ROute::get('discounted-product', 'ProductController@get_discounted_product');
     });
@@ -149,6 +153,8 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
             Route::delete('/', 'CustomerController@delete_address');
         });
 
+
+        //Done
         Route::group(['prefix' => 'support-ticket'], function () {
             Route::post('create', 'CustomerController@create_support_ticket');
             Route::get('get', 'CustomerController@get_support_tickets');
@@ -156,6 +162,8 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
             Route::post('reply/{ticket_id}', 'CustomerController@reply_support_ticket');
         });
 
+
+        //Done
         Route::group(['prefix' => 'wish-list'], function () {
             Route::get('/', 'CustomerController@wish_list');
             Route::post('add', 'CustomerController@add_to_wishlist');
@@ -177,6 +185,11 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
             Route::post('send-message', 'ChatController@messages_store');
         });
     });
+
+
+
+
+
 
     Route::group(['prefix' => 'order'], function () {
         Route::get('track', 'OrderController@track_order');

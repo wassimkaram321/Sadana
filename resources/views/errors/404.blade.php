@@ -31,7 +31,7 @@
 
             <p style="text-align: center;">{{\App\CPU\translate('We are sorry, the page you requested could not be found')}} <br> {{\App\CPU\translate('Please go back to the homepage')}}</p>
             <div style="text-align: center;">
-                <a class="btn btn-primary" href="{{ route('home') }}"> {{\App\CPU\translate('HOME')}}</a>
+                <a class="btn btn-primary" href="{{ route('admin.dashboard') }}"> {{\App\CPU\translate('HOME')}}</a>
             </div>
 
         </div>

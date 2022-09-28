@@ -26,7 +26,7 @@ class PharmicesRequest extends FormRequest
             'Pharmacies.*.name' => ['required', 'string'],
             'Pharmacies.*.land_number' => ['required', 'numeric'],
             'Pharmacies.*.address' => ['required', 'string'],
-            'Pharmacies.*.card_number' => ['required', 'numeric'],
+            'Pharmacies.*.card_number' => ['required', 'string'],
             'Pharmacies.*.city' => ['required', 'string'],
             'Pharmacies.*.region' => ['required', 'string'],
             'Pharmacies.*.group' => ['required', 'string'],

@@ -26,7 +26,7 @@ class CreateUserImportTable extends Migration
             $table->time('to');
             $table->time('from');
             $table->bigInteger('land_number');
-            $table->double('card_number');
+            $table->text('card_number');
             $table->timestamps();
         });
 

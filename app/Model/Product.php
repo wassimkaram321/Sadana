@@ -40,6 +40,12 @@ class Product extends Model
         'demand_limit'=>'integer',
         'reviews_count'=>'integer'
     ];
+    protected $hidden=[
+        "category_ids","video_provider","video_url","colors","variant_product","attributes","choice_options",
+        "variation","published","tax","tax_type","discount","discount_type","free_shipping","attachment","created_at",
+        "updated_at","meta_title","meta_description","meta_image","request_status","denied_note","shipping_cost",
+        "multiply_qty","temp_shipping_cost","is_shipping_cost_updated","store_id","production_date","num_id","translations"
+    ];
 
     public function translations()
     {

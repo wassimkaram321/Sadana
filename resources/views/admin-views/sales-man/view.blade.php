@@ -234,7 +234,7 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th>{{ \App\CPU\translate('#') }}</th>
-                                    <th style="width: 30%">{{ \App\CPU\translate('city') }}</th>
+                                    <th style="width: 30%">{{ \App\CPU\translate('group') }}</th>
 
                                     <th>{{ \App\CPU\translate('region') }}</th>
 
@@ -246,10 +246,10 @@
                                 @foreach ($all_areas_assign as $city_area)
                                 <tr>
                                     <td>
-                                        {{ $city_area['id'] }}
+                                        {{ $city_area['area_id'] }}
                                     </td>
                                     <td>
-                                        {{ $city_area['city_name'] }}
+                                        {{ $city_area['group_name'] }}
                                     </td>
                                     <td>
                                         {{ $city_area['area_name'] }}
@@ -265,13 +265,14 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                                                {{-- <a class="dropdown-item" href="javascript:"
-                                                    onclick="form_alert('sales-man-{{ $pharma['id'] }}','Want to unassign this information ?')">{{
+                                                <a class="dropdown-item" href="javascript:"
+                                                    onclick="form_alert('sales-man-{{$city_area['area_id'] }}','Want to unassign this information ?')">{{
                                                     \App\CPU\translate('unassign') }}</a>
-                                                <form action="{{ route('admin.sales-man.unassign', [$pharma['id']]) }}"
-                                                    method="post" id="sales-man-{{ $pharma['id'] }}">
+                                                <form action="{{ route('admin.sales-man.unassign-area', [$city_area['area_id']]) }}"
+                                                    method="post" id="sales-man-{{ $city_area['area_id'] }}">
                                                     @csrf
-                                                </form> --}}
+                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}" name="saler_id">
+                                                </form>
                                             </div>
                                         </div>
                                         <!-- End Dropdown -->
@@ -352,6 +353,7 @@
                                                 <form action="{{ route('admin.sales-man.unassign', [$pharma['id']]) }}"
                                                     method="post" id="sales-man-{{ $pharma['id'] }}">
                                                     @csrf
+                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}" name="saler_id">
                                                 </form>
                                             </div>
                                         </div>

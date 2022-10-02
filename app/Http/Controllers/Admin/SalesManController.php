@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use App\Model\City;
 use App\Model\Area;
 
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Validator;
+
 class SalesManController extends Controller
 {
 
@@ -65,6 +68,8 @@ class SalesManController extends Controller
 
     public function preview($id)
     {
+
+        $all_areas_assign=[];
         $sm= User::where(['id' => $id])->first();
         $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?',[$id]);
         $area_id  = DB::select('select area_id from sales_area where sales_id = ?',[$id]);
@@ -80,14 +85,11 @@ class SalesManController extends Controller
             array_push($arrArea,$idx->area_id);
         }
 
-        // $arrCity = array();
-        // foreach($city_id as $idc){
-        //     array_push($arrCity,$idc->city_id);
-        // }
 
-        $pharmacies = Pharmacy::whereIn('id' ,$arr)->paginate(5);
-        $areas = Area::whereIn('id' ,$arrArea)->paginate(5);
-        // $cities = City::whereIn('id' ,$arrCity)->paginate(5);
+
+        $pharmacies = Pharmacy::whereIn('id' ,$arr)->paginate(12);
+        $areas = Area::whereIn('id' ,$arrArea)->paginate(12);
+
 
         if(count($arr) >0){
             $all_pharmacies = Pharmacy::whereNotIn('id',$arr)->get();
@@ -101,19 +103,15 @@ class SalesManController extends Controller
 
             $all_areas_assign = Area::join("group_area", "group_area.id", "=", "areas.group_id")
             ->where("areas.id", $arrArea)
-            ->get();
+            ->get([
+                'group_area.group_name as group_name', 'areas.id as area_id',
+                'areas.area_name as area_name',
+            ]);
 
         }
         else{
             $all_areas = Area::all();
         }
-
-        // if(count($arrCity) >0){
-        //     $all_cities = City::whereNotIn('id',$arrCity)->get();
-        // }
-        // else{
-        //     $all_cities = City::all();
-        // }
 
         return view('admin-views.sales-man.view', compact('sm','pharmacies','all_pharmacies','all_areas','all_areas_assign'));
     }
@@ -121,8 +119,14 @@ class SalesManController extends Controller
 
 
     //Pharmecy
-    public function unassign($id){
-        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
+    public function unassign(Request $request,$id){
+        $validator = Validator::make($request->all(), [
+            'saler_id' => 'required',
+        ], [
+            'saler_id.required' => 'something wrong!',
+        ]);
+        $decrypted =Crypt::decrypt($request->saler_id);
+        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id ='.$id.' AND sales_id='.$decrypted.'');
         return redirect()->back();
     }
 
@@ -139,9 +143,27 @@ class SalesManController extends Controller
 
 
     //Area
-    public function unassign_area($id){
-        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
+    public function unassign_area(Request $request,$id){
+        $area_id=$id;
+
+        $validator = Validator::make($request->all(), [
+            'saler_id' => 'required',
+        ], [
+            'saler_id.required' => 'something wrong!',
+        ]);
+        $decrypted =Crypt::decrypt($request->saler_id);
+
+        $pharmacies = Pharmacy::join("users", "users.id", "=", "pharmacies.user_id")
+            ->where("users.area_id", $area_id)
+            ->get([
+                'pharmacies.id as pharma_id'
+            ]);
+        foreach($pharmacies as $pharma){
+            DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id ='.$pharma['pharma_id'].' AND sales_id='.$decrypted.'');
+        }
+        DB::delete('delete FROM sales_area WHERE area_id ='.$area_id.' AND sales_id='.$decrypted.'');
         return redirect()->back();
+
     }
 
 

@@ -737,9 +737,14 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('preview/{id}', 'SalesManController@preview')->name('preview');
 
             //Work Plan
-            Route::get('work-plans', 'SalesManController@work_plan_list')->name('work-plans');
-
-
+            Route::get('work-plans/list', 'WorkPlanController@work_plans_list')->name('work-plans');
+            Route::get('work-plan/add', 'WorkPlanController@work_plan_add')->name('work-plan-add');
+            Route::post('work-plan/store', 'WorkPlanController@work_plan_store')->name('work-plan-store');
+            Route::delete('work-plan/delete/{id}', 'WorkPlanController@work_plan_delete')->name('work-plan-delete');
+            Route::get('work-plan/edit/{id}', 'WorkPlanController@work_plan_edit')->name('work-plan-edit');
+            Route::post('work-plan/update/{id}', 'WorkPlanController@work_plan_update')->name('work-plan-update');
+            Route::post('work-plan/activation', 'WorkPlanController@work_plan_activation')->name('work-plan-activation');
+            Route::get('work-plan/get/pharmacies/{saler_id}', 'WorkPlanController@work_plan_pharmacies')->name('work-plan-pharmacies');
 
             Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
 

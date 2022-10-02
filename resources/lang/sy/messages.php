@@ -1930,4 +1930,6 @@
   'Areas' => 'Areas',
   'Are_you_sure_delete_this_bag' => 'Are you sure delete this bag',
   'city_deleted_successfully' => 'City deleted successfully',
+  'Work_plans' => 'Work plans',
+  'Salers list' => 'Salers list',
 );

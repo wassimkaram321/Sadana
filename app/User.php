@@ -20,7 +20,7 @@ class User extends Authenticatable
     ];
 
 
-   
+
 
     protected $hidden=[
         'password', 'remember_token',
@@ -69,6 +69,11 @@ class User extends Authenticatable
     public function pharmacies()
     {
         return $this->hasMany(Pharmacy::class,'id');
+    }
+
+    public function work_plans()
+    {
+        return $this->hasMany(WorkPlan::class,'id');
     }
 
 }

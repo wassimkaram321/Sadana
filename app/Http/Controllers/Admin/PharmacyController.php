@@ -168,7 +168,7 @@ class PharmacyController extends Controller
         }
         $pharmacies = $pharmacies->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
 
-       
+
         return view('admin-views.pharmacy.bulk-import', compact('pharmacies', 'search'));
     }
 
@@ -177,12 +177,14 @@ class PharmacyController extends Controller
     {
 
         try {
-            $collections = (new FastExcel)->import($request->file('products_file'));
+
+               // $path = $request->file('pharma')->store('public/uploads/excel-files');
+                $collections = (new FastExcel)->import($request->file("file"));
+
         } catch (\Exception $exception) {
             Toastr::error('You have uploaded a wrong format file, please upload the right file.');
             return back();
         }
-
         $data = [];
         $statusUpdate = 0;
         $statusCreate = 0;
@@ -398,7 +400,10 @@ class PharmacyController extends Controller
             $cus_city = City::where('id',$cus_group->city_id)->get()->first();
             $email="Hiba_Store".$id."@hiba.sy";
 
-            return view('admin-views.pharmacy-import.edit', compact('email','pharmacy','cus_area','cus_group','cus_city'));
+            return view('admin-views.pharmacy-import.edit',
+             compact('email','pharmacy'))
+             ->with('cus_area', $cus_area)->with('cus_group', $cus_group)->with('cus_city', $cus_city);
+
     }
 
 

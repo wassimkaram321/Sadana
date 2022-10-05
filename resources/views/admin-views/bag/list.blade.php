@@ -49,6 +49,7 @@
                                     <th scope="col">{{ \App\CPU\translate('Name')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Details')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Total_price')}}</th>
+                                    <th scope="col">{{ \App\CPU\translate('Limit')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Status')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Expiry_Date')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Image')}}</th>
@@ -66,7 +67,7 @@
                                         <td>{{$b['bag_name']}}</td>
                                         <td>{{$b['bag_description']}}</td>
                                         <td>{{$b['total_price_offer']}}</td>
-
+                                        <td>{{$b['demand_limit']}}</td>
 
                                         <td>
                                             <label class="switch switch-status">

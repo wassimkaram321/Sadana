@@ -188,6 +188,14 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
 
 
 
+    //sales Man
+    Route::group(['prefix' => 'sales-man', 'middleware' => 'auth:api'], function () {
+
+        Route::get('/pharmacies', 'SalesManController@get_pharmacies');
+        Route::get('/work-plans', 'SalesManController@get_work_plans');
+
+    });
+
 
 
 
@@ -196,6 +204,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('cancel-order','OrderController@order_cancel');
     });
 
+    //Done
     Route::group(['prefix' => 'banners'], function () {
         Route::get('/', 'BannerController@get_banners');
     });

@@ -505,10 +505,16 @@
                                         <span class="text-truncate">{{ \App\CPU\translate('add_new') }}</span>
                                     </a>
                                 </li>
-                                <li class="nav-item {{ Request::is('admin/product/bag-list') ? 'active' : '' }}">
+                                <li class="nav-item {{ Request::is('admin/product/bag/list') ? 'active' : '' }}">
                                     <a class="nav-link " href="{{ route('admin.bag.list') }}">
                                         <span class="tio-circle nav-indicator-icon"></span>
                                         <span class="text-truncate">{{ \App\CPU\translate('List') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/product/bag/settings') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.bag.settings') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Settings') }}</span>
                                     </a>
                                 </li>
                             </ul>

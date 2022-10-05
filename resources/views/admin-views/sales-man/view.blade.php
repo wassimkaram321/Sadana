@@ -63,10 +63,9 @@
                         </a>
                     </div>
                     <div class="col-md-8">
-                        {{-- <a href="{{route('admin.sales-man.add')}}" class="btn btn-primary pull-right"><i
-                                class="tio-add-circle"></i> {{\App\CPU\translate('assign')}}
-                            {{\App\CPU\translate('pharmacy')}}
-                        </a> --}}
+
+
+
                         <button type="button" class="btn btn-primary pull-right" data-toggle="modal"
                             data-target="#exampleModal" style="width: 160px">
                             <i class="tio-add-circle"></i> {{ \App\CPU\translate('assign') }}
@@ -79,13 +78,11 @@
                             {{ \App\CPU\translate('Area') }}
                         </button>
 
-                        {{-- <button type="button" class="btn btn-success pull-right" data-toggle="modal"
-                            data-target="#exampleModalCity" style="width: 125px">
+                        <button type="button" class="btn btn-success pull-right mx-3" data-toggle="modal"
+                            data-target="#exampleModalGroup" style="width: 140px">
                             <i class="tio-add-circle"></i> {{ \App\CPU\translate('assign') }}
-                            {{ \App\CPU\translate('City') }}
-                        </button> --}}
-
-
+                            {{ \App\CPU\translate('Group') }}
+                        </button>
 
 
                         <!-- Modal Pharmecy -->
@@ -103,20 +100,6 @@
                                     <form action="{{route('admin.sales-man.assign',['id'=>$sm->id])}}" method="POST">
                                         @csrf
                                         <div class="modal-body">
-                                            {{-- <div style="border: 1px solid black; padding:100px" class="container">
-                                                <div style="padding: 100px;">
-                                                    <div class="row">
-                                                        <div class="col-md-8">
-                                                            <input class="prompt" type="text"
-                                                                placeholder="Search countries...">
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <a onclick="btn_handler()"
-                                                                class="btn btn-primary">Submit</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> --}}
 
                                             <select class="js-example-basic-multiple" name="assigned_pharmacies[]"
                                                 multiple="multiple">
@@ -174,26 +157,26 @@
                         </div>
 
 
-                        <!-- Modal City -->
-                        {{-- <div class="modal fade" id="exampleModalCity" tabindex="-1" aria-labelledby="exampleModalLabel"
-                            aria-hidden="true">
+                        <!-- Modal Group -->
+                        <div class="modal fade" id="exampleModalGroup" tabindex="-1"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel"><i
-                                                class="tio-add-circle mr-2"></i>Assign Cities</h5>
+                                                class="tio-add-circle mr-2"></i>Assign Groups</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true" style="font-size: 25px;">&times;</span>
                                         </button>
                                     </div>
-                                    <form action="{{route('admin.sales-man.assign-city',['id'=>$sm->id])}}"
+                                    <form action="{{route('admin.sales-man.assign-group',['id'=>$sm->id])}}"
                                         method="POST">
                                         @csrf
                                         <div class="modal-body">
-                                            <select class="js-example-basic-multiple" name="assigned_cities[]"
+                                            <select class="js-example-basic-multiple" name="assigned_groups[]"
                                                 multiple="multiple">
-                                                @foreach($all_cities as $allc)
-                                                <option value="{{$allc->id}}">{{$allc->name}}</option>
+                                                @foreach($all_groups as $allg)
+                                                <option value="{{$allg->id}}">{{$allg->group_name}}</option>
                                                 @endforeach
 
                                             </select>
@@ -207,7 +190,7 @@
                                     </form>
                                 </div>
                             </div>
-                        </div> --}}
+                        </div>
 
 
 
@@ -223,6 +206,86 @@
 
     <div class="row" id="printableArea">
         <div class="col-lg-8 mb-3 mb-lg-0">
+
+
+            <h5 class="card-header-title">{{ \App\CPU\translate('Groups') }}</h5>
+            <div class="card">
+                <div class="card-header">
+
+                    <div class="table-responsive datatable-custom">
+                        <table
+                            class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>{{ \App\CPU\translate('#') }}</th>
+                                    <th style="width: 30%">{{ \App\CPU\translate('city') }}</th>
+
+                                    <th>{{ \App\CPU\translate('group') }}</th>
+
+                                    <th>{{ \App\CPU\translate('action') }}</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="set-rows">
+                                @foreach ($all_groups_assign as $city_group)
+                                <tr>
+                                    <td>
+                                        {{ $city_group['group_id'] }}
+                                    </td>
+                                    <td>
+                                        {{ $city_group['city_name'] }}
+                                    </td>
+                                    <td>
+                                        {{ $city_group['group_name'] }}
+                                    </td>
+
+                                    <td>
+                                        <!-- Dropdown -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                <i class="tio-settings"></i>
+                                            </button>
+                                            {{-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+                                                <a class="dropdown-item" href="javascript:"
+                                                    onclick="form_alert('sales-man-{{$city_area['area_id'] }}','Want to unassign this information ?')">{{
+                                                    \App\CPU\translate('unassign') }}</a>
+                                                <form
+                                                    action="{{ route('admin.sales-man.unassign-area', [$city_area['area_id']]) }}"
+                                                    method="post" id="sales-man-{{ $city_area['area_id'] }}">
+                                                    @csrf
+                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}"
+                                                        name="saler_id">
+                                                </form>
+                                            </div> --}}
+                                        </div>
+                                        <!-- End Dropdown -->
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <hr>
+
+                        <div class="page-area">
+                            <table>
+                                <tfoot>
+                                    {!! $pharmacies->links() !!}
+                                </tfoot>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
 
             <h5 class="card-header-title">{{ \App\CPU\translate('Regions') }}</h5>
             <div class="card">
@@ -268,10 +331,12 @@
                                                 <a class="dropdown-item" href="javascript:"
                                                     onclick="form_alert('sales-man-{{$city_area['area_id'] }}','Want to unassign this information ?')">{{
                                                     \App\CPU\translate('unassign') }}</a>
-                                                <form action="{{ route('admin.sales-man.unassign-area', [$city_area['area_id']]) }}"
+                                                <form
+                                                    action="{{ route('admin.sales-man.unassign-area', [$city_area['area_id']]) }}"
                                                     method="post" id="sales-man-{{ $city_area['area_id'] }}">
                                                     @csrf
-                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}" name="saler_id">
+                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}"
+                                                        name="saler_id">
                                                 </form>
                                             </div>
                                         </div>
@@ -353,7 +418,8 @@
                                                 <form action="{{ route('admin.sales-man.unassign', [$pharma['id']]) }}"
                                                     method="post" id="sales-man-{{ $pharma['id'] }}">
                                                     @csrf
-                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}" name="saler_id">
+                                                    <input type="hidden" value="{{Crypt::encrypt($sm->id)}}"
+                                                        name="saler_id">
                                                 </form>
                                             </div>
                                         </div>

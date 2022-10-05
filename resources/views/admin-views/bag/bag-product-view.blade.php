@@ -35,31 +35,32 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-4 d-flex align-items-center w-100">
-                                <input type="number" min="0" value="0" step="0.01"
+                            <div class="col-md-2 d-flex align-items-center w-100">
+                                <input type="number" min="1" step="1"
                                     placeholder="Count"
                                     name="product_count" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;">
+
                             </div>
 
 
-                            {{-- <a class="btn btn-primary" id="{{$b['id']}}">
-                                {{ \App\CPU\translate('Add_product')}}
-                            </a> --}}
+                            <div class="col-md-2 d-flex align-items-center w-100">
+                                <input type="checkbox"
+                                    value="1"
+                                    name="free" class=" regular-checkbox w-25 js-example-basic-multiple form-control"
+                                    style="width: 100%;width: 20px !important;">
+                                    <label  style="margin-bottom: 0px; margin-left: 8px;">{{\App\CPU\translate('Free')}}</label><br>
+                            </div>
+
                             <div class="col-md-4 w-100">
                                 <button type="submit" class="btn btn-primary w-100" style="border: none;appearance: none;border-radius: 5px;height:40px">
                                     {{\App\CPU\translate('Add_product')}}
                                 </button>
                             </div>
-
-
                         </form>
 
                     {{-- </div> --}}
                 </div>
-
-
-
 
 
                 <div class="card-body" style="padding: 0">
@@ -98,7 +99,11 @@
 
                                     <td>{{$b['product_price']}}</td>
                                     <td>{{$b['product_count']}}</td>
+                                    @if ($b['product_total_price']==0)
+                                    <td style="color: blue">{{ \App\CPU\translate('Free')}}</td>
+                                    @else
                                     <td>{{$b['product_total_price']}}</td>
+                                    @endif
 
                                     <td>
                                         <img style="width: 60px;height: 60px"
@@ -106,8 +111,6 @@
                                             src="{{asset('storage/app/public/product/thumbnail')}}/{{$b['"
                                             thumbnail"']}}">
                                     </td>
-
-
 
                                     <td>
                                         <a class="btn btn-danger btn-sm delete" id="{{$b['id']}}">

@@ -21,6 +21,7 @@ use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+
 class PharmacyController extends Controller
 {
 
@@ -177,10 +178,7 @@ class PharmacyController extends Controller
     {
 
         try {
-
-               // $path = $request->file('pharma')->store('public/uploads/excel-files');
-                $collections = (new FastExcel)->import($request->file("file"));
-
+                $collections = (new FastExcel)->import($request->file("pharmacies_file"));
         } catch (\Exception $exception) {
             Toastr::error('You have uploaded a wrong format file, please upload the right file.');
             return back();

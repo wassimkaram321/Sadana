@@ -38,24 +38,33 @@
 
                                     <div class="style">
                                         <label for="bag_name">{{ \App\CPU\translate('Name')}}</label>
-                                        <input type="text" name="bag_name" class="form-control" id="bag_name" >
+                                        <input type="text" name="bag_name" class="form-control" id="bag_name" required>
                                     </div>
 
                                     <div class="style">
                                         <label for="bag_description">{{ \App\CPU\translate('Description')}}</label>
-                                        <input type="text" name="bag_description" class="form-control" id="bag_description" >
+                                        <input type="text" name="bag_description" class="form-control" id="bag_description" required >
                                     </div>
 
+
+                                    <div class="style">
+                                        <label for="demand_limit">{{ \App\CPU\translate('Demand limit')}}</label>
+                                        <input type="number" name="demand_limit" class="form-control" id="demand_limit" required>
+                                    </div>
+
+                                    
                                     <div class="style">
                                         <label for="end_date">{{ \App\CPU\translate('Expiry Date')}}</label>
-                                        <input type="date" name="end_date" class="form-control" id="end_date" >
+                                        <input type="date" name="end_date" class="form-control" id="end_date" required>
                                     </div>
+
+
 
                                 <div  class="form-group style">
                                     <label for="bag_name">{{ \App\CPU\translate('bag_image')}}</label><span class="badge badge-soft-danger">( {{\App\CPU\translate('ratio')}} 1:1 )</span>
                                     <div class="custom-file" style="text-align: left" required>
                                         <input type="file" name="bag_image" id="customFileUpload" class="custom-file-input"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
                                         <label class="custom-file-label" for="customFileUpload">{{\App\CPU\translate('choose')}} {{\App\CPU\translate('file')}}</label>
                                     </div>
                                 </div>

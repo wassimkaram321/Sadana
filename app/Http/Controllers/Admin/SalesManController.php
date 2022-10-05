@@ -11,7 +11,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\DB;
 use App\Model\City;
 use App\Model\Area;
-
+use App\Model\Group;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
@@ -69,72 +69,97 @@ class SalesManController extends Controller
     public function preview($id)
     {
 
-        $all_areas_assign=[];
-        $sm= User::where(['id' => $id])->first();
-        $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?',[$id]);
-        $area_id  = DB::select('select area_id from sales_area where sales_id = ?',[$id]);
-        // $city_id  = DB::select('select city_id from sales_city where sales_id = ?',[$id]);
+        $all_areas_assign = [];
+        $all_groups_assign=[];
+        $sm = User::where(['id' => $id])->first();
+        $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?', [$id]);
+        $area_id  = DB::select('select area_id from sales_area where sales_id = ?', [$id]);
+        $group_id  = DB::select('select group_id from sales_group where sales_id = ?',[$id]);
 
         $arr = array();
-        foreach($pharma_id as $idx){
-            array_push($arr,$idx->pharmacy_id);
+        foreach ($pharma_id as $idx) {
+            array_push($arr, $idx->pharmacy_id);
         }
 
         $arrArea = array();
-        foreach($area_id as $idx){
-            array_push($arrArea,$idx->area_id);
+        foreach ($area_id as $idx) {
+            array_push($arrArea, $idx->area_id);
         }
 
-
-
-        $pharmacies = Pharmacy::whereIn('id' ,$arr)->paginate(12);
-        $areas = Area::whereIn('id' ,$arrArea)->paginate(12);
-
-
-        if(count($arr) >0){
-            $all_pharmacies = Pharmacy::whereNotIn('id',$arr)->get();
+        $arrGroup = array();
+        foreach ($group_id as $idg) {
+            array_push($arrGroup, $idg->group_id);
         }
-        else{
+
+        $pharmacies = Pharmacy::whereIn('id', $arr)->paginate(12);
+        $areas = Area::whereIn('id', $arrArea)->paginate(12);
+        $groups = Group::whereIn('id', $arrGroup)->paginate(12);
+
+        if (count($arr) > 0) {
+            $all_pharmacies = Pharmacy::whereNotIn('id', $arr)->get();
+        } else {
             $all_pharmacies = Pharmacy::all();
         }
 
-        if(count($arrArea) >0){
-            $all_areas = Area::whereNotIn('id',$arrArea)->get();
+        if (count($arrArea) > 0) {
+            $all_areas = Area::whereNotIn('id', $arrArea)->get();
 
             $all_areas_assign = Area::join("group_area", "group_area.id", "=", "areas.group_id")
-            ->where("areas.id", $arrArea)
-            ->get([
-                'group_area.group_name as group_name', 'areas.id as area_id',
-                'areas.area_name as area_name',
-            ]);
-
-        }
-        else{
+                ->where("areas.id", $arrArea)
+                ->get([
+                    'group_area.group_name as group_name', 'areas.id as area_id',
+                    'areas.area_name as area_name',
+                ]);
+        } else {
             $all_areas = Area::all();
         }
 
-        return view('admin-views.sales-man.view', compact('sm','pharmacies','all_pharmacies','all_areas','all_areas_assign'));
+        if (count($arrGroup) > 0) {
+            $all_groups = Group::whereNotIn('id', $arrGroup)->get();
+
+            $all_groups_assign = Group::join("cities", "cities.id", "=", "group_area.city_id")
+                ->where("group_area.id", $arrGroup)
+                ->get([
+                    'cities.city_name as city_name', 'group_area.id as group_id',
+                    'group_area.group_name as group_name',
+                ]);
+        } else {
+            $all_groups = Group::all();
+        }
+       // dd($all_groups_assign);
+        return view('admin-views.sales-man.view', compact('sm', 'pharmacies','all_groups','all_groups_assign', 'all_pharmacies', 'all_areas', 'all_areas_assign'));
     }
 
 
 
     //Pharmecy
-    public function unassign(Request $request,$id){
+    public function unassign(Request $request, $id)
+    {
         $validator = Validator::make($request->all(), [
             'saler_id' => 'required',
         ], [
             'saler_id.required' => 'something wrong!',
         ]);
-        $decrypted =Crypt::decrypt($request->saler_id);
-        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id ='.$id.' AND sales_id='.$decrypted.'');
+        $decrypted = Crypt::decrypt($request->saler_id);
+        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $id . ' AND sales_id=' . $decrypted . '');
         return redirect()->back();
     }
 
 
-    public function assign(Request $request , $id){
+    public function assign(Request $request, $id)
+    {
         $pharmacies = $request->assigned_pharmacies;
-        foreach($pharmacies as $pharma){
-            $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
+        foreach ($pharmacies as $pharma) {
+            $query = DB::table('sales_pharmacy')
+                ->select(['id'])
+                ->where('sales_id','=',$id)
+                ->where('pharmacy_id','=',$pharma)
+                ->get()->first();
+            if(isset($query)==false)
+            {
+                $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
+            }
+
         }
         return redirect()->back();
     }
@@ -143,65 +168,95 @@ class SalesManController extends Controller
 
 
     //Area
-    public function unassign_area(Request $request,$id){
-        $area_id=$id;
+    public function unassign_area(Request $request, $id)
+    {
+        $area_id = $id;
 
         $validator = Validator::make($request->all(), [
             'saler_id' => 'required',
         ], [
             'saler_id.required' => 'something wrong!',
         ]);
-        $decrypted =Crypt::decrypt($request->saler_id);
+        $decrypted = Crypt::decrypt($request->saler_id);
 
         $pharmacies = Pharmacy::join("users", "users.id", "=", "pharmacies.user_id")
             ->where("users.area_id", $area_id)
             ->get([
                 'pharmacies.id as pharma_id'
             ]);
-        foreach($pharmacies as $pharma){
-            DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id ='.$pharma['pharma_id'].' AND sales_id='.$decrypted.'');
+        foreach ($pharmacies as $pharma) {
+            DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $pharma['pharma_id'] . ' AND sales_id=' . $decrypted . '');
         }
-        DB::delete('delete FROM sales_area WHERE area_id ='.$area_id.' AND sales_id='.$decrypted.'');
+        DB::delete('delete FROM sales_area WHERE area_id =' . $area_id . ' AND sales_id=' . $decrypted . '');
         return redirect()->back();
-
     }
 
 
-    public function assign_area(Request $request , $id){
+    public function assign_area(Request $request, $id)
+    {
         $areas_id = $request->assigned_areas;
-        foreach($areas_id as $area_id){
+        foreach ($areas_id as $area_id) {
             DB::insert('insert into sales_area (sales_id, area_id) values (?, ?)', [$id, $area_id]);
-            $users = User::with(['pharmacy'])->where('area_id', $area_id)->where('user_type','pharmacist')->get();
-            foreach($users as $user){
-                $pharmacy = Pharmacy::where('user_id',$user->id)->get()->first();
-                DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
+            $users = User::with(['pharmacy'])->where('area_id', $area_id)->where('user_type', 'pharmacist')->get();
+            foreach ($users as $user) {
+                $pharmacy = Pharmacy::where('user_id', $user->id)->get()->first();
+                $query = DB::table('sales_pharmacy')
+                ->select(['id'])
+                ->where('sales_id','=',$id)
+                ->where('pharmacy_id','=',$pharmacy->id)
+                ->get()->first();
+                if(isset($query)==false)
+                {
+                    DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
+                }
             }
         }
         return redirect()->back();
     }
 
 
-    //City
-    // public function unassign_city($id){
-    //     DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = '.$id.' ');
-    //     return redirect()->back();
-    // }
+    //Group
+    public function unassign_group($id)
+    {
+        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = ' . $id . ' ');
+        return redirect()->back();
+    }
 
 
-    // public function assign_city(Request $request , $id){
-    //     $pharmacies = $request->assigned_pharmacies;
-    //     foreach($pharmacies as $pharma){
-    //         $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
-    //     }
-    //     return redirect()->back();
-    // }
+    public function assign_group(Request $request, $id)
+    {
+        $groups_id = $request->assigned_groups;
+        foreach ($groups_id as $group_id) {
+            DB::insert('insert into sales_group (sales_id, group_id) values (?, ?)', [$id, $group_id]);
+            $areas = Area::where('group_id', '=', $group_id)->get();
+            foreach ($areas as $area) {
+                $query = DB::table('sales_area')
+                ->select(['id'])
+                ->where('sales_id','=',$id)
+                ->where('area_id','=',$area->id)
+                ->get()->first();
+                if(isset($query)==false)
+                {
+                    DB::insert('insert into sales_area (sales_id, area_id) values (?, ?)', [$id, $area->id]);
+                }
+                $users = User::with(['pharmacy'])->where('area_id', $area->id)->where('user_type', 'pharmacist')->get();
+                foreach ($users as $user) {
+                    $pharmacy = Pharmacy::where('user_id', $user->id)->get()->first();
+                    $query = DB::table('sales_pharmacy')
+                    ->select(['id'])
+                    ->where('sales_id','=',$id)
+                    ->where('pharmacy_id','=',$pharmacy->id)
+                    ->get()->first();
+                    if(isset($query)==false)
+                    {
+                        DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
+                    }
 
-
-
-
-
-
-
+                }
+            }
+        }
+        return redirect()->back();
+    }
 
 
     public function store(Request $request)
@@ -213,24 +268,26 @@ class SalesManController extends Controller
             'email' => 'required|unique:users',
             'phone' => 'required|unique:users',
             'area_id' => 'required',
+            'group_id' => 'required',
             'city_id' => 'required',
         ], [
             'f_name.required' => 'First name is required!'
         ]);
 
-        $area=Area::where('id', $request->area_id)->get()->first();
-        $city=City::where('id',$area->city_id)->get()->first();
+        $area = Area::where('id', $request->area_id)->get()->first();
+        $group = Group::where('id', $area->group_id)->get()->first();
+        $city = City::where('id', $group->city_id)->get()->first();
 
         $sm = new User();
-        $sm->user_type= 'salesman';
-        $sm->name = $request->f_name.' '.$request->l_name;
+        $sm->user_type = 'salesman';
+        $sm->name = $request->f_name . ' ' . $request->l_name;
         $sm->f_name = $request->f_name;
         $sm->l_name = $request->l_name;
         $sm->email = $request->email;
 
         $sm->area_id = $request->area_id;
         $sm->city = $city->city_name;
-        $sm->country = "syria";
+        $sm->country = $group->group_name;
 
         $sm->phone = $request->phone;
         $sm->password = bcrypt($request->password);
@@ -239,13 +296,6 @@ class SalesManController extends Controller
         Toastr::success('Sales-man added successfully!');
         return redirect('admin/sales-man/list');
     }
-
-
-    public function show($id)
-    {
-        //
-    }
-
 
     public function edit($id)
     {
@@ -259,10 +309,11 @@ class SalesManController extends Controller
         //
         $request->validate([
             'f_name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'phone' => 'required|unique:users,phone,'.$id,
-            'area_id' => 'required',
-            'city_id' => 'required',
+            'l_name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'phone' => 'required|unique:users,phone,' . $id,
+            //'area_id' => 'required',
+            //'city_id' => 'required',
         ], [
             'f_name.required' => 'First name is required!'
         ]);
@@ -274,8 +325,8 @@ class SalesManController extends Controller
             ]);
         }
 
-        $area=Area::where('id', $request->region_id)->get()->first();
-        $city=City::where('id',$area->city_id)->get()->first();
+        //$area=Area::where('id', $request->region_id)->get()->first();
+        //$city=City::where('id',$area->city_id)->get()->first();
 
         $sales_man->user_type = 'salesman';
         $sales_man->f_name = $request->f_name;
@@ -283,40 +334,36 @@ class SalesManController extends Controller
         $sales_man->email = $request->email;
         $sales_man->phone = $request->phone;
 
-        $sales_man->area_id = $request->area_id;
-        $sales_man->city = $city->city_name;
+        // $sales_man->area_id = $request->area_id;
+        // $sales_man->city = $city->city_name;
 
-        $sales_man->password = strlen($request->password) > 1 ? bcrypt($request->password) : $sales_man['password'];
+        if (isset($request->password)) {
+            $sales_man->password = strlen($request->password) > 1 ? bcrypt($request->password) : $sales_man['password'];
+        }
+
         $sales_man->save();
 
         Toastr::success('Sales-man updated successfully!');
         return redirect('admin/sales-man/list');
     }
 
-
-
     public function destroy(Request $request)
     {
-        //
         $sales_man = User::find($request->id);
-
         $sales_man->delete();
         Toastr::success(translate('Sales-man removed!'));
         return back();
     }
 
-
-    public function areas(Request $request,$catId)
+    public function areas(Request $request, $catId)
     {
-        if(isset($request->city_id))
-        {
+        if (isset($request->city_id)) {
             $city_id = $request->city_id;
-        }else
-        {
+        } else {
             $city_id = $catId;
         }
 
-        $areas = Area::where('city_id',$city_id)->get();
+        $areas = Area::where('city_id', $city_id)->get();
         return response()->json([
             'areas' => $areas
         ]);

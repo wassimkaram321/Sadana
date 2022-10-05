@@ -2119,4 +2119,8 @@
   'Pharamcies' => 'Pharamcies',
   'Work plan removed!' => 'Work plan removed!',
   'Plan Edit' => 'Plan Edit',
+  'Groups' => 'Groups',
+  'Demand_Limit' => 'Demand Limit',
+  'Limit' => 'Limit',
+  'Free' => 'Free',
 );

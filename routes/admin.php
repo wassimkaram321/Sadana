@@ -388,7 +388,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
            Route::post('delete', 'BagController@bag_delete')->name('delete');
 
-           Route::post('settings', 'BagController@bag_settings')->name('settings');
+           Route::post('settings/store/{id}', 'BagController@bag_settings_store')->name('settings_store');
+           Route::get('settings/{id}', 'BagController@bag_settings')->name('settings');
            //bag products routes
            Route::get('products/list/{id}', 'BagController@bag_products_list')->name('products-list');
            Route::post('products/store/{bag_id}', 'BagController@bag_products_store')->name('products-store');
@@ -396,6 +397,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
 
            Route::post('status-update', 'BagController@status_update')->name('status-update');
+
        });
 
 
@@ -759,7 +761,6 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
             Route::post('unassign-group/{id}', 'SalesManController@unassign_group')->name('unassign-group');
             Route::post('assign-group/{id}', 'SalesManController@assign_group')->name('assign-group');
-
 
         });
 

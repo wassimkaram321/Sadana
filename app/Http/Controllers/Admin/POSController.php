@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\CPU\Helpers;
 use App\Model\Category;
+use App\Model\OrderAlameen;
 use App\Model\Product;
 use App\Model\Color;
 use Brian2694\Toastr\Facades\Toastr;
@@ -24,10 +25,7 @@ class POSController extends Controller
     {
         $query_param = [];
         $search = $request['search'];
-
-
         $orders = Order::with(['customer'])->where(['seller_is' => 'admin'])->where('order_status', 'delivered');
-
 
         if ($request->has('search')) {
             $key = explode(' ', $request['search']);
@@ -620,16 +618,19 @@ class POSController extends Controller
                         ->orWhere('phone', 'like', "%{$value}%");
                 }
             })
+            ->where('user_type','=','pharmacist')
             ->whereNotNull(['f_name', 'l_name', 'phone'])
             ->limit(8)
-            ->get([DB::raw('id,IF(id <> "0", CONCAT(f_name, " ", l_name, " (", phone ,")"," ",user_type),CONCAT(f_name, " ", l_name," ", user_type)) as text')]);
+            ->get([DB::raw('id,IF(id <> "0", CONCAT(f_name, " ", l_name, " (", phone ,")"),CONCAT(f_name, " ", l_name)) as text')]);
 
         //$data[] = (object)['id' => false, 'text' => 'walk_in_customer'];
 
         return response()->json($data);
     }
+
     public function place_order(Request $request)
     {
+        $myArray=array();
         $cart_id = session('current_user');
         $user_id = 0;
         $user_type = 'wc';
@@ -666,9 +667,6 @@ class POSController extends Controller
 
                 $product = Product::find($c['id']);
 
-
-
-
                 $total_qty = 0;
                 $offerType = 'no offer';
 
@@ -684,11 +682,8 @@ class POSController extends Controller
                 }
 
 
-
-
                 if ($product) {
                     $price = $c['price'];
-
                     //$product = Helpers::product_data_formatting($product);
                     $or_d = [
                         'order_id' => $order_id,
@@ -710,13 +705,17 @@ class POSController extends Controller
                         'created_at' => now(),
                         'updated_at' => now()
                     ];
+
+
                     $total_tax_amount += $or_d['tax'] * $c['quantity'];
                     $product_price += $product_subtotal - $discount_on_product;
                     $order_details[] = $or_d;
 
+
                     if ($c['variant'] != null) {
                         $type = $c['variant'];
                         $var_store = [];
+
 
                         foreach (json_decode($product['variation'], true) as $var) {
                             if ($type == $var['type']) {
@@ -736,6 +735,13 @@ class POSController extends Controller
                     DB::table('order_details')->insert($or_d);
                 }
             }
+            $product_d = [
+                'product_id' => $product->num_id,
+                'qty' => $c['quantity'],
+                'price' => $price,
+                'q_gift' => $total_qty,
+            ];
+            array_push($myArray,$product_d);
         }
 
         $total_price = $product_price;
@@ -764,12 +770,28 @@ class POSController extends Controller
             'updated_at' => now(),
         ];
         DB::table('orders')->insertGetId($or);
-
+        $this->save_order_alameen($user['id'],$order_id,$myArray);
         session()->forget($cart_id);
         session(['last_order' => $order_id]);
         Toastr::success(\App\CPU\translate('order_placed_successfully'));
         return back();
     }
+
+
+    public function save_order_alameen($user_id,$order_id,$product_details)
+    {
+
+        $pharmacy=Pharmacy::where('user_id','=',$user_id)->get()->first();
+        $orderAlameen=new OrderAlameen;
+        $orderAlameen->order_id=$order_id;
+        $orderAlameen->pharmacy_id=$pharmacy->id;
+        $orderAlameen->pharmacy_name=$pharmacy->name;
+        $orderAlameen->product_details=json_encode($product_details);
+        $orderAlameen->status="delivered";
+        $orderAlameen->save();
+    }
+
+
     public function store_keys(Request $request)
     {
         session()->put($request['key'], $request['value']);

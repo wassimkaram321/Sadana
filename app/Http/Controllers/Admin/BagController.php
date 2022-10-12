@@ -2,24 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\CPU\BackEndHelper;
+
 use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\BaseController;
-use App\Model\Brand;
 use App\Model\Bag;
+use App\Model\BagsSetting;
 use App\Model\BagProduct;
 use App\Model\Product;
-use App\Model\Store;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Rap2hpoutre\FastExcel\FastExcel;
-use function App\CPU\translate;
-use App\Model\Cart;
 use App\Model\Translation;
+use Exception;
 
 class BagController extends BaseController
 {
@@ -78,6 +73,11 @@ class BagController extends BaseController
         $bag->bag_status = 1;
         $bag->demand_limit = $request->demand_limit;
         $bag->save();
+
+        $bagSetting = new BagsSetting;
+        $bagSetting->all=1;
+        $bagSetting->bag_id=$bag->id;
+        $bagSetting->save();
         Toastr::success('bag added successfully!');
         return back();
     }
@@ -181,20 +181,17 @@ class BagController extends BaseController
             'product_id.required' => 'Product is required!',
         ]);
 
-        $freePrice=0;
+        $freePrice = 0;
         $bagProduct = new BagProduct();
         $bagProduct->bag_id = $bag_id;
         $bagProduct->product_count = $request->product_count;
         $bagProduct->product_id = $request->product_id;
-        if (isset($request->free))
-        {
+        if (isset($request->free)) {
             $bagProduct->is_gift = 1;
-            $freePrice=0;
-        }
-        else
-        {
+            $freePrice = 0;
+        } else {
             $bagProduct->is_gift = 0;
-            $freePrice=1;
+            $freePrice = 1;
         }
 
 
@@ -204,7 +201,7 @@ class BagController extends BaseController
             ->get()->first();
 
         $bagProduct->product_price =  $product->unit_price;
-        $bagProduct->product_total_price = $product->unit_price * $request->product_count *$freePrice;
+        $bagProduct->product_total_price = $product->unit_price * $request->product_count * $freePrice;
         $bagProduct->save();
 
         $price = DB::table('products_bag')->where('bag_id', $bag_id)->sum('product_total_price');
@@ -235,5 +232,52 @@ class BagController extends BaseController
         return response()->json([
             'success' => $success,
         ], 200);
+    }
+
+
+
+
+    public function bag_settings_store(Request $request, $id)
+    {
+        $request->validate([
+            'all' => 'required',
+        ], [
+            'all.required' => 'Choose something please!',
+        ]);
+        try {
+            $bagsSetting = BagsSetting::where('bag_id', '=', $id)->get()->first();
+            $bagsSetting->all = 0;
+            $bagsSetting->vip = 0;
+            $bagsSetting->non_vip = 0;
+            $bagsSetting->custom = 0;
+
+            if ($request->all == 0)
+                $bagsSetting->all = 1;
+            elseif ($request->all == 1)
+                $bagsSetting->vip = 1;
+            elseif ($request->all == 2)
+                $bagsSetting->non_vip = 1;
+            else {
+                $bagsSetting->custom = 1;
+                $bagsSetting->group_ids = json_encode($request->group_ids);
+            }
+            $bagsSetting->save();
+            Toastr::success('Updated successfully!');
+            return back();
+        } catch (Exception) {
+            Toastr::error('Error!');
+            return back();
+        }
+
+
+    }
+
+
+
+    public function bag_settings(Request $request, $id)
+    {
+        $bag = BagsSetting::where('bag_id','=',$id)->get()->first();
+        $b=$id;
+        return view('admin-views.bag.setting', compact('bag','b'));
     }
 }

@@ -87,23 +87,23 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
     });
 
     Route::group(['prefix' => 'pharmacy'], function () {
-        Route::post('store', 'PharmacyController@store')->name('store');
-        Route::post('update', 'PharmacyController@edit')->name('update');
+        Route::post('store', 'PharmacyController@store')->name('store');  //Done
+        Route::post('update', 'PharmacyController@edit')->name('update');//Done
     });
 
     Route::group(['prefix' => 'pharmacy'], function () {
-        Route::post('store', 'PharmacyController@store')->name('store');
-        Route::post('update', 'PharmacyController@edit')->name('update');
+        Route::post('store', 'PharmacyController@store')->name('store'); //Done
+        Route::post('update', 'PharmacyController@edit')->name('update'); //Done
     });
 
 
 
     Route::group(['prefix' => 'city'], function () {
-        Route::get('areas', 'RegionsController@get_areas');
+        Route::get('areas', 'RegionsController@get_areas'); //Done
     });
 
     Route::group(['prefix' => 'cities'], function () {
-        Route::get('/', 'RegionsController@get_cities');
+        Route::get('/', 'RegionsController@get_cities'); //Done
     });
 
 
@@ -111,13 +111,13 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
 
 
     Route::group(['prefix' => 'brands'], function () {
-        Route::get('/', 'BrandController@get_brands');
-        Route::get('products/{brand_id}', 'BrandController@get_products');
+        Route::get('/', 'BrandController@get_brands'); //Done
+        Route::get('products/{brand_id}', 'BrandController@get_products'); //Done
     });
 
     Route::group(['prefix' => 'bags'], function () {
-        Route::get('list', 'BagController@get_bags');
-        Route::get('products/list', 'BagController@get_bag_products');
+        Route::get('list', 'BagController@get_bags');//Done
+        Route::get('products/list', 'BagController@get_bag_products');//Done
 
     });
 

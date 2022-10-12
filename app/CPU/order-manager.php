@@ -9,8 +9,10 @@ use App\Model\CartShipping;
 use App\Model\Order;
 use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
+use App\Pharmacy;
 use App\Model\Product;
 use App\Model\Seller;
+use App\Model\OrderAlameen;
 use App\Model\SellerWallet;
 use App\Model\ShippingType;
 use App\Model\ShippingAddress;
@@ -76,6 +78,7 @@ class OrderManager
                     ]);
                 }
             }
+            $orderAlameen = OrderAlameen::where('order_id','=',$order->id)->update(["status" => $status]);
         } else {
             foreach ($order->details as $detail) {
                 if ($detail['is_stock_decreased'] == 0) {
@@ -110,6 +113,7 @@ class OrderManager
                     ]);
                 }
             }
+            $orderAlameen = OrderAlameen::where('order_id','=',$order->id)->update(["status" => $status]);
         }
     }
 
@@ -236,6 +240,8 @@ class OrderManager
 
     public static function generate_order($data)
     {
+        $myArray=array();
+
         $order_id = 100000 + Order::all()->count() + 1;
         if (Order::find($order_id)) {
             $order_id = Order::orderBy('id', 'DESC')->first()->id + 1;
@@ -319,8 +325,6 @@ class OrderManager
         foreach (CartManager::get_cart($data['cart_group_id']) as $c) {
             $product = Product::where(['id' => $c['product_id']])->first();
 
-
-
             $total_qty = 0;
             $offerType='no offer';
 
@@ -357,6 +361,15 @@ class OrderManager
                 'updated_at' => now()
             ];
 
+            $product_d = [
+                'product_id' => $product->num_id,
+                'qty' => $c['quantity'],
+                'price' => $c['price'],
+                'q_gift' => $total_qty,
+            ];
+            array_push($myArray,$product_d);
+
+
             if ($c['variant'] != null) {
                 $type = $c['variant'];
                 $var_store = [];
@@ -377,6 +390,15 @@ class OrderManager
 
             DB::table('order_details')->insert($or_d);
         }
+
+        $pharmacy=Pharmacy::where('user_id','=',$user['id'])->get()->first();
+        $orderAlameen=new OrderAlameen;
+        $orderAlameen->order_id=$order_id;
+        $orderAlameen->pharmacy_id=$pharmacy->id;
+        $orderAlameen->pharmacy_name=$pharmacy->name;
+        $orderAlameen->product_details=json_encode($myArray);
+        $orderAlameen->status="pending";
+        $orderAlameen->save();
 
         if ($or['payment_method'] != 'cash_on_delivery') {
             $order = Order::find($order_id);
@@ -456,4 +478,6 @@ class OrderManager
 
         return $order_id;
     }
+
+
 }

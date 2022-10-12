@@ -511,16 +511,9 @@
                                         <span class="text-truncate">{{ \App\CPU\translate('List') }}</span>
                                     </a>
                                 </li>
-                                <li class="nav-item {{ Request::is('admin/product/bag/settings') ? 'active' : '' }}">
-                                    <a class="nav-link " href="{{ route('admin.bag.settings') }}">
-                                        <span class="tio-circle nav-indicator-icon"></span>
-                                        <span class="text-truncate">{{ \App\CPU\translate('Settings') }}</span>
-                                    </a>
-                                </li>
+
                             </ul>
                         </li>
-
-
 
 
 
@@ -604,7 +597,7 @@
                                     \App\CPU\translate('coupons') }}</span>
                             </a>
                         </li>
-                        {{-- <li
+                        <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/notification*')?'active':''}}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{route('admin.notification.add-new')}}" title="">
@@ -613,7 +606,7 @@
                                     {{\App\CPU\translate('push_notification')}}
                                 </span>
                             </a>
-                        </li> --}}
+                        </li>
                         <!--
                             <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/deal/flash') ? 'active' : '' }}">
                                 <a class="js-navbar-vertical-aside-menu-link nav-link"
@@ -718,8 +711,8 @@
                                     {{\App\CPU\translate('order_Transactions')}}
                                 </span>
                             </a>
-                        </li> --}}
-                        {{-- <li
+                        </li>
+                        <li
                             class="navbar-vertical-aside-has-menu {{Request::is('admin/transaction/refund-list')?'active':''}}">
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                 href="{{route('admin.transaction.refund-list')}}">

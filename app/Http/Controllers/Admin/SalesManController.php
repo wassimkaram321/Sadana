@@ -216,9 +216,36 @@ class SalesManController extends Controller
 
 
     //Group
-    public function unassign_group($id)
+    public function unassign_group(Request $request,$id)
     {
-        DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id = ' . $id . ' ');
+        $group_id = $id;
+        $array_area=[];
+        $validator = Validator::make($request->all(), [
+            'saler_id' => 'required',
+        ], [
+            'saler_id.required' => 'something wrong!',
+        ]);
+        $decrypted = Crypt::decrypt($request->saler_id);
+
+        $area_ids=Area::where('group_id','=',$group_id)->get(['id']);
+        foreach($area_ids as $a)
+        {
+            array_push($array_area, $a->id);
+        }
+        $pharmacies = Pharmacy::join("users", "users.id", "=", "pharmacies.user_id")
+            ->whereIn("users.area_id", $array_area)
+            ->get([
+                'pharmacies.id as pharma_id'
+            ]);
+
+        foreach ($pharmacies as $pharma) {
+            DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $pharma['pharma_id'] . ' AND sales_id=' . $decrypted . '');
+        }
+        foreach($area_ids as $a)
+        {
+            DB::delete('delete FROM sales_area WHERE area_id =' . $a->id . ' AND sales_id=' . $decrypted . '');
+        }
+        DB::delete('delete FROM sales_group WHERE group_id =' . $group_id . ' AND sales_id=' . $decrypted . '');
         return redirect()->back();
     }
 

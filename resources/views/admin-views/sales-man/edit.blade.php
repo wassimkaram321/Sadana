@@ -62,62 +62,13 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="row">
-                                <div class="col-md-6 col-12">
-                                    <div class="form-group">
-                                        <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('identity')}} {{\App\CPU\translate('type')}}</label>
-                                        <select name="identity_type" class="form-control">
-                                            <option
-                                                value="passport" {{$sales_man['identity_type']=='passport'?'selected':''}}>
-                                                {{\App\CPU\translate('passport')}}
-                                            </option>
-                                            <option
-                                                value="driving_license" {{$delivery_man['identity_type']=='driving_license'?'selected':''}}>
-                                                {{\App\CPU\translate('driving')}} {{\App\CPU\translate('license')}}
-                                            </option>
-                                            <option value="nid" {{$delivery_man['identity_type']=='nid'?'selected':''}}>{{\App\CPU\translate('nid')}}
-                                            </option>
-                                            <option
-                                                value="company_id" {{$delivery_man['identity_type']=='company_id'?'selected':''}}>
-                                                {{\App\CPU\translate('company')}} {{\App\CPU\translate('id')}}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-12">
-                                    <div class="form-group">
-                                        <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('identity')}} {{\App\CPU\translate('number')}}</label>
-                                        <input type="text" name="identity_number" value="{{$delivery_man['identity_number']}}"
-                                               class="form-control"
-                                               placeholder="Ex : DH-23434-LS"
-                                               required>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 col-12">
-                                    <div class="form-group">
-                                        <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('identity')}} {{\App\CPU\translate('image')}}</label>
-                                        <div>
-                                            <div class="row" id="coba"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <br>
-
-                                @foreach(json_decode($delivery_man['identity_image'],true) as $img)
-                                    <div class="col-md-4 col-12 mb-2">
-                                        <img height="150" src="{{asset('storage/app/public/delivery-man').'/'.$img}}">
-                                    </div>
-                                @endforeach
-                                <hr>
-                            </div> --}}
-
+                           
                             <div class="form-group">
                                 <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('password')}}</label>
                                 <input type="text" name="password" class="form-control" placeholder="Ex : password">
                             </div>
 
-                            
+
                             <button type="submit" class="btn btn-primary">{{\App\CPU\translate('submit')}}</button>
                         </form>
                     </div>

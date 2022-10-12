@@ -2123,4 +2123,11 @@
   'Demand_Limit' => 'Demand Limit',
   'Limit' => 'Limit',
   'Free' => 'Free',
+  'custom' => 'Custom',
+  'NON VIP' => 'NON VIP',
+  'Choose City' => 'Choose City',
+  'Choose group' => 'Choose group',
+  'Choose area' => 'Choose area',
+  'Choose pharamcies' => 'Choose pharamcies',
+  'Custom' => 'Custom',
 );

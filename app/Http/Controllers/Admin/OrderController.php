@@ -12,13 +12,11 @@ use App\Model\OrderTransaction;
 use App\Model\Product;
 use App\Model\Seller;
 use App\Model\ShippingAddress;
-use Barryvdh\DomPDF\Facade as PDF;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Pharmacy;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {

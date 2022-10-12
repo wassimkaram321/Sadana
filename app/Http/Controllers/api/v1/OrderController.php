@@ -86,11 +86,13 @@ class OrderController extends Controller
 
         return response()->json(translate('order_placed_successfully'), 200);
     }
-    
+
     public function refund_request(Request $request)
     {
+
         $order_details = OrderDetail::find($request->order_details_id);
 
+        
         if($order_details->delivery_status == 'delivered')
         {
             $order = Order::find($order_details->order_id);

@@ -22,6 +22,8 @@ Route::group(['namespace' => 'AlameenApi','prefix'=>'Alameen'], function () {
     Route::post('/save-stores', 'AlameenController@SaveStores');
     Route::post('/save-pharmices', 'AlameenController@SavePharmices');
 
+    Route::get('/get-orders', 'AlameenController@getOrders');
+
 
 
     //Export Data

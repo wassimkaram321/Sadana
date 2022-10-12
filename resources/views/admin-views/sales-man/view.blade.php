@@ -247,19 +247,19 @@
                                                 aria-expanded="false">
                                                 <i class="tio-settings"></i>
                                             </button>
-                                            {{-- <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
                                                 <a class="dropdown-item" href="javascript:"
-                                                    onclick="form_alert('sales-man-{{$city_area['area_id'] }}','Want to unassign this information ?')">{{
+                                                    onclick="form_alert('sales-man-{{$city_group['group_id'] }}','Want to unassign this information ?')">{{
                                                     \App\CPU\translate('unassign') }}</a>
                                                 <form
-                                                    action="{{ route('admin.sales-man.unassign-area', [$city_area['area_id']]) }}"
-                                                    method="post" id="sales-man-{{ $city_area['area_id'] }}">
+                                                    action="{{ route('admin.sales-man.unassign-group', [$city_group['group_id']]) }}"
+                                                    method="post" id="sales-man-{{ $city_group['group_id'] }}">
                                                     @csrf
                                                     <input type="hidden" value="{{Crypt::encrypt($sm->id)}}"
                                                         name="saler_id">
                                                 </form>
-                                            </div> --}}
+                                            </div>
                                         </div>
                                         <!-- End Dropdown -->
                                     </td>

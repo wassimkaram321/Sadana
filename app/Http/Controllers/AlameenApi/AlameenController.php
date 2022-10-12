@@ -7,6 +7,7 @@ use App\Model\Product;
 use App\Model\Brand;
 use App\Model\Store;
 use App\Model\UserImportExcel;
+use App\Model\OrderAlameen;
 use App\Model\Group;
 use App\Model\City;
 use App\Model\Area;
@@ -30,7 +31,10 @@ class AlameenController extends Controller
     private $demand_limit;
     private $expiry_date;
     private $quantity;
-
+    private $notes;
+    private $Scientific_formula;
+    private $l_name;
+    private $f_name;
     //Done
     function __construct()
     {
@@ -41,7 +45,11 @@ class AlameenController extends Controller
         $this->demand_limit = 0;
         $this->expiry_date = 0000 - 00 - 00;
         $this->quantity = 0;
+        $this->notes = "";
+        $this->Scientific_formula = "";
 
+        $this->l_name = "";
+        $this->f_name = "";
     }
 
     //Done
@@ -50,6 +58,17 @@ class AlameenController extends Controller
         try {
 
             foreach ($request->products as $product) {
+
+                $this->normal_offer = 0;
+                $this->q_normal_offer = 0;
+                $this->featured_offer = 0;
+                $this->q_featured_offer = 0;
+                $this->demand_limit = 0;
+                $this->expiry_date = 0000 - 00 - 00;
+                $this->quantity = 0;
+                $this->notes = "";
+                $this->Scientific_formula = "";
+
                 if (isset($product['store_id'])) {
                     $store = Store::where('id', '=', $product['store_id'])->get()->first();
                     if (isset($store)) {
@@ -73,16 +92,19 @@ class AlameenController extends Controller
                     'id' => 9999999,
                     'position' => 10,
                 ]);
-                $data = [];
 
-                if (isset($product['normal_offer'])) {
-                    $this->q_normal_offer = $this->separate_plus_right($product['normal_offer']);
-                    $this->normal_offer = $this->separate_plus_left($product['normal_offer']);
+                $data = [];
+                if (isset($product['normal_offer']) && isset($product['q_normal_offer'])) {
+                    $this->normal_offer = $product['normal_offer'];
+                    $this->q_normal_offer = $product['q_normal_offer'];
                 }
-                if (isset($product['featured_offer'])) {
-                    $this->q_featured_offer = $this->separate_plus_right($product['featured_offer']);
-                    $this->featured_offer = $this->separate_plus_left($product['featured_offer']);
+
+                if (isset($product['featured_offer']) && isset($product['q_featured_offer'])) {
+
+                    $this->featured_offer = $product['featured_offer'];
+                    $this->q_featured_offer = $product['q_featured_offer'];
                 }
+
                 if (isset($product['demand_limit']))
                     $this->demand_limit = $product['demand_limit'];
                 if (isset($product['expiry_date']))
@@ -90,14 +112,21 @@ class AlameenController extends Controller
                 if (isset($product['quantity']))
                     $this->quantity = $product['quantity'];
 
+                if (isset($product['notes']))
+                    $this->notes = $product['notes'];
+
+                if (isset($product['Scientific_formula']))
+                    $this->Scientific_formula = $product['Scientific_formula'];
+
                 $productOld = Product::where('num_id', $product['num_id'])->get()->first();
+
                 if (isset($productOld)) {
                     $productOld->unit_price = $product['unit_price'];
                     $productOld->name = $product['name'];
                     $productOld->purchase_price = $product['purchase_price'];
                     $productOld->current_stock =  $this->quantity;
-                    $productOld->details = $product['notes'];
-                    $productOld->scientific_formula = $product['Scientific_formula'];
+                    $productOld->details = $this->notes;
+                    $productOld->scientific_formula = $this->Scientific_formula;
                     $productOld->q_normal_offer =  $this->q_normal_offer;
                     $productOld->normal_offer =   $this->normal_offer;
                     $productOld->q_featured_offer =   $this->q_featured_offer;
@@ -114,8 +143,8 @@ class AlameenController extends Controller
                         'unit_price' => $product['unit_price'],
                         'purchase_price' => $product['purchase_price'],
                         'current_stock' => $this->quantity,
-                        'details' => $product['notes'],
-                        'scientific_formula' => $product['Scientific_formula'],
+                        'details' =>  $this->notes,
+                        'scientific_formula' => $this->Scientific_formula,
                         'q_normal_offer' => $this->q_normal_offer,
                         'q_featured_offer' => $this->q_featured_offer,
                         'normal_offer' => $this->normal_offer,
@@ -219,7 +248,7 @@ class AlameenController extends Controller
     {
         try {
 
-            $data=[];
+            $data = [];
 
             foreach ($request->Pharmacies as $pharmacy) {
 
@@ -231,11 +260,22 @@ class AlameenController extends Controller
 
                 $user = UserImportExcel::where('id', '=', $pharmacy['num_id'])->get()->first();
 
+                $this->l_name = "";
+                $this->f_name = "";
+                if(isset($pharmacy['f_name']))
+                {
+                    $this->f_name = $pharmacy['f_name'];
+                }
+                if(isset($pharmacy['l_name']))
+                {
+                    $this->l_name = $pharmacy['l_name'];
+                }
+
                 if (isset($user)) {
                     $user->card_number = $pharmacy['card_number'];
                     $user->pharmacy_name = $pharmacy['name'];
-                    $user->f_name = $pharmacy['f_name'];
-                    $user->l_name = $pharmacy['l_name'];
+                    $user->f_name = $this->f_name;
+                    $user->l_name = $this->l_name;
                     $user->land_number = $pharmacy['land_number'];
                     $user->phone2 = $pharmacy['phone'];
                     $user->phone1 = $pharmacy['phone'];
@@ -249,7 +289,7 @@ class AlameenController extends Controller
                     array_push($data, [
                         'id' => $pharmacy['num_id'],
                         'f_name' => $pharmacy['f_name'],
-                        'l_name' =>$pharmacy['l_name'],
+                        'l_name' => $pharmacy['l_name'],
                         'card_number' => $pharmacy['card_number'],
                         'pharmacy_name' => $pharmacy['name'],
                         'land_number' => $pharmacy['land_number'],
@@ -269,6 +309,17 @@ class AlameenController extends Controller
         } catch (\Exception $e) {
             return $this->returnError($e);
         }
+    }
+
+
+    public function getOrders()
+    {
+        $details = OrderAlameen::get()->all();
+        foreach($details as $p)
+        {
+            $p->product_details = json_decode($p['product_details'], true);
+        }
+        return $this->returnSuccessMessage($details);
     }
 
 
@@ -304,7 +355,7 @@ class AlameenController extends Controller
     public function  compare_group($group, $cityId)
     {
         $name1 = trim($group, " \t.");
-        $groupDB = Group::where('group_name', '=',$name1)->get()->first();
+        $groupDB = Group::where('group_name', '=', $name1)->get()->first();
         if (isset($groupDB)) {
             return $groupDB->id;
         } else {
@@ -342,6 +393,5 @@ class AlameenController extends Controller
         } else {
             return 1;
         }
-
     }
 }

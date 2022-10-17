@@ -192,6 +192,7 @@ class Helpers
             foreach ($data as $item) {
                 // $variation = [];
                 // $item['category_ids'] = json_decode($item['category_ids']);
+                $item['images'] = json_encode($item['images']);
                 $item['images'] = json_decode($item['images']);
                 // $item['colors'] = Color::whereIn('code', json_decode($item['colors']))->get(['name', 'code']);
                 // $attributes = [];
@@ -217,6 +218,7 @@ class Helpers
         } else {
             // $variation = [];
             // $data['category_ids'] = json_decode($data['category_ids']);
+            $data['images'] = json_encode($data['images']);
             $data['images'] = json_decode($data['images']);
             // $data['colors'] = Color::whereIn('code', json_decode($data['colors']))->get(['name', 'code']);
             // $attributes = [];

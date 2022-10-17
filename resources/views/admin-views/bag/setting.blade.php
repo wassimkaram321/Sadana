@@ -52,7 +52,7 @@
         <div class="col-md-12">
 
             <form class="plan-form" action="{{route('admin.bag.settings_store',[$b])}}" method="POST"
-                style="text-align: {{Session::get('direction') === " rtl" ? 'right' : 'left' }};"
+                style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left' }};"
                 enctype="multipart/form-data" id="plan_form">
                 @csrf
 
@@ -125,7 +125,7 @@
                                     <select name="city_id" class="form-control @error('city') is-invalid @enderror">
                                         <option value="">{{\App\CPU\translate('select')}}</option>
                                         @foreach (App\Model\City::all() as $key => $city)
-                                        <option value="{{ $city->id }}">{{ $city->city_name }}</option>
+                                        <option {{ $city->id == $city_id ? 'selected' : '' }} value="{{ $city->id }}">{{ $city->city_name }}</option>
                                         @endforeach
                                     </select>
                                     @error('city')
@@ -144,7 +144,9 @@
                                         <select multiple="multiple" name="group_ids[]"
                                             class="js-example-basic-single" @error('group') is-invalid @enderror"
                                             >
-
+                                            @foreach($groups as $p)
+                                            <option value="{{$p->id }}" {{is_array($array) && in_array($p->id, $array) ? 'selected' : '' }}> {{$p->group_name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -194,7 +196,7 @@
                             $('select[name="group_ids[]"]').append(
                                 '<option value="">Select</option>');
                             $.each(data.groups, function(index, group) {
-                                $('select[name="group_ids[]"]').append('<option value="' +
+                                $('select[name="group_ids[]"]').append('<option  value="' +
                                     group.id + '">' + group.group_name + '</option>'
                                     );
                             })
@@ -216,6 +218,12 @@
 <script>
 
     $("document").ready(function() {
+
+        if(document.getElementById("all_custom").checked==true)
+        {
+            document.getElementById("dis").style.display = "flex";
+        }
+
      $('#all_custom').on('change', function() {
         document.getElementById("dis").style.display = "flex";
     });

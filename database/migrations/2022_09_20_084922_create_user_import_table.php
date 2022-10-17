@@ -10,6 +10,7 @@ class CreateUserImportTable extends Migration
     {
         Schema::create('user_import_excel', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigInteger('num_id');
             $table->string('f_name');
             $table->string('l_name');
             $table->bigInteger('phone1');
@@ -30,30 +31,30 @@ class CreateUserImportTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('group_area', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('city_id');
-            $table->string('group_name');
-            $table->boolean('group_status')->default(1);
-            $table->bigInteger('group_num')->default(0);
-            $table->timestamps();
-            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
-        });
+        // Schema::create('group_area', function (Blueprint $table) {
+        //     $table->bigIncrements('id');
+        //     $table->unsignedBigInteger('city_id');
+        //     $table->string('group_name');
+        //     $table->boolean('group_status')->default(1);
+        //     $table->bigInteger('group_num')->default(0);
+        //     $table->timestamps();
+        //     $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
+        // });
 
-        Schema::create('areas', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('group_id');
-            $table->string('area_name');
-            $table->boolean('area_status')->default(1);
-            $table->bigInteger('area_num')->default(0);
-            $table->timestamps();
-            $table->foreign('group_id')->references('id')->on('group_area')->onDelete('cascade');
+        // Schema::create('areas', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('group_id');
+        //     $table->string('area_name');
+        //     $table->boolean('area_status')->default(1);
+        //     $table->bigInteger('area_num')->default(0);
+        //     $table->timestamps();
+        //     $table->foreign('group_id')->references('id')->on('group_area')->onDelete('cascade');
 
-        });
+        // });
 
-        Schema::table('pharmacies', function (Blueprint $table) {
-            $table->double('card_number');
-        });
+        // Schema::table('pharmacies', function (Blueprint $table) {
+        //     $table->double('card_number');
+        // });
     }
 
     public function down()

@@ -115,9 +115,9 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('products/{brand_id}', 'BrandController@get_products'); //Done
     });
 
-    Route::group(['prefix' => 'bags'], function () {
-        Route::get('list', 'BagController@get_bags');//Done
-        Route::get('products/list', 'BagController@get_bag_products');//Done
+    Route::group(['prefix' => 'bags','middleware'=>'auth:api'], function () {
+        Route::get('list', 'BagController@get_bags'); //Done
+        Route::get('products/list', 'BagController@get_bag_products'); //Done
 
     });
 

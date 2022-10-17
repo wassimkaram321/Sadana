@@ -770,7 +770,7 @@ class POSController extends Controller
             'updated_at' => now(),
         ];
         DB::table('orders')->insertGetId($or);
-        $this->save_order_alameen($user['id'],$order_id,$myArray);
+        $this->save_order_alameen($user['pharmacy_id'],$order_id,$myArray);
         session()->forget($cart_id);
         session(['last_order' => $order_id]);
         Toastr::success(\App\CPU\translate('order_placed_successfully'));

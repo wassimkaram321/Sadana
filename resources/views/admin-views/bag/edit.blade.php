@@ -45,13 +45,13 @@
 
                         <div class="row">
                             <div class="col-md-6 col-12">
-                            <div class="form-group">
-                                <label class="input-label"
-                                    for="exampleFormControlInput1">{{\App\CPU\translate('Expiry_date')}}</label>
-                                <input type="date" value="{{$b['end_date']}}" name="end_date" class="form-control"
-                                    required>
+                                <div class="form-group">
+                                    <label class="input-label"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Expiry_date')}}</label>
+                                    <input type="date" value="{{$b['end_date']}}" name="end_date" class="form-control"
+                                        required>
+                                </div>
                             </div>
-                        </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
@@ -61,6 +61,18 @@
                                 </div>
                             </div>
 
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6 col-12">
+                                <div class="form-group">
+                                    <label class="input-label"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Total_price_offer')}}</label>
+                                    <input type="number" value="{{$b['total_price_offer']}}" name="total_price_offer" class="form-control"
+                                        required>
+                                </div>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>

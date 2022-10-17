@@ -16,6 +16,7 @@ use App\Model\OrderAlameen;
 use App\Model\SellerWallet;
 use App\Model\ShippingType;
 use App\Model\ShippingAddress;
+use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -78,7 +79,7 @@ class OrderManager
                     ]);
                 }
             }
-            $orderAlameen = OrderAlameen::where('order_id','=',$order->id)->update(["status" => $status]);
+            $orderAlameen = OrderAlameen::where('order_id', '=', $order->id)->update(["status" => $status]);
         } else {
             foreach ($order->details as $detail) {
                 if ($detail['is_stock_decreased'] == 0) {
@@ -113,9 +114,88 @@ class OrderManager
                     ]);
                 }
             }
-            $orderAlameen = OrderAlameen::where('order_id','=',$order->id)->update(["status" => $status]);
+            $orderAlameen = OrderAlameen::where('order_id', '=', $order->id)->update(["status" => $status]);
         }
     }
+
+
+
+
+    public static function stock_update_on_order_delete_change($detail, $order_id)
+    {
+        $product = Product::find($detail['product_id']);
+        $type = $detail['variant'];
+        $var_store = [];
+        foreach (json_decode($product['variation'], true) as $var) {
+            if ($type == $var['type']) {
+                $var['qty'] += $detail['qty'];
+            }
+            array_push($var_store, $var);
+        }
+        Product::where(['id' => $product['id']])->update([
+            'variation' => json_encode($var_store),
+            'current_stock' => $product['current_stock'] + $detail['qty'],
+        ]);
+        $order = Order::where('id', '=', $order_id)->get()->first();
+        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'],"delete") - $order->discount;
+        $order->save();
+    }
+
+    public static function stock_update_on_order_edit_change($detail, $order_id, $qtyNew)
+    {
+
+        $product = Product::find($detail['product_id']);
+        $type = $detail['variant'];
+        $var_store = [];
+        foreach (json_decode($product['variation'], true) as $var) {
+            if ($type == $var['type']) {
+                $var['qty'] += $qtyNew;
+            }
+            array_push($var_store, $var);
+        }
+        if ($qtyNew > $detail['qty'])
+            $Q = $detail['qty'] - $qtyNew;
+        elseif ($qtyNew == $detail['qty'])
+            $Q = $detail['qty'];
+        elseif ($qtyNew < $detail['qty'])
+            $Q = $detail['qty'] - $qtyNew;
+
+        Product::where(['id' => $product['id']])->update([
+            'variation' => json_encode($var_store),
+            'current_stock' => $product['current_stock'] + $Q,
+        ]);
+
+
+        $ordersDetails=OrderDetail::where('order_id','=',$order_id)
+        ->where('product_id','=',$detail['product_id'])
+        ->get()
+        ->first();
+        $ordersDetails->qty=$qtyNew;
+
+            $total_qty = 0;
+            $offerType = 'no offer';
+
+            if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
+                $total_qty = ((int)($qtyNew / $product->q_featured_offer)) * $product->featured_offer;
+                $offerType = 'featured';
+            }
+            if ($total_qty == 0) {
+                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                    $total_qty = ((int)($qtyNew / $product->q_normal_offer)) * $product->normal_offer;
+                    $offerType = 'normal';
+                }
+            }
+            $ordersDetails->total_qty=$total_qty;
+            $ordersDetails->offerType=$offerType;
+            $ordersDetails->save();
+
+        $order = Order::where('id', '=', $order_id)->get()->first();
+        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'],"edit") - $order->discount;
+        $order->save();
+    }
+
+
+
 
     public static function wallet_manage_on_order_status_change($order, $received_by)
     {
@@ -238,9 +318,11 @@ class OrderManager
         }
     }
 
+
+
     public static function generate_order($data)
     {
-        $myArray=array();
+        $myArray = array();
 
         $order_id = 100000 + Order::all()->count() + 1;
         if (Order::find($order_id)) {
@@ -326,17 +408,16 @@ class OrderManager
             $product = Product::where(['id' => $c['product_id']])->first();
 
             $total_qty = 0;
-            $offerType='no offer';
+            $offerType = 'no offer';
 
-            if ($product->q_featured_offer!=0 &&  $product->featured_offer != 0) {
+            if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
                 $total_qty = ((int)($c['quantity'] / $product->q_featured_offer)) * $product->featured_offer;
-                $offerType='featured';
+                $offerType = 'featured';
             }
-            if($total_qty==0)
-            {
-                if ($product->q_normal_offer!=0 && $product->normal_offer !=0) {
+            if ($total_qty == 0) {
+                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
                     $total_qty = ((int)($c['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
-                    $offerType='normal';
+                    $offerType = 'normal';
                 }
             }
 
@@ -367,7 +448,7 @@ class OrderManager
                 'price' => $c['price'],
                 'q_gift' => $total_qty,
             ];
-            array_push($myArray,$product_d);
+            array_push($myArray, $product_d);
 
 
             if ($c['variant'] != null) {
@@ -391,13 +472,14 @@ class OrderManager
             DB::table('order_details')->insert($or_d);
         }
 
-        $pharmacy=Pharmacy::where('user_id','=',$user['id'])->get()->first();
-        $orderAlameen=new OrderAlameen;
-        $orderAlameen->order_id=$order_id;
-        $orderAlameen->pharmacy_id=$pharmacy->id;
-        $orderAlameen->pharmacy_name=$pharmacy->name;
-        $orderAlameen->product_details=json_encode($myArray);
-        $orderAlameen->status="pending";
+        $pharmacy = Pharmacy::where('user_id', '=', $user['id'])->get()->first();
+        $userR = User::where('id', '=', $user['id'])->get()->first();
+        $orderAlameen = new OrderAlameen;
+        $orderAlameen->order_id = $order_id;
+        $orderAlameen->pharmacy_id = $userR->pharmacy_id;
+        $orderAlameen->pharmacy_name = $pharmacy->name;
+        $orderAlameen->product_details = json_encode($myArray);
+        $orderAlameen->status = "pending";
         $orderAlameen->save();
 
         if ($or['payment_method'] != 'cash_on_delivery') {
@@ -478,6 +560,4 @@ class OrderManager
 
         return $order_id;
     }
-
-
 }

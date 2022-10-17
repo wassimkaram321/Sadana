@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Pharmacy;
+use Exception;
 
 class OrderController extends Controller
 {
@@ -101,25 +103,25 @@ class OrderController extends Controller
         $shipping_address = ShippingAddress::find($order->shipping_address);
         $customerDetails = User::where('id', $order->customer_id)->get()->first();
 
-        $status=false;
+        $status = false;
         if ($order->orderBy_id != null) {
 
-             $pharmacy = Pharmacy::where('id',$order->orderBy_id)->get()->first();
-             $UserPharmacy = User::where('id',$pharmacy->user_id)->get()->first();
+            $pharmacy = Pharmacy::where('id', $order->orderBy_id)->get()->first();
+            $UserPharmacy = User::where('id', $pharmacy->user_id)->get()->first();
 
-            $status=true;
+            $status = true;
             if ($order->order_type == 'default_type') {
-                return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy','UserPharmacy'));
+                return view('admin-views.order.order-details', compact('status', 'shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy', 'UserPharmacy'));
             } else {
-                return view('admin-views.pos.order.order-details', compact('status','order', 'shipping_address', 'pharmacy','UserPharmacy'));
+                return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address', 'pharmacy', 'UserPharmacy'));
             }
         }
 
         if ($order->order_type == 'default_type') {
-            $status=false;
-            return view('admin-views.order.order-details', compact('status','shipping_address', 'order', 'linked_orders', 'delivery_men'));
+            $status = false;
+            return view('admin-views.order.order-details', compact('status', 'shipping_address', 'order', 'linked_orders', 'delivery_men'));
         } else {
-            return view('admin-views.pos.order.order-details', compact('status','order', 'shipping_address'));
+            return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address'));
         }
     }
 
@@ -168,8 +170,7 @@ class OrderController extends Controller
             $order = Order::find($order_id);
             $order->orderBy_id = $pharmacy_man_id;
             $order->save();
-
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             Toastr::warning(\App\CPU\translate('failed for Pharmacy!'));
             return response()->json([], 401);
         }
@@ -322,5 +323,97 @@ class OrderController extends Controller
         }
 
         return (new FastExcel($storage))->download($result);
+    }
+
+
+    public function edit_order($id)
+    {
+        try {
+            $order = Order::with('details', 'shipping', 'seller')->where(['id' => $id])->first();
+            if ($order->order_type == 'default_type') {
+                return view('admin-views.order.order-editing', compact('order'));
+            } else {
+                return back();
+            }
+        } catch (Exception $e) {
+            return back();
+        }
+    }
+
+
+    public function delete_product_order(Request $request)
+    {
+        try {
+            if ($request->ajax()) {
+                $product = OrderDetail::where('order_id', '=', $request->order_id)
+                    ->where('product_id', '=', $request->product_id)->get()->first();
+                OrderManager::stock_update_on_order_delete_change($product,$request->order_id);
+                $product->delete();
+            }
+
+            //notification
+            // $value = Helpers::order_status_update_message($request->order_status);
+            //$fcm_token = $order->customer->cm_firebase_token;
+            // try {
+            //     if ($value) {
+            //         $data = [
+            //             'title' => translate('Order'),
+            //             'description' => $value,
+            //             'order_id' => $order['id'],
+            //             'image' => '',
+            //         ];
+            //         Helpers::send_push_notif_to_device($fcm_token, $data);
+            //     }
+            // } catch (\Exception $e) {
+            // }
+
+            $data = 1;
+            return response()->json($data);
+        } catch (\Exception $e) {
+            $data = 0;
+            return response()->json($data);
+        }
+    }
+
+
+    public function product_edit_order(Request $request,$id)
+    {
+        $orderDetail = OrderDetail::where('order_id','=',$id)
+        ->where('product_id','=',$request->product_id)->get()->first();
+	    return response()->json([
+	      'data' => $orderDetail
+	    ]);
+    }
+
+
+    public function update_order(Request $request)
+    {
+        try {
+                $product = OrderDetail::where('order_id', '=', $request->order_id)
+                    ->where('product_id', '=', $request->product_id)->get()->first();
+                OrderManager::stock_update_on_order_edit_change($product,$request->order_id,$request->qty);
+
+            //notification
+            // $value = Helpers::order_status_update_message($request->order_status);
+            //$fcm_token = $order->customer->cm_firebase_token;
+            // try {
+            //     if ($value) {
+            //         $data = [
+            //             'title' => translate('Order'),
+            //             'description' => $value,
+            //             'order_id' => $order['id'],
+            //             'image' => '',
+            //         ];
+            //         Helpers::send_push_notif_to_device($fcm_token, $data);
+            //     }
+            // } catch (\Exception $e) {
+            // }
+
+            Toastr::success('Quantity updated successfully!');
+            return back();
+        } catch (\Exception $e) {
+            Toastr::error('Faild updated!');
+            return back();
+        }
     }
 }

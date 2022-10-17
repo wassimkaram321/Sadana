@@ -5,6 +5,7 @@ namespace App\CPU;
 use App\Model\Cart;
 use App\Model\CartShipping;
 use App\Model\Color;
+use App\Model\OrderDetail;
 use App\Model\Product;
 use App\Model\Shop;
 use Barryvdh\Debugbar\Twig\Extension\Debug;
@@ -153,6 +154,35 @@ class CartManager
                 $total += $product_subtotal;
             }
             $total += $shipping_cost;
+        }
+        return $total;
+    }
+
+    public static function order_grand_total($order_id,$product_id,$status)
+    {
+        $ordersDetails=OrderDetail::where('order_id','=',$order_id)->get();
+      // $shipping_cost = CartManager::get_shipping_cost($cart_group_id);
+        $total = 0;
+        if (!empty($ordersDetails)) {
+            foreach ($ordersDetails as $item) {
+                if($status=="delete")
+                {
+                    if($item->product_id!=$product_id)
+                    {
+                        $product_subtotal = ($item['price'] * $item['qty'])
+                        + ($item['tax'] * $item['qty'])
+                        - $item['discount'] * $item['qty'];
+                         $total += $product_subtotal;
+                    }
+                }
+                else{
+                    $product_subtotal = ($item['price'] * $item['qty'])
+                    + ($item['tax'] * $item['qty'])
+                    - $item['discount'] * $item['qty'];
+                     $total += $product_subtotal;
+                }
+            }
+           // $total += $shipping_cost;
         }
         return $total;
     }

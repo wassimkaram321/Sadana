@@ -513,6 +513,7 @@ class PharmacyController extends Controller
                 $user->f_name = $pharma->f_name;
                 $user->l_name = $pharma->l_name;
                 $user->phone = $pharma->phone1;
+                $user->pharmacy_id = $pharma->num_id;
                 $user->email = $emailNew;
                 $user->password = bcrypt($pharma->password);
                 $user->user_type = "pharmacist";

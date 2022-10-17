@@ -7,8 +7,10 @@ use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\BaseController;
 use App\Model\Bag;
+use App\Model\Group;
 use App\Model\BagsSetting;
 use App\Model\BagProduct;
+use App\Model\City;
 use App\Model\Product;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
@@ -98,11 +100,13 @@ class BagController extends BaseController
             'bag_description' => 'required',
             'end_date' => 'required',
             'demand_limit' => 'required',
+            'total_price_offer' => 'required',
         ], [
             'bag_name.required' => ' Name is required!',
             'bag_description.required' => 'Description name is required!',
             'end_date.required' => 'Expiry date is required!',
             'demand_limit.required' => 'Demand limit is required!',
+            'total_price_offer.required'=>'Price is required!',
         ]);
 
 
@@ -114,6 +118,7 @@ class BagController extends BaseController
             }
             $bag->bag_description = $request->bag_description;
             $bag->end_date = $request->end_date;
+            $bag->total_price_offer = $request->total_price_offer;
             $bag->demand_limit = $request->demand_limit;
             $bag->save();
             Toastr::success('bag updated successfully!');
@@ -250,6 +255,7 @@ class BagController extends BaseController
             $bagsSetting->vip = 0;
             $bagsSetting->non_vip = 0;
             $bagsSetting->custom = 0;
+            $bagsSetting->group_ids ="";
 
             if ($request->all == 0)
                 $bagsSetting->all = 1;
@@ -273,11 +279,22 @@ class BagController extends BaseController
     }
 
 
-
     public function bag_settings(Request $request, $id)
     {
+        $city_id=0;
+        $array=array();
+        $groups=[];
         $bag = BagsSetting::where('bag_id','=',$id)->get()->first();
+        if($bag->group_ids!="")
+        {
+            $array=json_decode($bag->group_ids);
+            $city=Group::where('id','=',$array[0])->get(['city_id'])->first();
+            $city_id=$city->city_id;
+
+            $groupsSelected=Group::whereIn("id",$array)->get();
+            $groups=Group::where('city_id','=',$city_id)->get();
+        }
         $b=$id;
-        return view('admin-views.bag.setting', compact('bag','b'));
+        return view('admin-views.bag.setting', compact('bag','b','city_id','array','groups'));
     }
 }

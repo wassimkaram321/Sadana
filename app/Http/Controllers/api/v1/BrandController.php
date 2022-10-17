@@ -26,6 +26,7 @@ class BrandController extends Controller
     public function get_products($brand_id)
     {
         try {
+           // return response()->json("fadi", 403);
             $products = BrandManager::get_products($brand_id);
         } catch (\Exception $e) {
             return response()->json(['errors' => $e], 403);

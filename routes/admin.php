@@ -624,6 +624,14 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('generate-invoice/{id}', 'OrderController@generate_invoice')->name('generate-invoice');
             Route::get('inhouse-order-filter', 'OrderController@inhouse_order_filter')->name('inhouse-order-filter');
 
+
+            Route::post('edit/order/product/{id}', 'OrderController@product_edit_order')->name('product-edit-order');
+
+            Route::get('edit/order/{id}', 'OrderController@edit_order')->name('edit-order');
+            Route::post('update/order', 'OrderController@update_order')->name('update-order');
+            Route::post('delete-product', 'OrderController@delete_product_order')->name('delete-product');
+
+
             Route::post('update-deliver-info', 'OrderController@update_deliver_info')->name('update-deliver-info');
             Route::get('add-delivery-man/{order_id}/{d_man_id}', 'OrderController@add_delivery_man')->name('add-delivery-man');
 

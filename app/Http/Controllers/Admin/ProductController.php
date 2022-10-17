@@ -66,6 +66,7 @@ class ProductController extends BaseController
     public function view($id)
     {
         $product = Product::with(['reviews'])->where(['id' => $id])->first();
+        $product->images=json_encode($product->images,true);
         $reviews = Review::where(['product_id' => $id])->paginate(Helpers::pagination_limit());
         $brand = Brand::where(['id' => $product->brand_id])->first();
         $store = Store::where(['id' => $product->store_id])->first();
@@ -525,6 +526,7 @@ class ProductController extends BaseController
     public function edit($id)
     {
         $product = Product::withoutGlobalScopes()->with('translations')->find($id);
+        $product->images=json_encode($product->images,true);
         $product_category = json_decode($product->category_ids);
         $product->colors = json_decode($product->colors);
         $categories = Category::where(['parent_id' => 0])->get();

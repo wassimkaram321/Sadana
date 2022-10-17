@@ -258,7 +258,7 @@ class AlameenController extends Controller
                 $area_id = $this->compare_area($pharmacy['region'], $group_id);
                 $is_active = $this->compare_active($pharmacy['is_active']);
 
-                $user = UserImportExcel::where('id', '=', $pharmacy['num_id'])->get()->first();
+                $user = UserImportExcel::where('num_id', '=', $pharmacy['num_id'])->get()->first();
 
                 $this->l_name = "";
                 $this->f_name = "";
@@ -272,6 +272,7 @@ class AlameenController extends Controller
                 }
 
                 if (isset($user)) {
+                    $user->num_id = $pharmacy['num_id'];
                     $user->card_number = $pharmacy['card_number'];
                     $user->pharmacy_name = $pharmacy['name'];
                     $user->f_name = $this->f_name;
@@ -287,7 +288,7 @@ class AlameenController extends Controller
                     $user->save();
                 } else {
                     array_push($data, [
-                        'id' => $pharmacy['num_id'],
+                        'num_id' => $pharmacy['num_id'],
                         'f_name' => $pharmacy['f_name'],
                         'l_name' => $pharmacy['l_name'],
                         'card_number' => $pharmacy['card_number'],

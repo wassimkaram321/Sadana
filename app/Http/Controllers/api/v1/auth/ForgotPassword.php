@@ -29,7 +29,7 @@ class ForgotPassword extends Controller
         $identity=$request['phone'];
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json([ 'status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
             //return $this->returnError(Helpers::error_processor($validator),403);
         }
 
@@ -62,13 +62,13 @@ class ForgotPassword extends Controller
                     'created_at' => now(),
                 ]);
                 //SMS_module::send($customer->phone, $token);
-                return response()->json(['token' => $token], 200);
+                return response()->json(['status'=>200,'token' => $token], 200);
                 //return $this->returnData('Details', ['token' => $token] , 'otp verification');
             }
         }
 
         return response()->json(['errors' => [
-            ['code' => 'not-found', 'message' => 'user not found or Account has been suspended!']
+            ['status' =>404,'code' => 'not-found', 'message' => 'user not found or Account has been suspended!']
         ]], 404);
     }
 
@@ -84,7 +84,7 @@ class ForgotPassword extends Controller
         $identity=$request['phone'];
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
             //return $this->returnError(Helpers::error_processor($validator),403);
         }
 
@@ -98,11 +98,11 @@ class ForgotPassword extends Controller
             ->first();
 
         if (isset($data)) {
-            return response()->json(['message' => 'Otp_verified'], 200);
+            return response()->json(['status'=>200 ,'message' => 'Otp_verified'], 200);
             //return $this->returnSuccessMessage('Otp_verified',200);
         }
 
-        return response()->json(['errors' => 'otp_not_found'], 404);
+        return response()->json(['status'=>404 ,'errors' => 'otp_not_found'], 404);
        // return $this->returnError('otp_not_found',200);
     }
 
@@ -120,7 +120,7 @@ class ForgotPassword extends Controller
          $identity=$request['phone'];
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
         }
 
         // $data = DB::table('password_resets')
@@ -147,10 +147,10 @@ class ForgotPassword extends Controller
             DB::table('password_resets')
                 ->where('identity',$identity)
                 ->where(['token' => $request['otp']])->delete();
-                return response()->json(['message' => 'Password changed successfully.'], 200);
+                return response()->json(['status'=>200 ,'message' => 'Password changed successfully.'], 200);
         }
 
-        return response()->json(['errors' => 'otp_not_found'], 404);
+        return response()->json(['status'=>404 ,'errors' => 'otp_not_found'], 404);
 
     }
 }

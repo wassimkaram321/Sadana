@@ -39,7 +39,7 @@ class PassportAuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
         }
 
 
@@ -94,7 +94,7 @@ class PassportAuthController extends Controller
         // }
 
         $token = $user->createToken('LaravelAuthApp')->accessToken;
-        return response()->json(['token' => $token], 200);
+        return response()->json(['status'=>200 ,'token' => $token], 200);
     }
 
 
@@ -108,7 +108,7 @@ class PassportAuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
         }
 
         $user_id = $request['phone'];
@@ -123,6 +123,7 @@ class PassportAuthController extends Controller
                 $errors = [];
                 array_push($errors, ['code' => 'email', 'message' => 'Invalid phone number']);
                 return response()->json([
+                    'status'=>404,
                     'errors' => $errors
                 ], 404);
             }
@@ -143,17 +144,18 @@ class PassportAuthController extends Controller
             $phone_verification = Helpers::get_business_settings('phone_verification');
             //$email_verification = Helpers::get_business_settings('email_verification');
             if ($phone_verification && !$user->is_phone_verified) {
-                return response()->json(['temporary_token' => $user->temporary_token], 200);
+                return response()->json(['status'=>200 ,'temporary_token' => $user->temporary_token], 200);
             }
             // if ($email_verification && !$user->is_email_verified) {
             //     return response()->json(['temporary_token' => $user->temporary_token], 200);
             // }
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json(['status'=>200 ,'token' => $token], 200);
         } else {
             $errors = [];
             array_push($errors, ['code' => 'auth-001', 'message' => translate('Customer_not_found_or_Account_has_been_suspended_or_wrong_password')]);
             return response()->json([
+                'status'=>404 ,
                 'errors' => $errors
             ], 404);
         }

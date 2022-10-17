@@ -25,7 +25,7 @@ class PhoneVerificationController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
         }
 
         // $user = User::where(['temporary_token' => $request->temporary_token])->first();
@@ -41,17 +41,29 @@ class PhoneVerificationController extends Controller
         {
             $phone->token=$code;
             $phone->save();
-            return response()->json(['message' => 'Phone_and_code_verifications'], 200);
+            $details=[
+                'phone_or_email' => $request['phone'],
+                'token' => $code,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            return response()->json(['status'=>200,'message' =>$details], 200);
         }
         else
         {
-            $details=PhoneOrEmailVerification::updateOrCreate([
+            $phone=PhoneOrEmailVerification::updateOrCreate([
                 'phone_or_email' => $request['phone'],
                 'token' => $code,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            return response()->json(['message' => $details], 200);
+            $details=[
+                'phone_or_email' => $request['phone'],
+                'token' => $code,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            return response()->json(['status'=>200 ,'message' => $details], 200);
             //return $this->returnData('Details', $details, ' Phone and code verifications');
         }
 
@@ -72,7 +84,7 @@ class PhoneVerificationController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 404);
+            return response()->json(['status'=>404 ,'errors' => Helpers::error_processor($validator)], 404);
             //return $this->returnError(Helpers::error_processor($validator),403);
         }
 
@@ -85,9 +97,9 @@ class PhoneVerificationController extends Controller
                 // $user->is_phone_verified = 1;
                 // $user->save();
                 $verify->delete();
-                return response()->json(['message' => translate('otp_verified')], 200);
+                return response()->json(['status'=>200 ,'message' => translate('otp_verified')], 200);
             } catch (\Exception $exception) {
-                return response()->json(['errors' => translate('otp_not_verified')], 404);
+                return response()->json(['status'=>404 ,'errors' => translate('otp_not_verified')], 404);
                 //return $this->returnError(Helpers::error_processor($validator),200);
             }
 
@@ -99,7 +111,7 @@ class PhoneVerificationController extends Controller
         }
         else
         {
-            return response()->json(['errors' => translate('otp_not_found')], 404);
+            return response()->json(['status'=>404 ,'errors' => translate('otp_not_found')], 404);
         }
         // return response()->json(['errors' => [
         //     ['code' => 'token', 'message' => translate('otp_not_found')]

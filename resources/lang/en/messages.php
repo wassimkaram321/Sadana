@@ -2130,4 +2130,11 @@
   'Choose area' => 'Choose area',
   'Choose pharamcies' => 'Choose pharamcies',
   'Custom' => 'Custom',
+  'otp_not_found' => 'Otp not found',
+  'Total_price_offer' => 'Total price offer',
+  'Product Deleted successfully' => 'Product Deleted successfully',
+  'Order is already delivered' => 'Order is already delivered',
+  'Are you sure you want to remove the product?' => 'Are you sure you want to remove the product ',
+  'You can not change it' => 'You can not change it',
+  'Product deleted successfully' => 'Product deleted successfully',
 );

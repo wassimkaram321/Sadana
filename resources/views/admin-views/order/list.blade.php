@@ -124,7 +124,7 @@
             <!-- End Header -->
 
             <!-- Table -->
-            <div class="table-responsive datatable-custom">
+            <div class="table-responsive datatable-custom" style="min-height:150px">
                 <table class="table table-hover table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
                        style="width: 100%; text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}}">
                     <thead class="thead-light">
@@ -236,9 +236,10 @@
                                         <a class="dropdown-item"
                                            href="{{route('admin.orders.details',['id'=>$order['id']])}}"><i
                                                 class="tio-visible"></i> {{\App\CPU\translate('view')}}</a>
-                                        {{-- <a class="dropdown-item" target="_blank"
-                                           href="{{route('admin.orders.generate-invoice',[$order['id']])}}"><i
-                                                class="tio-download"></i> {{\App\CPU\translate('invoice')}}</a> --}}
+
+                                        <a class="dropdown-item" target="_blank"
+                                           href="{{route('admin.orders.edit-order',[$order['id']])}}"><i
+                                                class="tio-edit"></i> {{\App\CPU\translate('Edit')}}</a>
 
                                                 <a  class="dropdown-item" target="_blank"
                                                 href={{ route('admin.orders.generate-excel', [$order['id']]) }}>

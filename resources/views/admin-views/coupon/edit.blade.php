@@ -23,13 +23,13 @@
                     <form action="{{route('admin.coupon.update',[$c['id']])}}" method="post">
                         @csrf
                         <div class="row">
-                            <div class="col-4">
+                            <div style="display: none;" class="col-4">
                                 <div class="form-group">
                                     <label  for="name">{{\App\CPU\translate('Type')}}</label>
                                     <select class="form-control" name="coupon_type"
                                             style="width: 100%" required>
                                         {{--<option value="delivery_charge_free">Delivery Charge Free</option>--}}
-                                        <option value="discount_on_purchase" {{$c['coupon_type']=='discount_on_purchase'?'selected':''}}>{{\App\CPU\translate('Discount on Purchase')}}</option>
+                                        <option selected value="discount_on_purchase" {{$c['coupon_type']=='discount_on_purchase'?'selected':''}}>{{\App\CPU\translate('Discount on Purchase')}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -54,15 +54,15 @@
                             <div class="col-md-3 col-6">
                                 <div class="form-group">
                                     <label for="name">{{\App\CPU\translate('start_date')}}</label>
-                                    <input type="date" name="start_date" class="form-control" id="start_date" value="{{date('Y-m-d',strtotime($c['start_date']))}}"
-                                        placeholder="{{\App\CPU\translate('start date')}}" required>
+                                    <input type="date" name="start_date" class="form-control" id="start_date" 
+                                        placeholder="{{\App\CPU\translate('start date')}}" >
                                 </div>
                             </div>
                             <div class="col-md-3 col-6">
                                 <div class="form-group">
                                     <label for="name">{{\App\CPU\translate('expire_date')}}</label>
-                                    <input type="date" name="expire_date" class="form-control" id="expire_date" value="{{date('Y-m-d',strtotime($c['expire_date']))}}"
-                                           placeholder="{{\App\CPU\translate('expire date')}}" required>
+                                    <input type="date" name="expire_date" class="form-control" id="expire_date" 
+                                           placeholder="{{\App\CPU\translate('expire date')}}" >
                                 </div>
                             </div>
                             <div class="col-md-3 col-6">
@@ -71,14 +71,14 @@
                                         <input type="number" name="limit" value="{{ $c['limit'] }}" id="coupon_limit" class="form-control" placeholder="{{\App\CPU\translate('EX')}}: {{\App\CPU\translate('10')}}">
                                 </div>
                             </div>
-                            <div class="col-md-3 col-6">
+                            <div style="display: none;" class="col-md-3 col-6">
                                 <div class="form-group">
                                     <label  for="name">{{\App\CPU\translate('discount_type')}}</label>
                                     <select id="discount_type" class="form-control" name="discount_type"
                                             onchange="checkDiscountType(this.value)"
                                             style="width: 100%">
                                         <option value="amount" {{$c['discount_type']=='amount'?'selected':''}}>{{\App\CPU\translate('Amount')}}</option>
-                                        <option value="percentage" {{$c['discount_type']=='percentage'?'selected':''}}>{{\App\CPU\translate('percentage')}}</option>
+                                        <option selected value="percentage" {{$c['discount_type']=='percentage'?'selected':''}}>{{\App\CPU\translate('percentage')}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -93,17 +93,17 @@
                                 </div>
                             </div>
                             <div class="col-md-3 col-6">
-                                <label for="name">{{\App\CPU\translate('minimum_purchase')}}</label>
+                                <label for="name">{{\App\CPU\translate('Points')}}</label>
                                 <input type="number" min="0" max="1000000" step=".01" name="min_purchase" class="form-control" id="minimum purchase" value="{{\App\CPU\Convert::default($c['min_purchase'])}}"
-                                        placeholder="{{\App\CPU\translate('minimum purchase')}}" required>
+                                        placeholder="{{\App\CPU\translate('Points')}}" required>
                             </div>
-                            <div id="max-discount" class="col-md-3 col-6">
+                            {{-- <div id="max-discount" class="col-md-3 col-6">
                                 <div class="form-group">
                                     <label for="name">{{\App\CPU\translate('maximum_discount')}}</label>
                                     <input type="number" min="0" max="1000000" step=".01" name="max_discount" class="form-control" id="maximum discount" value="{{\App\CPU\Convert::default($c['max_discount'])}}"
                                            placeholder="{{\App\CPU\translate('maximum discount')}}">
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div class="card-footer">

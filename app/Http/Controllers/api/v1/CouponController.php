@@ -29,4 +29,30 @@ class CouponController extends Controller
 
         return response()->json($coupon, 200);
     }
+
+    public function coupons(Request $request)
+    {
+        # code...
+        try {
+        $coupons = Coupon::where('status','=',1)->get();
+        $data = [];
+        foreach($coupons as $coupon){
+            $code = encrypt($coupon->code);
+            $data['id'] = $coupon->id;
+            $data['title'] = $coupon->title;
+            $data['start_date'] = $coupon->start_date;
+            $data['expire_date'] = $coupon->expire_date;
+            $data['min_purchase'] = $coupon->min_purchase;
+            $data['discount'] = $coupon->discount;
+            $data['code'] = $code;
+        }
+    }
+    catch (\Exception $e) {
+        return response()->json(['errors' => $e], 403);
+    }
+    return response()->json($data, 200);
+
+    }
+
+
 }

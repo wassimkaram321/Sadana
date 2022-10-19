@@ -611,7 +611,29 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
 
 
+        Route::group(['prefix' => 'points', 'as' => 'points.'], function () {
+            // Product Points
+            Route::get('list', 'ProductPointController@index')->name('points_list');
+            Route::get('create', 'ProductPointController@create')->name('points_create');
+            Route::post('store', 'ProductPointController@store')->name('points_store');
+            Route::post('delete', 'ProductPointController@destroy')->name('points_delete');
+            Route::get('edit/{id}', 'ProductPointController@edit')->name('points_edit');
+            Route::post('update/{id}', 'ProductPointController@update')->name('points_update');
+            // Bag Points
+            Route::get('bag_point_list', 'ProductPointController@bag_point_index')->name('bag_points_list');
+            Route::get('bag_point_create', 'ProductPointController@bag_point_create')->name('bag_points_create');
+            Route::post('bag_point_store', 'ProductPointController@bag_point_store')->name('bag_points_store');
+            Route::post('bag_point_delete', 'ProductPointController@bag_point_destroy')->name('bag_points_delete');
+            Route::get('bag_point_edit/{id}', 'ProductPointController@bag_point_edit')->name('bag_points_edit');
+            Route::post('bag_point_update/{id}', 'ProductPointController@bag_point_update')->name('bag_points_update');
+            // Order Points
+            Route::get('order_points', 'ProductPointController@order_points')->name('order_points');
+            Route::post('order_points_delele', 'ProductPointController@order_points_destroy')->name('order_points_delele');
+            Route::post('order_points_store', 'ProductPointController@order_points_store')->name('order_points_store');
+            // Pharmacies Points
+            Route::get('pharmacies_points', 'ProductPointController@pharmacies_points')->name('pharmacies_points');
 
+        });
 
 
         //order management

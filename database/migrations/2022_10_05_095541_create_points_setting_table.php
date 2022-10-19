@@ -12,7 +12,7 @@ class CreatePointsSettingTable extends Migration
         Schema::create('products_points', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->bigInteger('type_id');
+            $table->text('type_id');
             $table->string('name');
             $table->bigInteger('quantity');
             $table->bigInteger('points');
@@ -23,6 +23,7 @@ class CreatePointsSettingTable extends Migration
             $table->id();
             $table->bigInteger('price');
             $table->bigInteger('points');
+            $table->timestamps();
         });
     }
 

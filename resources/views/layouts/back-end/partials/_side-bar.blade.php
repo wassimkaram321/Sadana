@@ -607,6 +607,62 @@
                                 </span>
                             </a>
                         </li>
+
+
+
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store*') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
+                                <i class="tio-shop nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{
+                                    \App\CPU\translate('Points Section') }}</span>
+                            </a>
+                            <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
+                                style="display: {{ Request::is('admin/store*') ? 'block' : 'none' }}">
+                                <li class="nav-item {{ Request::is('admin/store/add-new') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.points_create') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Add Products Points') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/add-new') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.bag_points_create') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Add Bags Points') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.points_list') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Products Points') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.bag_points_list') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Bags Points') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.order_points') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Set Order Points') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.points.pharmacies_points') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Pharmacies Points') }}</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+
+
+
+
+
                         <!--
                             <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/deal/flash') ? 'active' : '' }}">
                                 <a class="js-navbar-vertical-aside-menu-link nav-link"

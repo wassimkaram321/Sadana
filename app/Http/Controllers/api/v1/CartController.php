@@ -6,22 +6,34 @@ use App\CPU\CartManager;
 use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\Model\Cart;
+use App\Model\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use function App\CPU\translate;
 
 class CartController extends Controller
 {
-    //Done
     public function cart(Request $request)
     {
         $user = Helpers::get_customer($request);
         $cart = Cart::where(['customer_id' => $user->id])->get();
+        // added
+        foreach($cart as $c){
+
+            $p = Product::whereid($c->product_id)->first();
+            $c['q_normal_offer']=$p->q_normal_offer;
+            $c['q_featured_offer']=$p->q_featured_offer  ;
+            $c['normal_offer']=$p->normal_offer;
+            $c['featured_offer']=$p->featured_offer;
+        }
+        //
+
         $cart->map(function ($data) {
             $data['choices'] = json_decode($data['choices']);
             $data['variations'] = json_decode($data['variations']);
             return $data;
         });
+
         return response()->json($cart, 200);
     }
 

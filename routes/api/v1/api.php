@@ -218,6 +218,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
 
     Route::group(['prefix' => 'coupon','middleware' => 'auth:api'], function () {
         Route::get('apply', 'CouponController@apply');
+        Route::get('list', 'CouponController@coupons');
     });
 
     //map api

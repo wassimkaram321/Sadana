@@ -1,7 +1,6 @@
 <?php
 
 namespace App\CPU;
-
 use App\Model\Admin;
 use App\Model\AdminWallet;
 use App\Model\Cart;
@@ -11,9 +10,12 @@ use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
 use App\Pharmacy;
 use App\Model\Product;
+use App\Model\ProductPoint;
 use App\Model\Seller;
 use App\Model\OrderAlameen;
+use App\Model\PharmaciesPoints;
 use App\Model\SellerWallet;
+use App\Model\OrdersPoints;
 use App\Model\ShippingType;
 use App\Model\ShippingAddress;
 use App\User;
@@ -164,8 +166,6 @@ class OrderManager
             'variation' => json_encode($var_store),
             'current_stock' => $product['current_stock'] + $Q,
         ]);
-
-
         $ordersDetails=OrderDetail::where('order_id','=',$order_id)
         ->where('product_id','=',$detail['product_id'])
         ->get()
@@ -560,4 +560,102 @@ class OrderManager
 
         return $order_id;
     }
+
+
+    public function products_points($pharmacy_id,$products)
+    {
+        # code...
+        $points = 0;
+        $productpoint = ProductPoint::wheretype('product')->get();
+        foreach($productpoint as $p){
+
+            foreach($products as $product){
+
+                $idx = json_decode($p->type_id);
+                if(in_array($product->id,$idx)){
+                    $points = $points + $p->points;
+                }
+            }
+
+        }
+        if($points !=0){
+            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
+            if(isset($pharmacy)){
+                $pharmacy->points = $pharmacy->points + $points;
+                $pharmacy->save();
+            }
+            else{
+                $pharmacy_points = new PharmaciesPoints();
+                $pharmacy_points->pharmacy_id = $pharmacy_id;
+                $pharmacy_points->points = $points;
+                $pharmacy_points->save();
+            }
+
+        }
+        return $points;
+    }
+    public function bags_points($pharmacy_id,$bags)
+    {
+        # code...
+        $points = 0;
+        $productpoint = ProductPoint::wheretype('bag')->get();
+        foreach($productpoint as $p){
+
+            foreach($bags as $product){
+
+                $idx = json_decode($p->type_id);
+                if(in_array($product->id,$idx)){
+                    $points = $points + $p->points;
+                }
+            }
+
+        }
+        if($points !=0){
+            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
+            if(isset($pharmacy)){
+                $pharmacy->points = $pharmacy->points + $points;
+                $pharmacy->save();
+            }
+            else{
+                $pharmacy_points = new PharmaciesPoints();
+                $pharmacy_points->pharmacy_id = $pharmacy_id;
+                $pharmacy_points->points = $points;
+                $pharmacy_points->save();
+            }
+
+        }
+        return $points;
+    }
+    public function order_points($pharmacy_id,$order_total_price)
+    {
+        # code...
+        $points = 0;
+        $orderpoint = OrdersPoints::get();
+        foreach($orderpoint as $p){
+
+
+                if($order_total_price >= $p->points){
+                    $points = $points + $p->points;
+                }
+
+
+        }
+        if($points !=0){
+            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
+            if(isset($pharmacy)){
+                $pharmacy->points = $pharmacy->points + $points;
+                $pharmacy->save();
+            }
+            else{
+                $pharmacy_points = new PharmaciesPoints();
+                $pharmacy_points->pharmacy_id = $pharmacy_id;
+                $pharmacy_points->points = $points;
+                $pharmacy_points->save();
+            }
+
+        }
+        return $points;
+    }
+
+
 }

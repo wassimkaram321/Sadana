@@ -32,13 +32,13 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-4">
+                                <div style="display: none;" class="col-4">
                                     <div class="form-group">
                                         <label for="name">{{\App\CPU\translate('Type')}}</label>
-                                        <select class="form-control" name="coupon_type"
+                                        <select hidden class="form-control" name="coupon_type"
                                                 style="width: 100%" required>
                                             {{--<option value="delivery_charge_free">Delivery Charge Free</option>--}}
-                                            <option value="discount_on_purchase">{{\App\CPU\translate('Discount_on_Purchase')}}</option>
+                                            <option selected value="discount_on_purchase">{{\App\CPU\translate('Discount_on_Purchase')}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -64,14 +64,14 @@
                                     <div class="form-group">
                                         <label for="name">{{\App\CPU\translate('start_date')}}</label>
                                         <input id="start_date" type="date" name="start_date" class="form-control" 
-                                               placeholder="{{\App\CPU\translate('start date')}}" required>
+                                               placeholder="{{\App\CPU\translate('start date')}}" >
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-6">
                                     <div class="form-group">
                                         <label for="name">{{\App\CPU\translate('expire_date')}}</label>
                                         <input id="expire_date" type="date" name="expire_date" class="form-control" 
-                                               placeholder="{{\App\CPU\translate('expire date')}}" required>
+                                               placeholder="{{\App\CPU\translate('expire date')}}" >
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-6">
@@ -82,14 +82,14 @@
                                                placeholder="{{\App\CPU\translate('EX')}}: {{\App\CPU\translate('10')}}">
                                     </div>
                                 </div>
-                                <div class="col-md-3 col-6">
+                                <div style="display: none;" class="col-md-3 col-6">
                                     <div class="form-group">
                                         <label for="name">{{\App\CPU\translate('discount_type')}}</label>
                                         <select id="discount_type" class="form-control" name="discount_type"
                                                 onchange="checkDiscountType(this.value)"
                                                 style="width: 100%">
                                             <option value="amount">{{\App\CPU\translate('Amount')}}</option>
-                                            <option value="percentage">{{\App\CPU\translate('percentage')}}</option>
+                                            <option selected value="percentage">{{\App\CPU\translate('percentage')}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -105,19 +105,19 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-6">
-                                    <label for="name">{{\App\CPU\translate('minimum_purchase')}}</label>
+                                    <label for="name">{{\App\CPU\translate('Points To Reedem')}}</label>
                                     <input type="number" min="1" max="1000000" name="min_purchase" class="form-control"
                                            id="minimum purchase"
-                                           placeholder="{{\App\CPU\translate('minimum purchase')}}" required>
+                                           placeholder="{{\App\CPU\translate('points')}}" required>
                                 </div>
-                                <div id="max-discount" class="col-md-3 col-6">
+                                {{-- <div id="max-discount" class="col-md-3 col-6">
                                     <div class="form-group">
                                         <label for="name">{{\App\CPU\translate('maximum_discount')}}</label>
                                         <input type="number" min="1" max="1000000" name="max_discount" 
                                                class="form-control" id="maximum discount"
                                                placeholder="{{\App\CPU\translate('maximum discount')}}" >
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
                             <div class="card-footer">
@@ -165,14 +165,14 @@
                                 <thead class="thead-light">
                                 <tr>
                                     <th>{{\App\CPU\translate('SL')}}#</th>
-                                    <th>{{\App\CPU\translate('coupon_type')}}</th>
+                                    {{-- <th>{{\App\CPU\translate('coupon_type')}}</th> --}}
                                     <th>{{\App\CPU\translate('Title')}}</th>
                                     <th>{{\App\CPU\translate('Code')}}</th>
                                     <th>{{ \App\CPU\translate('user') }} {{ \App\CPU\translate('limit') }}</th>
-                                    <th>{{\App\CPU\translate('minimum_purchase')}}</th>
-                                    <th>{{\App\CPU\translate('maximum_discount')}}</th>
+                                    <th>{{\App\CPU\translate('Points')}}</th>
+                                    {{-- <th>{{\App\CPU\translate('maximum_discount')}}</th> --}}
                                     <th>{{\App\CPU\translate('Discount')}}</th>
-                                    <th>{{\App\CPU\translate('discount_type')}}</th>
+                                    {{-- <th>{{\App\CPU\translate('discount_type')}}</th> --}}
                                     <th>{{\App\CPU\translate('start_date')}}</th>
                                     <th>{{\App\CPU\translate('expire_date')}}</th>
                                     <th>{{\App\CPU\translate('Status')}}</th>
@@ -183,16 +183,17 @@
                                 @foreach($cou as $k=>$c)
                                     <tr>
                                         <th scope="row">{{$cou->firstItem() + $k}}</th>
-                                        <td style="text-transform: capitalize">{{str_replace('_',' ',$c['coupon_type'])}}</td>
+                                        {{-- <td style="text-transform: capitalize">{{str_replace('_',' ',$c['coupon_type'])}}</td> --}}
                                         <td class="text-capitalize">
                                             {{substr($c['title'],0,20)}}
                                         </td>
                                         <td>{{$c['code']}}</td>
                                         <td>{{ $c['limit'] }}</td>
-                                        <td>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($c['min_purchase']))}}</td>
-                                        <td>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($c['max_discount']))}}</td>
+                                        {{-- <td>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($c['min_purchase']))}}</td> --}}
+                                        <td>{{$c['min_purchase']}}</td>
+                                        {{-- <td>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($c['max_discount']))}}</td> --}}
                                         <td>{{$c['discount_type']=='amount'?\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($c['discount'])):$c['discount']}}</td>
-                                        <td>{{$c['discount_type']}}</td>
+                                        {{-- <td>{{$c['discount_type']}}</td> --}}
                                         <td>{{date('d-M-y',strtotime($c['start_date']))}}</td>
                                         <td>{{date('d-M-y',strtotime($c['expire_date']))}}</td>
                                         <td>

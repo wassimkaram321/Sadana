@@ -39,7 +39,6 @@ class Product extends Model
         'featured_offer'=>'integer',
         'demand_limit'=>'integer',
         'reviews_count'=>'integer',
-        'images'=>'array'
     ];
     protected $hidden=[
         "category_ids","video_provider","video_url","colors","variant_product","attributes","choice_options",

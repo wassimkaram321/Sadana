@@ -17,7 +17,6 @@ class CartController extends Controller
     {
         $user = Helpers::get_customer($request);
         $cart = Cart::where(['customer_id' => $user->id])->get();
-        // added
         foreach($cart as $c){
 
             $p = Product::whereid($c->product_id)->first();
@@ -26,8 +25,6 @@ class CartController extends Controller
             $c['normal_offer']=$p->normal_offer;
             $c['featured_offer']=$p->featured_offer;
         }
-        //
-
         $cart->map(function ($data) {
             $data['choices'] = json_decode($data['choices']);
             $data['variations'] = json_decode($data['variations']);

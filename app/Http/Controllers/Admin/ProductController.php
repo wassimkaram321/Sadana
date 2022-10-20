@@ -66,7 +66,7 @@ class ProductController extends BaseController
     public function view($id)
     {
         $product = Product::with(['reviews'])->where(['id' => $id])->first();
-        $product->images=json_encode($product->images,true);
+      //  dd($product->images);
         $reviews = Review::where(['product_id' => $id])->paginate(Helpers::pagination_limit());
         $brand = Brand::where(['id' => $product->brand_id])->first();
         $store = Store::where(['id' => $product->store_id])->first();
@@ -526,7 +526,7 @@ class ProductController extends BaseController
     public function edit($id)
     {
         $product = Product::withoutGlobalScopes()->with('translations')->find($id);
-        $product->images=json_encode($product->images,true);
+       // $product->images=json_decode($product->images,true);
         $product_category = json_decode($product->category_ids);
         $product->colors = json_decode($product->colors);
         $categories = Category::where(['parent_id' => 0])->get();
@@ -840,7 +840,7 @@ class ProductController extends BaseController
             return back();
         }
 
-
+ $countUpdate=0;
         $data = [];
         $dataUpdate = [];
         $skip = ['youtube_video_url', 'details', 'thumbnail', 'حد الطلبة'];
@@ -883,8 +883,8 @@ class ProductController extends BaseController
                 'id' => 9999999,
                 'position' => 10,
             ]);
-
-            $brand = Brand::where('name', 'LIKE', '%' . $collection['المجموعة'] . '%')->get()->first();
+            $brand_name = trim($collection['المجموعة'], " \t.");
+            $brand = Brand::where('name', '==',$brand_name)->get()->first();
             if (isset($brand)) {
                 $brand_id = $brand->id;
             } else {
@@ -896,11 +896,12 @@ class ProductController extends BaseController
                 $brand_id = $NewBrand->id;
             }
 
-            $product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
-            //dd($collection['العرض المميز']);
+            $product = Product::where('num_id', '=',$collection['رمز المادة '])->get()->first();
 
-            $countUpdate=0;
+
+
             if (isset($product)) {
+                $product->num_id = $collection['رمز المادة '];
                 $product->unit_price = $collection['السعر'];
                 $product->current_stock = $collection['الكمية'];
                 $product->details = $collection['الملاحظات'];
@@ -918,6 +919,7 @@ class ProductController extends BaseController
             } else {
 
                 array_push($data, [
+                    'num_id' =>$collection['رمز المادة '],
                     'brand_id' => $brand_id,
                     'name' => $collection['اسم المادة'],
                     'unit_price' => $collection['السعر'],

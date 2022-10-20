@@ -94,7 +94,7 @@ class PassportAuthController extends Controller
         // }
 
         $token = $user->createToken('LaravelAuthApp')->accessToken;
-        return response()->json(['status'=>200 ,'token' => $token], 200);
+        return response()->json(['status'=>200 ,'user_type'=> $user->user_type,'token' => $token], 200);
     }
 
 
@@ -121,7 +121,7 @@ class PassportAuthController extends Controller
                 $medium = 'phone';
             } else {
                 $errors = [];
-                array_push($errors, ['code' => 'email', 'message' => 'Invalid phone number']);
+                array_push($errors, ['code' => 'phone', 'message' => 'Invalid phone number']);
                 return response()->json([
                     'status'=>404,
                     'errors' => $errors
@@ -144,13 +144,13 @@ class PassportAuthController extends Controller
             $phone_verification = Helpers::get_business_settings('phone_verification');
             //$email_verification = Helpers::get_business_settings('email_verification');
             if ($phone_verification && !$user->is_phone_verified) {
-                return response()->json(['status'=>200 ,'temporary_token' => $user->temporary_token], 200);
+                return response()->json(['status'=>200 ,'user_type'=> $user->user_type,'temporary_token' => $user->temporary_token], 200);
             }
             // if ($email_verification && !$user->is_email_verified) {
             //     return response()->json(['temporary_token' => $user->temporary_token], 200);
             // }
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return response()->json(['status'=>200 ,'token' => $token], 200);
+            return response()->json(['status'=>200,'user_type'=> $user->user_type ,'token' => $token], 200);
         } else {
             $errors = [];
             array_push($errors, ['code' => 'auth-001', 'message' => translate('Customer_not_found_or_Account_has_been_suspended_or_wrong_password')]);

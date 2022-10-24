@@ -1,6 +1,7 @@
 <?php
 
 namespace App\CPU;
+
 use App\Model\Admin;
 use App\Model\AdminWallet;
 use App\Model\Cart;
@@ -16,6 +17,9 @@ use App\Model\OrderAlameen;
 use App\Model\PharmaciesPoints;
 use App\Model\SellerWallet;
 use App\Model\OrdersPoints;
+use App\Model\Bag;
+use App\Model\BagsOrdersDetails;
+use App\Model\BagProduct;
 use App\Model\ShippingType;
 use App\Model\ShippingAddress;
 use App\User;
@@ -74,7 +78,7 @@ class OrderManager
                     }
                     Product::where(['id' => $product['id']])->update([
                         'variation' => json_encode($var_store),
-                        'current_stock' => $product['current_stock'] + $detail['qty'],
+                        'current_stock' => $product['current_stock'] + $detail['qty'] +  $detail['total_qty'],
                     ]);
                     OrderDetail::where(['id' => $detail['id']])->update([
                         'is_stock_decreased' => 0
@@ -109,7 +113,7 @@ class OrderManager
                     }
                     Product::where(['id' => $product['id']])->update([
                         'variation' => json_encode($var_store),
-                        'current_stock' => $product['current_stock'] - $detail['qty'],
+                        'current_stock' => $product['current_stock'] - $detail['qty'] - $detail['total_qty'],
                     ]);
                     OrderDetail::where(['id' => $detail['id']])->update([
                         'is_stock_decreased' => 1
@@ -119,8 +123,6 @@ class OrderManager
             $orderAlameen = OrderAlameen::where('order_id', '=', $order->id)->update(["status" => $status]);
         }
     }
-
-
 
 
     public static function stock_update_on_order_delete_change($detail, $order_id)
@@ -139,7 +141,7 @@ class OrderManager
             'current_stock' => $product['current_stock'] + $detail['qty'],
         ]);
         $order = Order::where('id', '=', $order_id)->get()->first();
-        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'],"delete") - $order->discount;
+        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'], "delete") - $order->discount;
         $order->save();
     }
 
@@ -166,36 +168,33 @@ class OrderManager
             'variation' => json_encode($var_store),
             'current_stock' => $product['current_stock'] + $Q,
         ]);
-        $ordersDetails=OrderDetail::where('order_id','=',$order_id)
-        ->where('product_id','=',$detail['product_id'])
-        ->get()
-        ->first();
-        $ordersDetails->qty=$qtyNew;
+        $ordersDetails = OrderDetail::where('order_id', '=', $order_id)
+            ->where('product_id', '=', $detail['product_id'])
+            ->get()
+            ->first();
+        $ordersDetails->qty = $qtyNew;
 
-            $total_qty = 0;
-            $offerType = 'no offer';
+        $total_qty = 0;
+        $offerType = 'no offer';
 
-            if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
-                $total_qty = ((int)($qtyNew / $product->q_featured_offer)) * $product->featured_offer;
-                $offerType = 'featured';
+        if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
+            $total_qty = ((int)($qtyNew / $product->q_featured_offer)) * $product->featured_offer;
+            $offerType = 'featured';
+        }
+        if ($total_qty == 0) {
+            if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                $total_qty = ((int)($qtyNew / $product->q_normal_offer)) * $product->normal_offer;
+                $offerType = 'normal';
             }
-            if ($total_qty == 0) {
-                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
-                    $total_qty = ((int)($qtyNew / $product->q_normal_offer)) * $product->normal_offer;
-                    $offerType = 'normal';
-                }
-            }
-            $ordersDetails->total_qty=$total_qty;
-            $ordersDetails->offerType=$offerType;
-            $ordersDetails->save();
+        }
+        $ordersDetails->total_qty = $total_qty;
+        $ordersDetails->offerType = $offerType;
+        $ordersDetails->save();
 
         $order = Order::where('id', '=', $order_id)->get()->first();
-        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'],"edit") - $order->discount;
+        $order->order_amount = CartManager::order_grand_total($order_id, $detail['product_id'], "edit") - $order->discount;
         $order->save();
     }
-
-
-
 
     public static function wallet_manage_on_order_status_change($order, $received_by)
     {
@@ -318,8 +317,6 @@ class OrderManager
         }
     }
 
-
-
     public static function generate_order($data)
     {
         $myArray = array();
@@ -405,82 +402,134 @@ class OrderManager
         $order_id = DB::table('orders')->insertGetId($or);
 
         foreach (CartManager::get_cart($data['cart_group_id']) as $c) {
-            $product = Product::where(['id' => $c['product_id']])->first();
+            if ($c->order_type == "bag") {
 
-            $total_qty = 0;
-            $offerType = 'no offer';
+                $bagProducts = BagProduct::where(['bag_id' => $c['product_id']])->get();
 
-            if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
-                $total_qty = ((int)($c['quantity'] / $product->q_featured_offer)) * $product->featured_offer;
-                $offerType = 'featured';
-            }
-            if ($total_qty == 0) {
-                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
-                    $total_qty = ((int)($c['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
-                    $offerType = 'normal';
+                foreach ($bagProducts as $ccc) {
+                    $p = Product::whereid($ccc->product_id)->first();
+                    $b = Product::whereid($p->brand_id)->first();
+                    $ccc['product_name'] = $p->name;
+                    $ccc['brand_name'] = $b->name;
                 }
-            }
 
-            $or_d = [
-                'order_id' => $order_id,
-                'product_id' => $c['product_id'],
-                'seller_id' => $c['seller_id'],
-                'product_details' => $product,
-                'qty' => $c['quantity'],
-                'total_qty' => $total_qty,
-                'offerType' => $offerType,
-                'price' => $c['price'],
-                'tax' => $c['tax'] * $c['quantity'],
-                'discount' => $c['discount'] * $c['quantity'],
-                'discount_type' => 'discount_on_product',
-                'variant' => $c['variant'],
-                'variation' => $c['variations'],
-                'delivery_status' => 'pending',
-                'shipping_method_id' => null,
-                'payment_status' => 'unpaid',
-                'created_at' => now(),
-                'updated_at' => now()
-            ];
-
-            $product_d = [
-                'product_id' => $product->num_id,
-                'qty' => $c['quantity'],
-                'price' => $c['price'],
-                'q_gift' => $total_qty,
-            ];
-            array_push($myArray, $product_d);
+                $or_dd = [
+                    'order_id' => $order_id,
+                    'bag_id' => $c['product_id'],
+                    'seller_id' => $c['seller_id'],
+                    'bag_details' => json_encode($bagProducts, true),
+                    'bag_qty' => $c['quantity'],
+                    'bag_price' => $c['price'],
+                    'bag_tax' => $c['tax'] * $c['quantity'],
+                    'bag_discount' => $c['discount'] * $c['quantity'],
+                    'delivery_status' => 'pending',
+                    'payment_status' => 'unpaid',
+                    'is_stock_decreased' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
 
 
-            if ($c['variant'] != null) {
-                $type = $c['variant'];
-                $var_store = [];
-                foreach (json_decode($product['variation'], true) as $var) {
-                    if ($type == $var['type']) {
-                        $var['qty'] -= $c['quantity'];
+                foreach ($bagProducts as $bagProduct) {
+                    $bagProductId = $bagProduct['product_id'];
+                    $bagProductQty = $bagProduct['product_count'];
+                    $product = Product::where(['id' => $bagProductId])->first();
+                    Product::where(['id' => $bagProductId])->update([
+                        'current_stock' => $product['current_stock'] - ($bagProductQty * $c['quantity'])
+                    ]);
+                    $product_d = [
+                        'product_id' => $product->num_id,
+                        'qty' => ($bagProductQty * $c['quantity']),
+                        'price' => $bagProduct['product_total_price'],
+                        'q_gift' => 0,
+                    ];
+                    array_push($myArray, $product_d);
+                }
+                DB::table('bags_orders_details')->insert($or_dd);
+            } else {
+
+                $product = Product::where(['id' => $c['product_id']])->first();
+
+                $total_qty = 0;
+                $offerType = 'no offer';
+
+                if ($product->q_featured_offer != 0 &&  $product->featured_offer != 0) {
+                    $total_qty = ((int)($c['quantity'] / $product->q_featured_offer)) * $product->featured_offer;
+                    $offerType = 'featured';
+                }
+                if ($total_qty == 0) {
+                    if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                        $total_qty = ((int)($c['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                        $offerType = 'normal';
                     }
-                    array_push($var_store, $var);
                 }
+
+                $or_d = [
+                    'order_id' => $order_id,
+                    'product_id' => $c['product_id'],
+                    'seller_id' => $c['seller_id'],
+                    'product_details' => $product,
+                    'qty' => $c['quantity'],
+                    'total_qty' => $total_qty,
+                    'offerType' => $offerType,
+                    'price' => $c['price'],
+                    'tax' => $c['tax'] * $c['quantity'],
+                    'discount' => $c['discount'] * $c['quantity'],
+                    'discount_type' => 'discount_on_product',
+                    'variant' => $c['variant'],
+                    'variation' => $c['variations'],
+                    'delivery_status' => 'pending',
+                    'shipping_method_id' => null,
+                    'payment_status' => 'unpaid',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+                $product_d = [
+                    'product_id' => $product->num_id,
+                    'qty' => $c['quantity'],
+                    'price' => $c['price'],
+                    'q_gift' => $total_qty,
+                ];
+                array_push($myArray, $product_d);
+
+
+                if ($c['variant'] != null) {
+                    $type = $c['variant'];
+                    $var_store = [];
+                    foreach (json_decode($product['variation'], true) as $var) {
+                        if ($type == $var['type']) {
+                            $var['qty'] -= $c['quantity'];
+                        }
+                        array_push($var_store, $var);
+                    }
+                    Product::where(['id' => $product['id']])->update([
+                        'variation' => json_encode($var_store),
+                    ]);
+                }
+
                 Product::where(['id' => $product['id']])->update([
-                    'variation' => json_encode($var_store),
+                    'current_stock' => $product['current_stock'] - $c['quantity'] - $total_qty
                 ]);
+
+                DB::table('order_details')->insert($or_d);
             }
-
-            Product::where(['id' => $product['id']])->update([
-                'current_stock' => $product['current_stock'] - $c['quantity'] - $total_qty
-            ]);
-
-            DB::table('order_details')->insert($or_d);
         }
 
-        $pharmacy = Pharmacy::where('user_id', '=', $user['id'])->get()->first();
-        $userR = User::where('id', '=', $user['id'])->get()->first();
-        $orderAlameen = new OrderAlameen;
-        $orderAlameen->order_id = $order_id;
-        $orderAlameen->pharmacy_id = $userR->pharmacy_id;
-        $orderAlameen->pharmacy_name = $pharmacy->name;
-        $orderAlameen->product_details = json_encode($myArray);
-        $orderAlameen->status = "pending";
-        $orderAlameen->save();
+        if ($user->user_type == "pharmacist") {
+            $pharmacy = Pharmacy::where('user_id', '=', $user['id'])->get()->first();
+            $userR = User::where('id', '=', $user['id'])->get()->first();
+            $orderAlameen = new OrderAlameen;
+            $orderAlameen->order_id = $order_id;
+            $orderAlameen->pharmacy_id = $userR->pharmacy_id;
+            $orderAlameen->pharmacy_name = $pharmacy->name;
+            $orderAlameen->product_details = json_encode($myArray);
+            $orderAlameen->status = "pending";
+            $orderAlameen->save();
+        } else {
+            //salesman
+        }
+
 
         if ($or['payment_method'] != 'cash_on_delivery') {
             $order = Order::find($order_id);
@@ -519,6 +568,7 @@ class OrderManager
                     'updated_at' => now(),
                 ]);
             }
+
             DB::table('admin_wallets')->where('admin_id', $order['seller_id'])->increment('pending_amount', $order['order_amount']);
         }
 
@@ -562,99 +612,142 @@ class OrderManager
     }
 
 
-    public function products_points($pharmacy_id,$products)
+    public function products_points($pharmacy_id, $products)
     {
         # code...
         $points = 0;
         $productpoint = ProductPoint::wheretype('product')->get();
-        foreach($productpoint as $p){
+        foreach ($productpoint as $p) {
 
-            foreach($products as $product){
+            foreach ($products as $product) {
 
                 $idx = json_decode($p->type_id);
-                if(in_array($product->id,$idx)){
+                if (in_array($product->id, $idx)) {
                     $points = $points + $p->points;
                 }
             }
-
         }
-        if($points !=0){
-            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
-            if(isset($pharmacy)){
+        if ($points != 0) {
+            $pharmacy = PharmaciesPoints::where('pharmacy_id', $pharmacy_id)->first();
+            if (isset($pharmacy)) {
                 $pharmacy->points = $pharmacy->points + $points;
                 $pharmacy->save();
-            }
-            else{
+            } else {
                 $pharmacy_points = new PharmaciesPoints();
                 $pharmacy_points->pharmacy_id = $pharmacy_id;
                 $pharmacy_points->points = $points;
                 $pharmacy_points->save();
             }
-
         }
         return $points;
     }
-    public function bags_points($pharmacy_id,$bags)
+
+
+    public function bags_points($pharmacy_id, $bags)
     {
         # code...
         $points = 0;
         $productpoint = ProductPoint::wheretype('bag')->get();
-        foreach($productpoint as $p){
+        foreach ($productpoint as $p) {
 
-            foreach($bags as $product){
+            foreach ($bags as $product) {
 
                 $idx = json_decode($p->type_id);
-                if(in_array($product->id,$idx)){
+                if (in_array($product->id, $idx)) {
                     $points = $points + $p->points;
                 }
             }
-
         }
-        if($points !=0){
-            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
-            if(isset($pharmacy)){
+        if ($points != 0) {
+            $pharmacy = PharmaciesPoints::where('pharmacy_id', $pharmacy_id)->first();
+            if (isset($pharmacy)) {
                 $pharmacy->points = $pharmacy->points + $points;
                 $pharmacy->save();
-            }
-            else{
+            } else {
                 $pharmacy_points = new PharmaciesPoints();
                 $pharmacy_points->pharmacy_id = $pharmacy_id;
                 $pharmacy_points->points = $points;
                 $pharmacy_points->save();
             }
-
         }
         return $points;
     }
-    public function order_points($pharmacy_id,$order_total_price)
+
+
+    public function order_points($pharmacy_id, $order_total_price)
     {
         # code...
         $points = 0;
         $orderpoint = OrdersPoints::get();
-        foreach($orderpoint as $p){
+        foreach ($orderpoint as $p) {
 
 
-                if($order_total_price >= $p->points){
-                    $points = $points + $p->points;
-                }
-
-
+            if ($order_total_price >= $p->points) {
+                $points = $points + $p->points;
+            }
         }
-        if($points !=0){
-            $pharmacy = PharmaciesPoints::where('pharmacy_id',$pharmacy_id)->first();
-            if(isset($pharmacy)){
+        if ($points != 0) {
+            $pharmacy = PharmaciesPoints::where('pharmacy_id', $pharmacy_id)->first();
+            if (isset($pharmacy)) {
                 $pharmacy->points = $pharmacy->points + $points;
                 $pharmacy->save();
-            }
-            else{
+            } else {
                 $pharmacy_points = new PharmaciesPoints();
                 $pharmacy_points->pharmacy_id = $pharmacy_id;
                 $pharmacy_points->points = $points;
                 $pharmacy_points->save();
             }
-
         }
         return $points;
+    }
+
+
+
+
+    public static function stock_update_on_bag_order_status_change($order, $status)
+    {
+        if ($status == 'returned' || $status == 'failed' || $status == 'canceled') {
+
+            $bagDetails = BagsOrdersDetails::where('order_id', '=', $order->id)->get();
+
+            foreach ($bagDetails as $detail) {
+                if ($detail['is_stock_decreased'] == 1) {
+
+                    $bagProducts = json_decode($detail->bag_details,true);
+
+                    foreach ($bagProducts as $bagProduct) {
+
+                        $product = Product::where('id','=',$bagProduct['product_id'])->get()->first();
+
+                        Product::where(['id' => $product['id']])->update([
+                            'current_stock' => $product['current_stock'] + $bagProduct['product_count'] * $detail['bag_qty'],
+                        ]);
+
+                        BagsOrdersDetails::where(['id' => $detail['id']])->update([
+                            'is_stock_decreased' => 0
+                        ]);
+                    }
+                }
+            }
+        } else {
+            $bagDetails = BagsOrdersDetails::where('order_id', '=', $order->id)->get();
+
+            foreach ($bagDetails as $detail) {
+                if ($detail['is_stock_decreased'] == 0) {
+                    $bagProducts = json_decode($detail->bag_details,true);
+                    foreach ($bagProducts as $bagProduct) {
+
+                        $product = Product::where('id','=',$bagProduct['product_id'])->get()->first();
+                        Product::where(['id' => $product['id']])->update([
+                            'current_stock' => $product['current_stock'] - $bagProduct['product_count'] * $detail['bag_qty'],
+                        ]);
+                        BagsOrdersDetails::where(['id' => $detail['id']])->update([
+                            'is_stock_decreased' => 1
+                        ]);
+                    }
+                }
+            }
+        }
     }
 
 

@@ -13,6 +13,7 @@ use App\User;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
 {
@@ -116,10 +117,37 @@ class CustomerController extends Controller
         ]);
     }
 
-
     public function update(Request $request,$id)
     {
         $user = User::where('id',$id)->get()->first();
+        $pharmacy = Pharmacy::where('user_id',$id)->get()->first();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'street_address' => 'required|string',
+            'f_name' => 'required|string',
+            'l_name' => 'required|string',
+            'lat' => 'between:-90,90',
+            'lng' => 'between:-90,90',
+            'to' => 'required|date_format:H:i:s',
+            'from' => 'required|date_format:H:i:s',
+            'land_number' => 'required|numeric',
+            'city_id' => 'required|numeric',
+            'email' => 'required',
+            'area_id' => 'required|numeric',
+            'group_id' => 'required|numeric',
+            'phone' => 'required|unique:users,phone,'.$id,
+            'num_id' => 'required|unique:users,pharmacy_id,'.$id,
+            'card_number' => 'required|unique:pharmacies,card_number,'.$pharmacy->id,
+       ]);
+
+       if ($validator->fails()) {
+           Toastr::success($validator->errors());
+           return back();
+       }
+
+        $emailNew="Hiba_Store".$request->num_id."@hiba.sy";
+
         $group = Group::where('id',$request->group_id)->get()->first();
         $area = Area::where('id',$request->area_id)->get()->first();
         $city = City::where('id',$request->city_id)->get()->first();
@@ -127,22 +155,23 @@ class CustomerController extends Controller
         $user->f_name=$request->f_name;
         $user->l_name=$request->l_name;
         $user->phone=$request->phone;
-        $user->email=$request->email;
+        $user->email= $request->email;
         $user->street_address=$request->street_address;
         $user->country=$group->group_name;//الكتلة
         $user->city= $city->city_name;//المدينة
         $user->zip=30303;
+        $user->pharmacy_id=$request->num_id;
         $user->area_id=$request->area_id;
 
 
-        $pharmacy = Pharmacy::where('user_id',$id)->get()->first();
+
 
         $pharmacy->lat=$request->lat;
         $pharmacy->lan=$request->lan;
         $pharmacy->city = $city->city_name;
         $pharmacy->region = $area->area_name; //المنطقة
         $pharmacy->name=$request->name;
-        $pharmacy->Address=$request->Address;
+        $pharmacy->Address=$request->street_address;
         $pharmacy->from=$request->from;
         $pharmacy->to=$request->to;
         $pharmacy->land_number=$request->land_number;

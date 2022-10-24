@@ -7,6 +7,8 @@ use App\Model\CartShipping;
 use App\Model\Color;
 use App\Model\OrderDetail;
 use App\Model\Product;
+use App\Model\Bag;
+use App\Model\BagProduct;
 use App\Model\Shop;
 use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Cassandra\Collection;
@@ -158,31 +160,28 @@ class CartManager
         return $total;
     }
 
-    public static function order_grand_total($order_id,$product_id,$status)
+    public static function order_grand_total($order_id, $product_id, $status)
     {
-        $ordersDetails=OrderDetail::where('order_id','=',$order_id)->get();
-      // $shipping_cost = CartManager::get_shipping_cost($cart_group_id);
+        $ordersDetails = OrderDetail::where('order_id', '=', $order_id)->get();
+        // $shipping_cost = CartManager::get_shipping_cost($cart_group_id);
         $total = 0;
         if (!empty($ordersDetails)) {
             foreach ($ordersDetails as $item) {
-                if($status=="delete")
-                {
-                    if($item->product_id!=$product_id)
-                    {
+                if ($status == "delete") {
+                    if ($item->product_id != $product_id) {
                         $product_subtotal = ($item['price'] * $item['qty'])
+                            + ($item['tax'] * $item['qty'])
+                            - $item['discount'] * $item['qty'];
+                        $total += $product_subtotal;
+                    }
+                } else {
+                    $product_subtotal = ($item['price'] * $item['qty'])
                         + ($item['tax'] * $item['qty'])
                         - $item['discount'] * $item['qty'];
-                         $total += $product_subtotal;
-                    }
-                }
-                else{
-                    $product_subtotal = ($item['price'] * $item['qty'])
-                    + ($item['tax'] * $item['qty'])
-                    - $item['discount'] * $item['qty'];
-                     $total += $product_subtotal;
+                    $total += $product_subtotal;
                 }
             }
-           // $total += $shipping_cost;
+            // $total += $shipping_cost;
         }
         return $total;
     }
@@ -210,7 +209,24 @@ class CartManager
         $price = 0;
 
         $user = Helpers::get_customer($request);
-        $product = Product::find($request->id);
+        if ($request->type == "product") {
+            $product = Product::find($request->id);
+        } elseif ($request->type == "bag") {
+            $bag = Bag::find($request->id);
+            if ($bag) {
+                return CartManager::bag_add_to_cart($request, $user, $bag);
+            } else {
+                return [
+                    'status' => 0,
+                    'message' => translate('Bag not found!')
+                ];
+            }
+        } else {
+            return [
+                'status' => 0,
+                'message' => translate('Error!')
+            ];
+        }
 
 
         if ($product) {
@@ -373,8 +389,6 @@ class CartManager
     }
 
 
-
-
     public static function update_cart_qty($request)
     {
         $user = Helpers::get_customer($request);
@@ -469,4 +483,169 @@ class CartManager
 
         return $cost;
     }
+
+
+
+    //Cart bags
+    public static function bag_add_to_cart($request, $user, $bag)
+    {
+
+        $str = '';
+        $variations = [];
+        $price = 0;
+        $choices = [];
+
+        if ($user == 'offline') {
+            if (session()->has('offline_cart')) {
+                $cart = session('offline_cart');
+                $check = $cart->where('product_id', $request->id)->where('variant', $str)->where('order_type', '=', $request->type)->first();
+                if (isset($check) == false) {
+                    $cart = collect();
+                    $cart['id'] = time();
+                } else {
+                    return [
+                        'status' => 0,
+                        'message' => translate('already_added!')
+                    ];
+                }
+            } else {
+                $cart = collect();
+                session()->put('offline_cart', $cart);
+            }
+        } else {
+            $cart = Cart::where(['product_id' => $request->id, 'customer_id' => $user->id, 'variant' => $str])->where('order_type', '=', $request->type)->first();
+            if (isset($cart) == false) {
+                $cart = new Cart();
+            } else {
+                return [
+                    'status' => 0,
+                    'message' => translate('already_added!')
+                ];
+            }
+        }
+
+        $cart['color'] = $request->has('color') ? $request['color'] : null;
+        $cart['product_id'] = $bag->id;
+        $cart['choices'] = json_encode($choices);
+
+        if ($bag['demand_limit'] < $request['quantity']) {
+            return [
+                'status' => 0,
+                'message' => translate('out_of_demand_limit!')
+            ];
+        }
+
+        $bagProducts = BagProduct::where('bag_id', '=', $bag->id)->get();
+        foreach ($bagProducts as $bagProduct) {
+            $product = Product::where('id', '=', $bagProduct->product_id)->get()->first();
+            if ($product['current_stock'] < $bagProduct['product_count']*$request['quantity']) {
+                return [
+                    'status' => 0,
+                    'message' => translate($product->name.' : out_of_stock!')
+                ];
+            }
+        }
+
+        $cart['variations'] = json_encode($variations);
+        $cart['variant'] = $str;
+        $price = $bag->total_price_offer;
+        $tax = 0;
+
+        if ($user == 'offline') {
+            $check = session('offline_cart');
+            $cart_check = $check->where('seller_id', 1)
+                ->where('seller_is', 'admin')->first();
+        } else {
+            $cart_check = Cart::where([
+                'customer_id' => $user->id,
+                'seller_id' => 1,
+                'seller_is' => 'admin'
+            ])->first();
+        }
+
+        if (isset($cart_check)) {
+            $cart['cart_group_id'] = $cart_check['cart_group_id'];
+        } else {
+            $cart['cart_group_id'] = ($user == 'offline' ? 'offline' : $user->id) . '-' . Str::random(5) . '-' . time();
+        }
+
+
+        $cart['customer_id'] = $user->id ?? 0;
+        $cart['quantity'] = $request['quantity'];
+        /*$data['shipping_method_id'] = $shipping_id;*/
+        $cart['price'] = $price;
+        $cart['tax'] = $tax;
+        $cart['slug'] = Str::slug($bag->bag_name, '-');
+        $cart['name'] = $bag->bag_name;
+        $cart['discount'] = 0;
+        /*$data['shipping_cost'] = $shipping_cost;*/
+        $cart['thumbnail'] = "def.png";
+        $cart['seller_id'] = 1;
+        $cart['seller_is'] = 'admin';
+        $cart['shipping_cost'] = 0;
+        $cart['shop_info'] = Helpers::get_business_settings('company_name');
+        $shippingMethod = Helpers::get_business_settings('shipping_method');
+        $cart['shipping_type'] = "order_wise";
+        $cart['order_type'] = "bag";
+
+        if ($user == 'offline') {
+            $offline_cart = session('offline_cart');
+            $offline_cart->push($cart);
+            session()->put('offline_cart', $offline_cart);
+        } else {
+            $cart->save();
+        }
+
+        return [
+            'status' => 1,
+            'message' => translate('successfully_added!')
+        ];
+
+    }
+
+    public static function bag_update_cart_qty($request)
+    {
+        $user = Helpers::get_customer($request);
+        $status = 1;
+        $qty = 0;
+        $cart = Cart::where(['id' => $request->key, 'customer_id' => $user->id])->first();
+        $bag = Bag::find($cart['product_id']);
+
+
+
+        if ($bag['demand_limit'] < $request['quantity']) {
+            return [
+                'status' => 0,
+                'message' => translate('out_of_demand_limit!')
+            ];
+        }
+
+        $bagProducts = BagProduct::where('bag_id', '=', $bag->id)->get();
+        foreach ($bagProducts as $bagProduct) {
+            $product = Product::where('id', '=', $bagProduct->product_id)->get()->first();
+            if ($product['current_stock'] < $bagProduct['product_count']*$request['quantity']) {
+                $status = 0;
+                $qty = $cart['quantity'];
+                return [
+                    'status' => 0,
+                    'message' => translate($product->name.' : out_of_stock!')
+                ];
+            }
+        }
+
+        if ($status) {
+            $qty = $request->quantity;
+            $cart['quantity'] = $request->quantity;
+            $cart['shipping_cost'] =  CartManager::get_shipping_cost_for_product_category_wise($product, $request->quantity);
+        }
+        $cart->save();
+
+        return [
+            'status' => $status,
+            'qty' => $qty,
+            'message' => $status == 1 ? translate('successfully_updated!') : translate('sorry_stock_is_limited')
+        ];
+    }
+
+
 }

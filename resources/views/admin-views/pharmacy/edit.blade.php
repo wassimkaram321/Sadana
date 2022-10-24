@@ -204,16 +204,22 @@
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('card_number')}}</label>
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('card_number')}}<span style="color: red;">*</span></label>
                                     <input type="number" step="0.001" value="{{$user->pharmacy['card_number']}}" name="card_number"
-                                        class="form-control" placeholder="card_number" required>
+                                        class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-12">
+                                <div class="form-group">
+                                    <label class="input-label"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Account Number')}}<span style="color: red;">*</span></label>
+                                    <input type="number" value="{{$user['pharmacy_id']}}" name="num_id"
+                                        class="form-control" required>
                                 </div>
                             </div>
 
                         </div>
-
-
-
 
 
 

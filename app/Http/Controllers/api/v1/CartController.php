@@ -19,11 +19,15 @@ class CartController extends Controller
         $cart = Cart::where(['customer_id' => $user->id])->get();
         foreach($cart as $c){
 
-            $p = Product::whereid($c->product_id)->first();
-            $c['q_normal_offer']=$p->q_normal_offer;
-            $c['q_featured_offer']=$p->q_featured_offer  ;
-            $c['normal_offer']=$p->normal_offer;
-            $c['featured_offer']=$p->featured_offer;
+            if($c->order_type!="bag")
+            {
+                $p = Product::whereid($c->product_id)->first();
+                $c['q_normal_offer']=$p->q_normal_offer;
+                $c['q_featured_offer']=$p->q_featured_offer  ;
+                $c['normal_offer']=$p->normal_offer;
+                $c['featured_offer']=$p->featured_offer;
+            }
+
         }
         $cart->map(function ($data) {
             $data['choices'] = json_decode($data['choices']);
@@ -39,8 +43,10 @@ class CartController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'quantity' => 'required',
+            'type' => 'required|string',
         ], [
-            'id.required' => translate('Product ID is required!')
+            'id.required' => translate('Product ID is required!'),
+            'type.required' => translate('Type is required!')
         ]);
 
         if ($validator->errors()->count() > 0) {
@@ -56,17 +62,25 @@ class CartController extends Controller
         $validator = Validator::make($request->all(), [
             'key' => 'required',
             'quantity' => 'required',
+            'type' => 'required',
         ], [
-            'key.required' => translate('Cart key or ID is required!')
+            'key.required' => translate('Cart key or ID is required!'),
+            'type.required' => translate('type key is required!')
         ]);
 
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
         }
 
-        $response = CartManager::update_cart_qty($request);
+        if($request->type=="bag")
+          $response = CartManager::bag_update_cart_qty($request);
+        else
+          $response = CartManager::update_cart_qty($request);
+
         return response()->json($response);
     }
+
+
 
     public function remove_from_cart(Request $request)
     {
@@ -87,15 +101,15 @@ class CartController extends Controller
 
     public function remove_all_from_cart(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'key' => 'required'
-        ], [
-            'key.required' => translate('Cart key or ID is required!')
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'key' => 'required'
+        // ], [
+        //     'key.required' => translate('Cart key or ID is required!')
+        // ]);
 
-        if ($validator->errors()->count() > 0) {
-            return response()->json(['errors' => Helpers::error_processor($validator)]);
-        }
+        // if ($validator->errors()->count() > 0) {
+        //     return response()->json(['errors' => Helpers::error_processor($validator)]);
+        // }
 
         $user = Helpers::get_customer($request);
         Cart::where(['customer_id' => $user->id])->delete();

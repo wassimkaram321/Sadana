@@ -47,6 +47,7 @@ class OrderController extends Controller
 
         if ($order['payment_method'] == 'cash_on_delivery' && $order['order_status'] == 'pending') {
             OrderManager::stock_update_on_order_status_change($order, 'canceled');
+            OrderManager::stock_update_on_bag_order_status_change($order, 'canceled');
             Order::where(['id' => $request->order_id])->update([
                 'order_status' => 'canceled'
             ]);
@@ -59,6 +60,13 @@ class OrderController extends Controller
 
     public function place_order(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'pharmacy_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        }
+
         $unique_id = $request->user()->id . '-' . rand(000001, 999999) . '-' . time();
         $order_ids = [];
         foreach (CartManager::get_cart_group_ids($request) as $group_id) {
@@ -92,20 +100,19 @@ class OrderController extends Controller
 
         $order_details = OrderDetail::find($request->order_details_id);
 
-        
-        if($order_details->delivery_status == 'delivered')
-        {
+
+        if ($order_details->delivery_status == 'delivered') {
             $order = Order::find($order_details->order_id);
             $total_product_price = 0;
             $refund_amount = 0;
             $data = [];
             foreach ($order->details as $key => $or_d) {
-                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount;
+                $total_product_price += ($or_d->qty * $or_d->price) + $or_d->tax - $or_d->discount;
             }
 
             $subtotal = ($order_details->price * $order_details->qty) - $order_details->discount + $order_details->tax;
 
-            $coupon_discount = ($order->discount_amount*$subtotal)/$total_product_price;
+            $coupon_discount = ($order->discount_amount * $subtotal) / $total_product_price;
 
             $refund_amount = $subtotal - $coupon_discount;
 
@@ -123,19 +130,16 @@ class OrderController extends Controller
             $length = $order_details_date->diffInDays($current);
             $expired = false;
             $already_requested = false;
-            if($order_details->refund_request != 0)
-            {
+            if ($order_details->refund_request != 0) {
                 $already_requested = true;
             }
-            if($length > $refund_day_limit )
-            {
+            if ($length > $refund_day_limit) {
                 $expired = true;
             }
-            return response()->json(['already_requested'=>$already_requested,'expired'=>$expired,'refund'=>$data], 200);
-        }else{
+            return response()->json(['already_requested' => $already_requested, 'expired' => $expired, 'refund' => $data], 200);
+        } else {
             return response()->json(translate('You_can_request_for_refund_after_order_delivered'), 200);
         }
-
     }
 
     public function store_refund(Request $request)
@@ -143,7 +147,7 @@ class OrderController extends Controller
 
         $order_details = OrderDetail::find($request->order_details_id);
 
-        if($order_details->refund_request == 0){
+        if ($order_details->refund_request == 0) {
 
             $validator = Validator::make($request->all(), [
                 'order_details_id' => 'required',
@@ -175,46 +179,45 @@ class OrderController extends Controller
             $order_details->save();
 
             return response()->json(translate('refunded_request_updated_successfully!!'), 200);
-        }else{
+        } else {
             return response()->json(translate('already_applied_for_refund_request!!'), 302);
         }
-
     }
 
 
     public function refund_details(Request $request)
     {
         $order_details = OrderDetail::find($request->id);
-        $refund = RefundRequest::where('customer_id',$request->user()->id)
-                                ->where('order_details_id',$order_details->id )->get();
-        $refund = $refund->map(function($query){
+        $refund = RefundRequest::where('customer_id', $request->user()->id)
+            ->where('order_details_id', $order_details->id)->get();
+        $refund = $refund->map(function ($query) {
             $query['images'] = json_decode($query['images']);
             return $query;
         });
 
         $order = Order::find($order_details->order_id);
 
-            $total_product_price = 0;
-            $refund_amount = 0;
-            $data = [];
-            foreach ($order->details as $key => $or_d) {
-                $total_product_price += ($or_d->qty*$or_d->price) + $or_d->tax - $or_d->discount;
-            }
+        $total_product_price = 0;
+        $refund_amount = 0;
+        $data = [];
+        foreach ($order->details as $key => $or_d) {
+            $total_product_price += ($or_d->qty * $or_d->price) + $or_d->tax - $or_d->discount;
+        }
 
-            $subtotal = ($order_details->price * $order_details->qty) - $order_details->discount + $order_details->tax;
+        $subtotal = ($order_details->price * $order_details->qty) - $order_details->discount + $order_details->tax;
 
-            $coupon_discount = ($order->discount_amount*$subtotal)/$total_product_price;
+        $coupon_discount = ($order->discount_amount * $subtotal) / $total_product_price;
 
-            $refund_amount = $subtotal - $coupon_discount;
+        $refund_amount = $subtotal - $coupon_discount;
 
-            $data['product_price'] = $order_details->price;
-            $data['quntity'] = $order_details->qty;
-            $data['product_total_discount'] = $order_details->discount;
-            $data['product_total_tax'] = $order_details->tax;
-            $data['subtotal'] = $subtotal;
-            $data['coupon_discount'] = $coupon_discount;
-            $data['refund_amount'] = $refund_amount;
-            $data['refund_request']=$refund;
+        $data['product_price'] = $order_details->price;
+        $data['quntity'] = $order_details->qty;
+        $data['product_total_discount'] = $order_details->discount;
+        $data['product_total_tax'] = $order_details->tax;
+        $data['subtotal'] = $subtotal;
+        $data['coupon_discount'] = $coupon_discount;
+        $data['refund_amount'] = $refund_amount;
+        $data['refund_request'] = $refund;
 
         // $refund = [
         //         "id"=> $refund->id,

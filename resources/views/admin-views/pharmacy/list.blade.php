@@ -10,8 +10,14 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-2">
-            <h1 class="h3 mb-0 text-black-50">{{ \App\CPU\translate($status.'_pharmacy__list ') }} <span
-                    style="color: rgb(252, 59, 10);">({{ \App\User::where('is_active', 1)->count() }})</span></h1>
+            <h1 class="h3 mb-0 text-black-50">{{ \App\CPU\translate($status.'_pharmacy__list ') }}
+                <span style="color: rgb(252, 59, 10);">
+                    @if ($status=="Pending")
+                    ({{ \App\User::where('is_active', 0)->where('user_type','=','pharmacist')->count() }})
+                    @else
+                    ({{ \App\User::where('is_active', 1)->where('user_type','=','pharmacist')->count() }})
+                    @endif
+                </span></h1>
         </div>
 
         <div class="row" style="margin-top: 20px">

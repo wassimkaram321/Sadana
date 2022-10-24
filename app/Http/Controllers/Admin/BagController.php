@@ -270,7 +270,7 @@ class BagController extends BaseController
             $bagsSetting->save();
             Toastr::success('Updated successfully!');
             return back();
-        } catch (Exception) {
+        } catch (Exception $e) {
             Toastr::error('Error!');
             return back();
         }

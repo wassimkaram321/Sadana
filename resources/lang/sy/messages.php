@@ -1988,4 +1988,11 @@
   'points' => 'Points',
   'Product_name' => 'Product name',
   'Are_you_sure_delete_this_product_points' => 'Are you sure delete this product points',
+  'Update Pharmacy' => 'Update Pharmacy',
+  'street_address' => 'Street address',
+  'land_number' => 'Land number',
+  'pharmacy name' => 'Pharmacy name',
+  'Work_start_time' => 'Work start time',
+  'Work_end_time' => 'Work end time',
+  'Account Number' => 'Account Number',
 );

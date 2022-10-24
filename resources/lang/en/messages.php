@@ -2162,4 +2162,12 @@
   'Are_you_sure_delete_this_order_points' => 'Are you sure delete this order points',
   'points_deleted_successfully' => 'Points deleted successfully',
   'Pharmacy Name' => 'Pharmacy Name',
+  'Account Number' => 'Account Number',
+  'Type is required!' => 'Type is required!',
+  'Hi!' => 'Hi!',
+  'Bag not found!' => 'Bag not found!',
+  'Error!' => 'Error!',
+  'موسينيست 375 ملغ ابن زهر : out_of_stock!' => 'موسينيست 375 ملغ ابن زهر : out of stock!',
+  'type key is required!' => 'Type key is required!',
+  'fadi' => 'Fadi',
 );

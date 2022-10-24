@@ -62,7 +62,12 @@ class ForgotPassword extends Controller
                     'created_at' => now(),
                 ]);
                 //SMS_module::send($customer->phone, $token);
-                return response()->json(['status'=>200,'token' => $token], 200);
+                $details=[
+                    'token' => $token,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+                return response()->json(['status'=>200,'message' =>$details], 200);
                 //return $this->returnData('Details', ['token' => $token] , 'otp verification');
             }
         }

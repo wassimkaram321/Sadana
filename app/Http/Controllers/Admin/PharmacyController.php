@@ -60,7 +60,19 @@ class PharmacyController extends Controller
 
     public function activation(Request $request, $id, $status)
     {
-        $User = User::find($id);
+        $User = User::with(['pharmacy'])->where('id', $request->id)->get()->first();
+       // $User = User::find($id);
+        if(!isset($User->pharmacy_id) && $User->pharmacy_id==null)
+        {
+            Toastr::success('Please enter the missing data before activating (Account Number)');
+            return back();
+        }
+        if(!isset($User->pharmacy->card_number) && $User->pharmacy->card_number=="")
+        {
+            Toastr::success('Please enter the missing data before activating (Card Number)');
+            return back();
+        }
+
         if ($status == 1) {
             $User->is_active = 1;
         } else {
@@ -184,6 +196,7 @@ class PharmacyController extends Controller
             return back();
         }
         $data = [];
+        $card_num="";
         $statusUpdate = 0;
         $statusCreate = 0;
         $skip = ['youtube_video_url', 'details', 'thumbnail'];
@@ -195,36 +208,49 @@ class PharmacyController extends Controller
             $area_id = $this->compare_area($collection['المنطقة'], $group_id);
             $is_active = $this->compare_active($collection['وضع الزبون']);
 
-            $name1 = trim($collection['رقم البطاقة'], " \t.");
-            $user = UserImportExcel::where('card_number', '=', $name1)->get()->first();
-            if (isset($user)) {
-                $user->card_number = $collection['رقم البطاقة'];
-                $user->pharmacy_name = $collection['الاسم'];
-                $user->land_number = $collection['هاتف 1'];
-                $user->phone2 = $collection['هاتف 2'];
-                $user->phone1 = $collection['خليوي'];
-                $user->city_id = $city_id;
-                $user->group_id = $group_id;
-                $user->area_id = $area_id;
-                $user->street_address = $collection['العنوان'];
-                $user->is_active = $is_active;
-                $user->save();
-                $statusUpdate++;
-            } else {
-                array_push($data, [
-                    'card_number' => $collection['رقم البطاقة'],
-                    'pharmacy_name' => $collection['الاسم'],
-                    'land_number' => $collection['هاتف 1'],
-                    'phone1' => $collection['هاتف 2'],
-                    'phone2' => $collection['خليوي'],
-                    'group_id' => $group_id,
-                    'city_id' => $city_id,
-                    'area_id' => $area_id,
-                    'street_address' => $collection['العنوان'],
-                    'is_active' => $is_active,
-                ]);
-                $statusCreate++;
+            if(isset($collection['رقم البطاقة']))
+            {
+                $card_num=$collection['رقم البطاقة'];
             }
+            $name1 = (int)trim($collection['رمز الحساب'], " \t.");
+            if($name1!=0)
+            {
+                $user = UserImportExcel::where('num_id', '==', $name1)->get()->first();
+                if (isset($user)) {
+                    $user->lat = $collection['خط العرض'];
+                    $user->lng = $collection['خط الطول'];
+                    $user->card_number = $card_num;
+                    $user->pharmacy_name = $collection['الاسم'];
+                    $user->land_number = $collection['هاتف 1'];
+                    $user->phone2 = $collection['هاتف 2'];
+                    $user->phone1 = $collection['خليوي'];
+                    $user->city_id = $city_id;
+                    $user->group_id = $group_id;
+                    $user->area_id = $area_id;
+                    $user->street_address = $collection['العنوان'];
+                    $user->is_active = $is_active;
+                    $user->save();
+                    $statusUpdate++;
+                } else {
+                    array_push($data, [
+                        'num_id'=> $collection['رمز الحساب'],
+                        'lat' => $collection['خط العرض'],
+                        'lng' => $collection['خط الطول'],
+                        'card_number' => $card_num,
+                        'pharmacy_name' => $collection['الاسم'],
+                        'land_number' => $collection['هاتف 1'],
+                        'phone1' => $collection['هاتف 2'],
+                        'phone2' => $collection['خليوي'],
+                        'group_id' => $group_id,
+                        'city_id' => $city_id,
+                        'area_id' => $area_id,
+                        'street_address' => $collection['العنوان'],
+                        'is_active' => $is_active,
+                    ]);
+                    $statusCreate++;
+                }
+            }
+
         }
 
         try {
@@ -508,7 +534,7 @@ class PharmacyController extends Controller
             $cityDB = City::where('id', '=',$pharma->city_id)->get()->first();
             $groupDB = Group::where('id', '=',$pharma->group_id)->get()->first();
             $areaDB = Area::where('id', '=',$pharma->area_id)->get()->first();
-            $emailNew="Hiba_Store".$id."@hiba.sy";
+            $emailNew="Hiba_Store".$pharma->num_id."@hiba.sy";
                 $user->name = $pharma->f_name.' '.$pharma->l_name;
                 $user->f_name = $pharma->f_name;
                 $user->l_name = $pharma->l_name;

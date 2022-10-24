@@ -10,6 +10,7 @@ use App\Model\Order;
 use App\Model\Product;
 use App\Model\OrderDetail;
 use App\Model\ShippingAddress;
+use App\Model\BagsOrdersDetails;
 use App\Model\SupportTicket;
 use App\Model\SupportTicketConv;
 use App\Model\Wishlist;
@@ -216,12 +217,23 @@ class CustomerController extends Controller
         }
 
         $details = OrderDetail::where(['order_id' => $request['order_id']])->get();
+        $bagDetails = BagsOrdersDetails::where(['order_id' => $request['order_id']])->get();
+
         $details->map(function ($query) {
             $query['variation'] = json_decode($query['variation'], true);
             $query['product_details'] = Helpers::product_data_formatting(json_decode($query['product_details'], true));
             return $query;
         });
-        return response()->json($details, 200);
+
+        $bagDetails->map(function ($query) {
+            $query['bag_details'] =json_decode($query['bag_details'], true);
+            return $query;
+        });
+
+        $merged = $details->merge($bagDetails);
+        $result = $merged->all();
+
+        return response()->json($result, 200);
     }
 
     public function update_profile(Request $request)

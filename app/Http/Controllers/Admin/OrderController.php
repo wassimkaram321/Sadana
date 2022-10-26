@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
+use App\Model\Bag;
 use App\User;
 use App\Model\DeliveryMan;
 use App\Model\Order;
@@ -12,6 +13,8 @@ use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
 use App\Model\Product;
 use App\Model\Seller;
+use App\Model\BagProduct;
+use App\Model\BagsOrdersDetails;
 use App\Model\ShippingAddress;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
@@ -85,6 +88,24 @@ class OrderController extends Controller
     public function details($id)
     {
         $order = Order::with('details', 'shipping', 'seller')->where(['id' => $id])->first();
+        $bagsOrder = BagsOrdersDetails::where(['order_id' => $id])->get();
+
+        $count=0;
+      foreach($bagsOrder as $bagOrder)
+      {
+        $bag = Bag::where(['id' => $bagOrder->bag_id])->get()->first();
+        $bagProducts=BagProduct::where(['bag_id' => $bagOrder->bag_id])->get();
+        foreach($bagProducts as $bagProduct)
+        {
+            if($bagProduct->is_gift==1)
+            {
+                $count=$count+$bagProduct->product_count;
+            }
+        }
+        $bagOrder['bag_name']=$bag->bag_name;
+        $bagOrder['total_qty']=$count;
+      }
+  //  dd($bagsOrder);
 
         $linked_orders = Order::where(['order_group_id' => $order['order_group_id']])
             ->whereNotIn('order_group_id', ['def-order-group'])
@@ -111,7 +132,7 @@ class OrderController extends Controller
 
             $status = true;
             if ($order->order_type == 'default_type') {
-                return view('admin-views.order.order-details', compact('status', 'shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy', 'UserPharmacy'));
+                return view('admin-views.order.order-details', compact('bagsOrder','status', 'shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy', 'UserPharmacy'));
             } else {
                 return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address', 'pharmacy', 'UserPharmacy'));
             }
@@ -119,7 +140,7 @@ class OrderController extends Controller
 
         if ($order->order_type == 'default_type') {
             $status = false;
-            return view('admin-views.order.order-details', compact('status', 'shipping_address', 'order', 'linked_orders', 'delivery_men'));
+            return view('admin-views.order.order-details', compact('bagsOrder','status', 'shipping_address', 'order', 'linked_orders', 'delivery_men'));
         } else {
             return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address'));
         }
@@ -213,6 +234,7 @@ class OrderController extends Controller
 
         $order->order_status = $request->order_status;
         OrderManager::stock_update_on_order_status_change($order, $request->order_status);
+        OrderManager::stock_update_on_bag_order_status_change($order, $request->order_status);
         $order->save();
 
         $transaction = OrderTransaction::where(['order_id' => $order['id']])->first();
@@ -223,6 +245,9 @@ class OrderController extends Controller
         if ($request->order_status == 'delivered' && $order['seller_id'] != null) {
             OrderManager::wallet_manage_on_order_status_change($order, 'admin');
             OrderDetail::where('order_id', $order->id)->update(
+                ['delivery_status' => 'delivered']
+            );
+            BagsOrdersDetails::where('order_id', $order->id)->update(
                 ['delivery_status' => 'delivered']
             );
         }

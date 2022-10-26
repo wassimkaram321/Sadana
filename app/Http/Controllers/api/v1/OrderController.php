@@ -60,13 +60,16 @@ class OrderController extends Controller
 
     public function place_order(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'pharmacy_id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        if($request->user()->user_type=="salesman")
+        {
+            $validator = Validator::make($request->all(), [
+                'pharmacy_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+            }
         }
-
+        //send notification
         $unique_id = $request->user()->id . '-' . rand(000001, 999999) . '-' . time();
         $order_ids = [];
         foreach (CartManager::get_cart_group_ids($request) as $group_id) {
@@ -85,6 +88,10 @@ class OrderController extends Controller
             $order->billing_address = ($request['billing_address_id'] != null) ? $request['billing_address_id'] : $order['billing_address'];
             $order->billing_address_data = ($request['billing_address_id'] != null) ?  ShippingAddress::find($request['billing_address_id']) : $order['billing_address_data'];
             $order->order_note = ($request['order_note'] != null) ? $request['order_note'] : $order['order_note'];
+            if($request->user()->user_type=="salesman")
+            {
+                $order->orderBy_id = $request->pharmacy_id;
+            }
             $order->save();
 
             array_push($order_ids, $order_id);

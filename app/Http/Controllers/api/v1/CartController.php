@@ -7,6 +7,7 @@ use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\Model\Cart;
 use App\Model\Product;
+use App\Model\Bag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use function App\CPU\translate;
@@ -26,6 +27,16 @@ class CartController extends Controller
                 $c['q_featured_offer']=$p->q_featured_offer  ;
                 $c['normal_offer']=$p->normal_offer;
                 $c['featured_offer']=$p->featured_offer;
+                $c['demand_limit']=$p->demand_limit;
+            }
+            if($c->order_type=="bag")
+            {
+                $p = Bag::whereid($c->product_id)->first();
+                $c['q_normal_offer']=0;
+                $c['q_featured_offer']=0;
+                $c['normal_offer']=0;
+                $c['featured_offer']=0;
+                $c['demand_limit']=$p->demand_limit;
             }
 
         }

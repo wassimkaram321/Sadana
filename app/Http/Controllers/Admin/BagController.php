@@ -9,6 +9,7 @@ use App\Http\Controllers\BaseController;
 use App\Model\Bag;
 use App\Model\Group;
 use App\Model\BagsSetting;
+use App\Model\BagsOrdersDetails;
 use App\Model\BagProduct;
 use App\Model\City;
 use App\Model\Product;
@@ -77,8 +78,8 @@ class BagController extends BaseController
         $bag->save();
 
         $bagSetting = new BagsSetting;
-        $bagSetting->all=1;
-        $bagSetting->bag_id=$bag->id;
+        $bagSetting->all = 1;
+        $bagSetting->bag_id = $bag->id;
         $bagSetting->save();
         Toastr::success('bag added successfully!');
         return back();
@@ -106,7 +107,7 @@ class BagController extends BaseController
             'bag_description.required' => 'Description name is required!',
             'end_date.required' => 'Expiry date is required!',
             'demand_limit.required' => 'Demand limit is required!',
-            'total_price_offer.required'=>'Price is required!',
+            'total_price_offer.required' => 'Price is required!',
         ]);
 
 
@@ -239,7 +240,29 @@ class BagController extends BaseController
         ], 200);
     }
 
-
+    public function products_bag_ajax(Request $request, $id)
+    {
+        $subLaws = '';
+        $free = 'free';
+        $bagProducts = BagsOrdersDetails::where('bag_id', '=', $id)->get()->first();
+        $bagProducts->bag_details = json_decode($bagProducts->bag_details, true);
+        for ($i = 0; $i < count($bagProducts->bag_details); $i++) {
+            if ($bagProducts->bag_details[$i]['is_gift'] == 1)
+                $free = 'free';
+            else
+                $free = '';
+            $subLaws .= '<tr class="odd">
+                          <td>' . $bagProducts->bag_details[$i]['product_name'] . '</td>
+                          <td>' . $bagProducts->bag_details[$i]['brand_name'] . '</td>
+                          <td>' . $bagProducts->bag_details[$i]['product_count'] . '</td>
+                          <td>' . $bagProducts->bag_details[$i]['product_price'] . '</td>
+                          <td>' . $bagProducts->bag_details[$i]['product_total_price'] . '</td>
+                          <td>' . $free . '</td>' . '<tr>';
+        }
+        return response()->json([
+            'data' => $subLaws
+        ]);
+    }
 
 
     public function bag_settings_store(Request $request, $id)
@@ -255,7 +278,7 @@ class BagController extends BaseController
             $bagsSetting->vip = 0;
             $bagsSetting->non_vip = 0;
             $bagsSetting->custom = 0;
-            $bagsSetting->group_ids ="";
+            $bagsSetting->group_ids = "";
 
             if ($request->all == 0)
                 $bagsSetting->all = 1;
@@ -274,27 +297,24 @@ class BagController extends BaseController
             Toastr::error('Error!');
             return back();
         }
-
-
     }
 
 
     public function bag_settings(Request $request, $id)
     {
-        $city_id=0;
-        $array=array();
-        $groups=[];
-        $bag = BagsSetting::where('bag_id','=',$id)->get()->first();
-        if($bag->group_ids!="")
-        {
-            $array=json_decode($bag->group_ids);
-            $city=Group::where('id','=',$array[0])->get(['city_id'])->first();
-            $city_id=$city->city_id;
+        $city_id = 0;
+        $array = array();
+        $groups = [];
+        $bag = BagsSetting::where('bag_id', '=', $id)->get()->first();
+        if ($bag->group_ids != "") {
+            $array = json_decode($bag->group_ids);
+            $city = Group::where('id', '=', $array[0])->get(['city_id'])->first();
+            $city_id = $city->city_id;
 
-            $groupsSelected=Group::whereIn("id",$array)->get();
-            $groups=Group::where('city_id','=',$city_id)->get();
+            $groupsSelected = Group::whereIn("id", $array)->get();
+            $groups = Group::where('city_id', '=', $city_id)->get();
         }
-        $b=$id;
-        return view('admin-views.bag.setting', compact('bag','b','city_id','array','groups'));
+        $b = $id;
+        return view('admin-views.bag.setting', compact('bag', 'b', 'city_id', 'array', 'groups'));
     }
 }

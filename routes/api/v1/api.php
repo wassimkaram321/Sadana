@@ -49,6 +49,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('check-shipping-type','ShippingMethodController@check_shipping_type');
     });
 
+
     //Done
     Route::group(['prefix' => 'cart','middleware'=>'auth:api'], function () {
         Route::get('/', 'CartController@cart');
@@ -60,7 +61,16 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
     });
     //End Done
 
+    
     Route::get('faq', 'GeneralController@faq');
+
+
+    Route::group(['prefix' => 'bonuses','middleware'=>'auth:api'], function () {
+        Route::get('/', 'BonusesController@index');
+        Route::get('/unlock_products', 'BonusesController@unlock_products');
+        Route::get('/lock_products', 'BonusesController@lock');
+    });
+
 
     Route::group(['prefix' => 'products'], function () {
         Route::get('latest', 'ProductController@get_latest_products');     //Done

@@ -659,7 +659,30 @@
                         </li>
 
 
+                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store*') ? 'active' : '' }}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:">
+                                <i class="tio-shop nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{
+                                    \App\CPU\translate('Bonus Section') }}</span>
+                            </a>
+                            <ul class="js-navbar-vertical-aside-submenu nav nav-sub"
+                                style="display: {{ Request::is('admin/store*') ? 'block' : 'none' }}">
 
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.bonuses.bonuses_list') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Bonus') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item {{ Request::is('admin/store/list') ? 'active' : '' }}">
+                                    <a class="nav-link " href="{{ route('admin.bonuses.create') }}">
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Create Bonus') }}</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
 
 
 

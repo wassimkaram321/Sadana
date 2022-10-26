@@ -167,8 +167,115 @@
 
     <!-- End Page Header -->
 
+
     <div class="row" id="printableArea">
         <div class="col-lg-8 mb-3 mb-lg-0">
+
+            <!-- Card bag-->
+            <div class="card mb-3 mb-lg-5">
+                <!-- Header -->
+                <div class="card-header" style="display: block!important;">
+                    <div class="row">
+                        <div class="col-12 pb-2 border-bottom">
+                            <h4 class="card-header-title">
+                                {{\App\CPU\translate('Bags')}} {{\App\CPU\translate('Order')}}
+                                {{\App\CPU\translate('details')}}
+                                <span
+                                    class="badge badge-soft-dark rounded-circle ml-1">{{$order->details->count()}}</span>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Header -->
+
+                <!-- Body -->
+                <div class="card-body">
+                    <div class="media">
+
+
+                        <div class="media-body">
+                            <div class="row">
+                                <div class="col-md-3 product-name">
+                                    <p> {{\App\CPU\translate('Bag Name')}}</p>
+                                </div>
+
+                                <div class="col col-md-2 align-self-center p-0 ">
+                                    <p> {{\App\CPU\translate('price')}}</p>
+                                </div>
+
+                                <div class="col col-md-1 align-self-center">
+                                    <p>Q</p>
+                                </div>
+
+                                <div class="col col-md-1 align-self-center  p-0 product-name">
+                                    <p> {{\App\CPU\translate('Q_Offer')}}</p>
+                                </div>
+
+                                <div class="col col-md-2 d-flex align-self-center justify-content-end p-0 product-name">
+                                    <p> {{\App\CPU\translate('Discount')}}</p>
+                                </div>
+
+                                <div class="col col-md-2 align-self-center text-right  ">
+                                    <p> {{\App\CPU\translate('Subtotal')}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @php($bagSubtotal=0)
+                    @foreach($bagsOrder as $bagOrder)
+                    <!-- Media -->
+                    <div class="media">
+                        <div class="media-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3 mb-md-0 product-name">
+                                    <a href="" id="editCompany" data-toggle="modal" data-target='#practice_modal'
+                                        data-product_id="{{$bagOrder['bag_id']}}"
+                                        data-id="{{ $bagOrder['bag_id'] }}">{{substr($bagOrder['bag_name'],0,45)}}{{strlen($bagOrder['bag_name'])>25?'...':''}}</a>
+                                </div>
+
+                                <div class="col col-md-2 align-self-center p-0 ">
+                                    <h6>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($bagOrder['bag_price']))}}
+                                    </h6>
+                                </div>
+
+                                <div class="col col-md-1 align-self-center">
+
+                                    <h5>{{$bagOrder->bag_qty}}</h5>
+                                </div>
+
+                                <div class="col col-md-1 align-self-center  p-0 product-name">
+
+                                    <h5>{{$bagOrder['total_qty']}}</h5>
+                                </div>
+                                <div
+                                    class="col col-md-2 align-self-center d-flex  justify-content-end p-0 product-name">
+
+                                    <h5>
+                                        {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($bagOrder['bag_discount']))}}
+                                    </h5>
+                                </div>
+
+                                <div class="col col-md-2 align-self-center text-right  ">
+                                    @php($bagSubtotal=$bagOrder['bag_price']*$bagOrder->bag_qty+$bagOrder['bag_tax']-$bagOrder['bag_discount'])
+
+                                    <h5 style="font-size: 12px">
+                                        {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($bagSubtotal))}}
+                                    </h5>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    @endforeach
+
+                    <!-- End Row -->
+                </div>
+                <!-- End Body -->
+            </div>
+            <!-- End Card bag -->
+
             <!-- Card -->
             <div class="card mb-3 mb-lg-5">
                 <!-- Header -->
@@ -425,6 +532,7 @@
                 <!-- End Body -->
             </div>
             <!-- End Card -->
+
         </div>
 
         <div class="col-lg-4">
@@ -665,8 +773,46 @@
     </div>
     <!-- End Row -->
 </div>
+
+<div class="modal fade" id="practice_modal">
+    <div class="modal-dialog">
+
+        <div class="modal-content" style="min-height: 150px; padding: 20px">
+            <div class="card-body" style="padding: 0">
+                <div class="table-responsive">
+                    <table id="sublawmasterdata"
+                        style="text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};  width: 100%;"
+                        class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">{{ \App\CPU\translate('product_name') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('brand_name') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('Q') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('price') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('total_price') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('Action') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exampleid">
+                            <tr>
+                                <td>*******</td>
+                                <td>*******</td>
+                                <td>*******</td>
+                                <td>*******</td>
+                                <td>*******</td>
+                                <td>*******</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!--Show locations on map Modal -->
-<div class="modal fade" id="locationModal" tabindex="-1" role="dialog" aria-labelledby="locationModalLabel">
+{{-- <div class="modal fade" id="locationModal" tabindex="-1" role="dialog" aria-labelledby="locationModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -686,11 +832,11 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 <!-- End Modal -->
 
 <!--Show delivery info Modal -->
-<div class="modal" id="shipping_chose" role="dialog" tabindex="-1">
+{{-- <div class="modal" id="shipping_chose" role="dialog" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -727,7 +873,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 <!-- End Modal -->
 @endsection
 
@@ -927,71 +1073,104 @@
         }
 </script>
 
-{{-- <script
+{{--
+<script
     src="https://maps.googleapis.com/maps/api/js?key={{\App\CPU\Helpers::get_business_settings('AIzaSyCeSycFWU-UA_Q56WeJBAWXYm3RJKSSU0k')}}&v=3.45.8">
 </script>
 <script>
-    function initializegLocationMap() {
-            var map = null;
-            //var myLatlng = new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}});
-            var myLatlng = new google.maps.LatLng(33.491649803775616,36.33539185613544);
-            var dmbounds = new google.maps.LatLngBounds(null);
-            var locationbounds = new google.maps.LatLngBounds(null);
-            var dmMarkers = [];
-            dmbounds.extend(myLatlng);
-            locationbounds.extend(myLatlng);
+    // function initializegLocationMap() {
+    //         var map = null;
+    //         //var myLatlng = new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}});
+    //         var myLatlng = new google.maps.LatLng(33.491649803775616,36.33539185613544);
+    //         var dmbounds = new google.maps.LatLngBounds(null);
+    //         var locationbounds = new google.maps.LatLngBounds(null);
+    //         var dmMarkers = [];
+    //         dmbounds.extend(myLatlng);
+    //         locationbounds.extend(myLatlng);
 
-            var myOptions = {
-                center: myLatlng,
-                zoom: 13,
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
+    //         var myOptions = {
+    //             center: myLatlng,
+    //             zoom: 13,
+    //             mapTypeId: google.maps.MapTypeId.ROADMAP,
 
-                panControl: true,
-                mapTypeControl: false,
-                panControlOptions: {
-                    position: google.maps.ControlPosition.RIGHT_CENTER
-                },
-                zoomControl: true,
-                zoomControlOptions: {
-                    style: google.maps.ZoomControlStyle.LARGE,
-                    position: google.maps.ControlPosition.RIGHT_CENTER
-                },
-                scaleControl: false,
-                streetViewControl: false,
-                streetViewControlOptions: {
-                    position: google.maps.ControlPosition.RIGHT_CENTER
-                }
-            };
-            map = new google.maps.Map(document.getElementById("location_map_canvas"), myOptions);
-            console.log(map);
-            var infowindow = new google.maps.InfoWindow();
+    //             panControl: true,
+    //             mapTypeControl: false,
+    //             panControlOptions: {
+    //                 position: google.maps.ControlPosition.RIGHT_CENTER
+    //             },
+    //             zoomControl: true,
+    //             zoomControlOptions: {
+    //                 style: google.maps.ZoomControlStyle.LARGE,
+    //                 position: google.maps.ControlPosition.RIGHT_CENTER
+    //             },
+    //             scaleControl: false,
+    //             streetViewControl: false,
+    //             streetViewControlOptions: {
+    //                 position: google.maps.ControlPosition.RIGHT_CENTER
+    //             }
+    //         };
+    //         map = new google.maps.Map(document.getElementById("location_map_canvas"), myOptions);
+    //         console.log(map);
+    //         var infowindow = new google.maps.InfoWindow();
 
-            @if($shipping_address && isset($shipping_address))
-            var marker = new google.maps.Marker({
-                position: new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}}),
-                map: map,
-                title: "{{$order->customer['f_name']??""}} {{$order->customer['l_name']??""}}",
-                icon: "{{asset('public/assets/front-end/img/customer_location.png')}}"
-            });
+    //         @if($shipping_address && isset($shipping_address))
+    //         var marker = new google.maps.Marker({
+    //             position: new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}}),
+    //             map: map,
+    //             title: "{{$order->customer['f_name']??""}} {{$order->customer['l_name']??""}}",
+    //             icon: "{{asset('public/assets/front-end/img/customer_location.png')}}"
+    //         });
 
-            google.maps.event.addListener(marker, 'click', (function (marker) {
-                return function () {
-                    infowindow.setContent("<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{asset('storage/app/public/profile/')}}{{$order->customer->image??""}}'></div><div style='float:right; padding: 10px;'><b>{{$order->customer->f_name??""}} {{$order->customer->l_name??""}}</b><br/>{{$shipping_address->address??""}}</div>");
-                    infowindow.open(map, marker);
-                }
-            })(marker));
-            locationbounds.extend(marker.getPosition());
-            @endif
+    //         google.maps.event.addListener(marker, 'click', (function (marker) {
+    //             return function () {
+    //                 infowindow.setContent("<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{asset('storage/app/public/profile/')}}{{$order->customer->image??""}}'></div><div style='float:right; padding: 10px;'><b>{{$order->customer->f_name??""}} {{$order->customer->l_name??""}}</b><br/>{{$shipping_address->address??""}}</div>");
+    //                 infowindow.open(map, marker);
+    //             }
+    //         })(marker));
+    //         locationbounds.extend(marker.getPosition());
+    //         @endif
 
-            google.maps.event.addListenerOnce(map, 'idle', function () {
-                map.fitBounds(locationbounds);
-            });
-        }
+    //         google.maps.event.addListenerOnce(map, 'idle', function () {
+    //             map.fitBounds(locationbounds);
+    //         });
+    //     }
 
-        // Re-init map before show modal
-        $('#locationModal').on('shown.bs.modal', function (event) {
-            initializegLocationMap();
-        });
+    //     // Re-init map before show modal
+    //     $('#locationModal').on('shown.bs.modal', function (event) {
+    //         initializegLocationMap();
+    //     });
 </script> --}}
+
+
+
+<script>
+    $(document).ready(function () {
+
+    $.ajaxSetup({
+        headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+    });
+
+    $('body').on('click', '#editCompany', function (event) {
+        event.preventDefault();
+        var id = $(this).data('id');
+        var product_id = $(this).data('product_id');
+        $.ajax({
+          url: 'bagsProducts/'+product_id,
+          type: "POST",
+          data: {
+            product_id: product_id,
+          },
+          success: function (data) {
+            $("#sublawmasterdata tbody").empty();
+            $("#exampleid").append(data.data);
+          }
+      });
+
+    });
+
+   });
+</script>
 
 @endpush

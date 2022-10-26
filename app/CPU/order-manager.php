@@ -7,6 +7,7 @@ use App\Model\AdminWallet;
 use App\Model\Cart;
 use App\Model\CartShipping;
 use App\Model\Order;
+use App\Model\Brand;
 use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
 use App\Pharmacy;
@@ -48,11 +49,29 @@ class OrderManager
         $sub_total = 0;
         $total_tax = 0;
         $total_discount_on_product = 0;
-        foreach ($order->details as $key => $detail) {
-            $sub_total += $detail->price * $detail->qty;
-            $total_tax += $detail->tax;
-            $total_discount_on_product += $detail->discount;
+        $sub_total_bag = 0;
+        $total_tax_bag = 0;
+        $total_discount_on_product_bag = 0;
+
+        $bagOrderDetails=BagsOrdersDetails::where('order_id','=',$order->id)->get();
+
+        foreach ($bagOrderDetails as $detail) {
+            $sub_total_bag += ($detail->bag_qty*$detail->bag_price);
+            $total_tax_bag += $detail->bag_tax;
+            $total_discount_on_product_bag += $detail->bag_discount;
         }
+
+
+        foreach ($order->details as $key => $detail) {
+            $sub_total += ($detail->price * $detail->qty);
+            $total_tax += $detail->tax ;
+            $total_discount_on_product += $detail->discount ;
+        }
+
+        $sub_total = $sub_total+$sub_total_bag;
+        $total_tax = $total_tax+$total_tax_bag;
+        $total_discount_on_product = $total_discount_on_product+$total_discount_on_product_bag;
+
         $total_shipping_cost = $order['shipping_cost'];
         return [
             'subtotal' => $sub_total,
@@ -408,7 +427,7 @@ class OrderManager
 
                 foreach ($bagProducts as $ccc) {
                     $p = Product::whereid($ccc->product_id)->first();
-                    $b = Product::whereid($p->brand_id)->first();
+                    $b = Brand::whereid($p->brand_id)->first();
                     $ccc['product_name'] = $p->name;
                     $ccc['brand_name'] = $b->name;
                 }
@@ -700,8 +719,6 @@ class OrderManager
         }
         return $points;
     }
-
-
 
 
     public static function stock_update_on_bag_order_status_change($order, $status)

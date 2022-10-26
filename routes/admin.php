@@ -396,6 +396,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
            Route::post('products/delete', 'BagController@bag_products_delete')->name('products-delete');
 
 
+
            Route::post('status-update', 'BagController@status_update')->name('status-update');
 
        });
@@ -406,7 +407,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
        Route::get('list', 'CityController@city_list')->name('list');
        Route::post('store', 'CityController@city_store')->name('store');
        Route::post('delete', 'CityController@city_delete')->name('delete');
-       Route::post('status-update', 'BagController@city_status_update')->name('status-update');
+       Route::post('status-update', 'BagController@city_status_update')->name('status-update');    //Error fadi hi
 
 
        //group
@@ -609,6 +610,16 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('analytics-update', 'BusinessSettingsController@analytics_update')->name('analytics-update');
         });
 
+        
+        Route::group(['prefix' => 'bonuses', 'as' => 'bonuses.'], function () {
+            // Bonuses
+            Route::get('list', 'BounusController@index')->name('bonuses_list');
+            Route::get('create', 'BounusController@create')->name('create');
+            Route::post('store', 'BounusController@store')->name('store');
+            Route::post('delete', 'BounusController@destroy')->name('delete');
+            Route::post('delete_sec', 'BounusController@destroy_sec')->name('delete_sec');
+
+        });
 
 
         Route::group(['prefix' => 'points', 'as' => 'points.'], function () {
@@ -636,6 +647,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         });
 
 
+
         //order management
         Route::group(['prefix' => 'orders', 'as' => 'orders.', 'middleware' => ['module:order_management']], function () {
             Route::get('list/{status}', 'OrderController@list')->name('list');
@@ -648,6 +660,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
 
             Route::post('edit/order/product/{id}', 'OrderController@product_edit_order')->name('product-edit-order');
+
+            Route::post('details/bagsProducts/{id}', 'BagController@products_bag_ajax')->name('product-bag-ajax');
 
             Route::get('edit/order/{id}', 'OrderController@edit_order')->name('edit-order');
             Route::post('update/order', 'OrderController@update_order')->name('update-order');

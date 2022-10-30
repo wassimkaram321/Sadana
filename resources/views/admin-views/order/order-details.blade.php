@@ -18,7 +18,7 @@
 @endpush
 
 @section('content')
-<div class="content container-fluid">
+<div class="content container-fluid" style="direction: {{ Session::get('direction') === 'rtl' ? 'rtl' : 'ltr' }};; text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};">
     <!-- Page Header -->
     <div class="page-header d-print-none p-3" style="background: white">
         <div class="row align-items-center">
@@ -28,8 +28,8 @@
                         <li class="breadcrumb-item"><a class="breadcrumb-link"
                                 href="{{route('admin.orders.list',['status'=>'all'])}}">{{\App\CPU\translate('Orders')}}</a>
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">{{\App\CPU\translate('Order')}}
-                            {{\App\CPU\translate('details')}} </li>
+                        <li class="breadcrumb-item active" aria-current="page">{{\App\CPU\translate('Order_details')}}
+                           </li>
                     </ol>
                 </nav>
 
@@ -81,39 +81,8 @@
                     @endif
 
                 </div>
-                <div class="col-md-6 mt-2">
-                    {{-- <a class="text-body mr-3" target="_blank"
-                        href={{route('admin.orders.generate-invoice',[$order['id']])}}>
-                        <i class="tio-print mr-1"></i> {{\App\CPU\translate('Print')}} {{\App\CPU\translate('invoice')}}
-                    </a> --}}
 
-                    <a class="text-body mr-3" target="_blank"
-                        href={{route('admin.orders.generate-excel',[$order['id']])}}>
-                        <i class="tio-print mr-1"></i> {{\App\CPU\translate('Export')}} {{\App\CPU\translate('excel')}}
-                    </a>
-
-
-                    {{-- @if (isset($shipping_address['latitude']) && isset($shipping_address['longitude']))
-                    <button class="btn btn-xs btn-secondary" data-toggle="modal" data-target="#locationModal"><i
-                            class="tio-map"></i> {{\App\CPU\translate('show_locations_on_map')}}</button>
-                    @else
-                    <button class="btn btn-xs btn-warning"><i class="tio-map"></i>
-                        {{\App\CPU\translate('shipping_address_has_been_given_below')}}
-                    </button>
-                    @endif --}}
-                </div>
-
-                <div class="row">
-                    <div class="col-12 col-md-6 mt-4">
-                        <label class="badge badge-info">{{\App\CPU\translate('linked_orders')}}
-                            : {{$linked_orders->count()}}</label><br>
-                        @foreach($linked_orders as $linked)
-                        <a href="{{route('admin.orders.details',[$linked['id']])}}"
-                            class="btn btn-secondary">{{\App\CPU\translate('ID')}}
-                            :{{$linked['id']}}</a>
-                        @endforeach
-                    </div>
-
+                <div class="row" >
                     <div class="col-12 col-md-6">
                         <div class="hs-unfold float-right col-6">
                             <div class="dropdown">
@@ -159,6 +128,16 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="col-md-6 mt-2">
+                        <a class="text-body mr-3" target="_blank"
+                            href={{route('admin.orders.generate-excel',[$order['id']])}}>
+                            <i class="tio-print mr-1"></i> {{\App\CPU\translate('Export')}} {{\App\CPU\translate('excel')}}
+                        </a>
+                    </div>
+
+
                 </div>
                 <!-- End Unfold -->
             </div>
@@ -178,10 +157,9 @@
                     <div class="row">
                         <div class="col-12 pb-2 border-bottom">
                             <h4 class="card-header-title">
-                                {{\App\CPU\translate('Bags')}} {{\App\CPU\translate('Order')}}
-                                {{\App\CPU\translate('details')}}
+                                {{\App\CPU\translate('Bags_Order_details')}}
                                 <span
-                                    class="badge badge-soft-dark rounded-circle ml-1">{{$order->details->count()}}</span>
+                                    class="badge badge-soft-dark rounded-circle ml-1">{{$bagsOrder->count()}}</span>
                             </h4>
                         </div>
                     </div>
@@ -204,7 +182,7 @@
                                 </div>
 
                                 <div class="col col-md-1 align-self-center">
-                                    <p>Q</p>
+                                    <p>{{\App\CPU\translate('Q')}}</p>
                                 </div>
 
                                 <div class="col col-md-1 align-self-center  p-0 product-name">
@@ -283,7 +261,7 @@
                     <div class="row">
                         <div class="col-12 pb-2 border-bottom">
                             <h4 class="card-header-title">
-                                {{\App\CPU\translate('Order')}} {{\App\CPU\translate('details')}}
+                                {{\App\CPU\translate('Order_details')}}
                                 <span
                                     class="badge badge-soft-dark rounded-circle ml-1">{{$order->details->count()}}</span>
                             </h4>
@@ -299,18 +277,6 @@
                             </p>
                             @endif
                         </div>
-                        <div class="col-6 pt-2">
-                            <div class="text-right">
-                                <h6 class="" style="color: #8a8a8a;">
-                                    {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('Method')}}
-                                    : {{str_replace('_',' ',$order['payment_method'])}}
-                                </h6>
-                                {{-- <h6 class="" style="color: #8a8a8a;">
-                                    {{\App\CPU\translate('Payment')}} {{\App\CPU\translate('reference')}}
-                                    : {{str_replace('_',' ',$order['transaction_ref'])}}
-                                </h6> --}}
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <!-- End Header -->
@@ -318,9 +284,7 @@
                 <!-- Body -->
                 <div class="card-body">
                     <div class="media">
-                        {{-- <div class="avatar avatar-xl mr-3">
-                            <p>{{\App\CPU\translate('image')}}</p>
-                        </div> --}}
+
 
                         <div class="media-body">
                             <div class="row">
@@ -333,14 +297,9 @@
                                 </div>
 
                                 <div class="col col-md-1 align-self-center">
-                                    <p>Q</p>
+                                    <p> {{\App\CPU\translate('Q')}}</p>
                                 </div>
-                                {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
-                                    <p> {{\App\CPU\translate('TAX')}}</p>
-                                </div> --}}
-                                {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
-                                    <p> {{\App\CPU\translate('Offer Type')}}</p>
-                                </div> --}}
+
                                 <div class="col col-md-1 align-self-center  p-0 product-name">
                                     <p> {{\App\CPU\translate('Q_Offer')}}</p>
                                 </div>
@@ -363,87 +322,17 @@
                     @foreach($order->details as $key=>$detail)
 
                     @if($detail->product)
-                    @if ($key==0)
-                    @if($detail->product->added_by=='admin')
-                    {{-- <div class="row">
-                        <img class="avatar-img" style="width: 55px;height: 55px; border-radius: 50%;"
-                            onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                            src="{{asset('storage/app/public/company/'.\App\CPU\Helpers::get_business_settings('company_web_logo'))}}"
-                            alt="Image">
-                        <p class="sellerName">
-                            <a style="color: black;" href="javascript:">
-                                {{ \App\CPU\Helpers::get_business_settings('company_name')}}
-                            </a>
-                        </p>
-                    </div> --}}
-                    @else
 
-                    {{-- @php($shop = \App\Model\Shop::where('seller_id','=',$detail->seller_id)->first())
-                    @if (isset($shop))
-                    <div class="row">
-                        <img class="avatar-img" style="width: 55px;height: 55px; border-radius: 50%;"
-                            onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                            src="{{asset('storage/app/public/shop/'.$shop->image)}}" alt="Image">
-                        <p class="sellerName">
-                            <a style="color: black;" href="{{route('admin.sellers.view',$detail->seller_id)}}">{{
-                                $shop->name}}</a>
-                            <i class="tio tio-info-outined ml-4" data-toggle="collapse"
-                                style="font-size: 20px; cursor: pointer"
-                                data-target="#sellerInfoCollapse-{{ $detail->id }}" aria-expanded="false"></i>
-                        </p>
-                    </div>
-                    @endif --}}
-
-                    {{-- @php($seller = App\Model\Seller::with('shop')->find($detail->seller_id))
-                    @if (isset($seller))
-                    <div class="collapse" id="sellerInfoCollapse-{{ $detail->id }}">
-                        <div class="row card-body mb-3">
-                            <div class="col-6">
-                                <h4>
-                                    {{\App\CPU\translate('Status')}}
-                                    : {!! $seller->status=='approved'?'<label
-                                        class="badge badge-success">Active</label>':'<label
-                                        class="badge badge-danger">In-Active</label>' !!}
-                                </h4>
-                                <h5>{{\App\CPU\translate('Email')}} : <a class="text-dark"
-                                        href="mailto:{{ $seller->email }}">{{ $seller->email }}</a>
-                                </h5>
-                            </div>
-                            <div class="col-6">
-                                <h5>{{\App\CPU\translate('name')}} : <a class="text-dark"
-                                        href="{{ route('admin.sellers.view', [$seller['id']]) }}">{{
-                                        $seller['shop']!=null?$seller['shop']->name:'' }}</a>
-                                </h5>
-                                <h5>{{\App\CPU\translate('Phone')}} : <a class="text-dark"
-                                        href="tel:{{ $seller->phone }}">{{ $seller->phone }}</a>
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                    @endif --}}
-                    @endif
-                    @endif
                     <!-- Media -->
                     <div class="media">
-                        {{-- <div class="avatar avatar-xl mr-3">
-                            <img class="img-fluid"
-                                onerror="this.src='{{asset('public/assets/back-end/img/160x160/img2.jpg')}}'"
-                                src="{{\App\CPU\ProductManager::product_image_path('thumbnail')}}/{{$detail->product['thumbnail']}}"
-                                alt="Image Description">
-                        </div> --}}
 
                         <div class="media-body">
                             <div class="row">
                                 <div class="col-md-3 mb-3 mb-md-0 product-name">
 
                                     <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
-                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,45)}}{{strlen($detail->product['name'])>25?'...':''}}</a>
-                                    {{-- <strong><u>{{\App\CPU\translate('Variation')}} : </u></strong> --}}
+                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,55)}}{{strlen($detail->product['name'])>35?'':''}}</a>
 
-                                    {{-- <div class="font-size-sm text-body">
-
-                                        <span class="font-weight-bold">{{$detail['variant']}}</span>
-                                    </div> --}}
                                 </div>
 
                                 <div class="col col-md-2 align-self-center p-0 ">
@@ -455,16 +344,7 @@
 
                                     <h5>{{$detail->qty}}</h5>
                                 </div>
-                                {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
 
-                                    <h5>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($detail['tax']))}}
-                                    </h5>
-                                </div> --}}
-
-                                {{-- <div class="col col-md-1 align-self-center  p-0 product-name">
-
-                                    <h5>{{$detail['offerType']}}</h5>
-                                </div> --}}
 
                                 <div class="col col-md-1 align-self-center  p-0 product-name">
 
@@ -542,20 +422,7 @@
                 </div>
                 <div class="card-body text-capitalize">
                     <ul class="list-unstyled list-unstyled-py-2">
-                        {{-- <li>
-                            <h6 class="" style="color: #8a8a8a;">
-                                {{\App\CPU\translate('shipping_type')}}
-                                : {{str_replace('_',' ',$order->shipping_type)}}
-                            </h6>
-                        </li>
-                        @if ($order->shipping_type == 'order_wise')
-                        <li>
-                            <h6 class="" style="color: #8a8a8a;">
-                                {{\App\CPU\translate('shipping')}} {{\App\CPU\translate('method')}}
-                                : {{$order->shipping ? $order->shipping->title :'No shipping method selected'}}
-                            </h6>
-                        </li>
-                        @endif --}}
+
                         <li>
                             <select class="form-control text-capitalize" name="delivery_type"
                                 onchange="choose_delivery_type(this.value)">
@@ -566,10 +433,7 @@
                                 <option value="self_delivery" {{$order->delivery_type=='self_delivery'?'selected':''}}>
                                     {{\App\CPU\translate('by_self_delivery_man')}}
                                 </option>
-                                {{-- <option value="third_party_delivery" {{$order->
-                                    delivery_type=='third_party_delivery'?'selected':''}} >
-                                    {{\App\CPU\translate('by_third_party_delivery_service')}}
-                                </option> --}}
+
                             </select>
                         </li>
                         <li id="choose_delivery_man">
@@ -588,20 +452,7 @@
                                 @endforeach
                             </select>
                         </li>
-                        {{-- <li class=" mt-2" id="by_third_party_delivery_service_info">
-                            <span>
-                                {{\App\CPU\translate('delivery_service_name')}} : {{$order->delivery_service_name}}
-                            </span>
-                            <span style="float: right;">
-                                <a href="javascript:" onclick="choose_delivery_type('third_party_delivery')">
-                                    <i class="tio-edit"></i>
-                                </a>
-                            </span>
-                            <br>
-                            <span>
-                                {{\App\CPU\translate('tracking_id')}} : {{$order->third_party_delivery_tracking_id}}
-                            </span>
-                        </li> --}}
+
                     </ul>
                 </div>
             </div>
@@ -632,10 +483,6 @@
                                 '.$order->customer['l_name']}}</span>
                         </div>
 
-                        {{-- <div class="media-body">
-                            <span class="text-body text-hover-primary">{{$order['customer_type']}}</span>
-                        </div> --}}
-
                         <div class="media-body text-right">
                             {{--<i class="tio-chevron-right text-body"></i>--}}
                         </div>
@@ -660,7 +507,7 @@
                     <hr>
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5>{{\App\CPU\translate('Contact')}} {{\App\CPU\translate('info')}} </h5>
+                        <h5>{{\App\CPU\translate('Contact_info')}}</h5>
                     </div>
 
                     <ul class="list-unstyled list-unstyled-py-2">
@@ -679,7 +526,7 @@
                     @if($status==true && $UserPharmacy!=null && $pharmacy!=null)
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5>{{\App\CPU\translate('pharmacy')}} {{\App\CPU\translate('info :')}}{{$pharmacy['name']}}
+                        <h5>{{\App\CPU\translate('pharmacy_info')}} {{$pharmacy['name']}}
                         </h5>
 
                     </div>
@@ -702,62 +549,6 @@
 
                     @endif
 
-
-                    {{-- <div class="d-flex justify-content-between align-items-center">
-                        <h5>{{\App\CPU\translate('shipping_address')}}</h5>
-                    </div>
-
-                    @if($order->shippingAddress)
-                    @php($shipping_address=$order->shippingAddress)
-                    @else
-                    @php($shipping_address=json_decode($order['shipping_address_data']))
-                    @endif
-
-                    <span class="d-block">{{\App\CPU\translate('Name')}} :
-                        <strong>{{$shipping_address? $shipping_address->contact_person_name :
-                            \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('Country')}}:
-                        <strong>{{$shipping_address ? $shipping_address->country :
-                            \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('City')}}:
-                        <strong>{{$shipping_address ? $shipping_address->city :
-                            \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('zip_code')}} :
-                        <strong>{{$shipping_address ? $shipping_address->zip :
-                            \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('address')}} :
-                        <strong>{{$shipping_address ? $shipping_address->address :
-                            \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('Phone')}}:
-                        <strong>{{$shipping_address ? $shipping_address->phone : \App\CPU\translate('empty')}}</strong>
-                    </span>
-
-                    <hr>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5>{{\App\CPU\translate('billing_address')}}</h5>
-
-                    </div>
-
-                    @if($order->billingAddress)
-                    @php($billing=$order->billingAddress)
-                    @else
-                    @php($billing=json_decode($order['billing_address_data']))
-                    @endif
-
-                    <span class="d-block">{{\App\CPU\translate('Name')}} :
-                        <strong>{{$billing? $billing->contact_person_name : \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('Country')}}:
-                        <strong>{{$billing ? $billing->country : \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('City')}}:
-                        <strong>{{$billing ? $billing->city : \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('zip_code')}} :
-                        <strong>{{$billing ? $billing->zip : \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('address')}} :
-                        <strong>{{$billing ? $billing->address : \App\CPU\translate('empty')}}</strong><br>
-                        {{\App\CPU\translate('Phone')}}:
-                        <strong>{{$billing ? $billing->phone : \App\CPU\translate('empty')}}</strong>
-                    </span> --}}
                 </div>
                 @else
                 <div class="card-body">
@@ -790,7 +581,7 @@
                                 <th scope="col">{{ \App\CPU\translate('Q') }}</th>
                                 <th scope="col">{{ \App\CPU\translate('price') }}</th>
                                 <th scope="col">{{ \App\CPU\translate('total_price') }}</th>
-                                <th scope="col">{{ \App\CPU\translate('Action') }}</th>
+                                <th scope="col">{{ \App\CPU\translate('note') }}</th>
                             </tr>
                         </thead>
                         <tbody id="exampleid">
@@ -811,70 +602,7 @@
     </div>
 </div>
 
-<!--Show locations on map Modal -->
-{{-- <div class="modal fade" id="locationModal" tabindex="-1" role="dialog" aria-labelledby="locationModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="locationModalLabel">{{\App\CPU\translate('location')}}
-                    {{\App\CPU\translate('data')}}</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 modal_body_map">
-                        <div class="location-map" id="location-map">
-                            <div style="width: 100%; height: 400px;" id="location_map_canvas"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> --}}
-<!-- End Modal -->
 
-<!--Show delivery info Modal -->
-{{-- <div class="modal" id="shipping_chose" role="dialog" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{\App\CPU\translate('update_third_party_delivery_info')}}</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-12">
-                        <form action="{{route('admin.orders.update-deliver-info')}}" method="POST">
-                            @csrf
-                            <input type="hidden" name="order_id" value="{{$order['id']}}">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="">{{\App\CPU\translate('delivery_service_name')}}</label>
-                                    <input class="form-control" type="text" name="delivery_service_name"
-                                        value="{{$order['delivery_service_name']}}" id="" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="">{{\App\CPU\translate('tracking_id')}}
-                                        ({{\App\CPU\translate('optional')}})</label>
-                                    <input class="form-control" type="text" name="third_party_delivery_tracking_id"
-                                        value="{{$order['third_party_delivery_tracking_id']}}" id="">
-                                </div>
-                                <button class="btn btn-primary" type="submit">{{\App\CPU\translate('update')}}</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-
-            </div>
-        </div>
-    </div>
-</div> --}}
-<!-- End Modal -->
 @endsection
 
 @push('script_2')
@@ -1072,76 +800,6 @@
             });
         }
 </script>
-
-{{--
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{\App\CPU\Helpers::get_business_settings('AIzaSyCeSycFWU-UA_Q56WeJBAWXYm3RJKSSU0k')}}&v=3.45.8">
-</script>
-<script>
-    // function initializegLocationMap() {
-    //         var map = null;
-    //         //var myLatlng = new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}});
-    //         var myLatlng = new google.maps.LatLng(33.491649803775616,36.33539185613544);
-    //         var dmbounds = new google.maps.LatLngBounds(null);
-    //         var locationbounds = new google.maps.LatLngBounds(null);
-    //         var dmMarkers = [];
-    //         dmbounds.extend(myLatlng);
-    //         locationbounds.extend(myLatlng);
-
-    //         var myOptions = {
-    //             center: myLatlng,
-    //             zoom: 13,
-    //             mapTypeId: google.maps.MapTypeId.ROADMAP,
-
-    //             panControl: true,
-    //             mapTypeControl: false,
-    //             panControlOptions: {
-    //                 position: google.maps.ControlPosition.RIGHT_CENTER
-    //             },
-    //             zoomControl: true,
-    //             zoomControlOptions: {
-    //                 style: google.maps.ZoomControlStyle.LARGE,
-    //                 position: google.maps.ControlPosition.RIGHT_CENTER
-    //             },
-    //             scaleControl: false,
-    //             streetViewControl: false,
-    //             streetViewControlOptions: {
-    //                 position: google.maps.ControlPosition.RIGHT_CENTER
-    //             }
-    //         };
-    //         map = new google.maps.Map(document.getElementById("location_map_canvas"), myOptions);
-    //         console.log(map);
-    //         var infowindow = new google.maps.InfoWindow();
-
-    //         @if($shipping_address && isset($shipping_address))
-    //         var marker = new google.maps.Marker({
-    //             position: new google.maps.LatLng({{$shipping_address->latitude}}, {{$shipping_address->longitude}}),
-    //             map: map,
-    //             title: "{{$order->customer['f_name']??""}} {{$order->customer['l_name']??""}}",
-    //             icon: "{{asset('public/assets/front-end/img/customer_location.png')}}"
-    //         });
-
-    //         google.maps.event.addListener(marker, 'click', (function (marker) {
-    //             return function () {
-    //                 infowindow.setContent("<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{asset('storage/app/public/profile/')}}{{$order->customer->image??""}}'></div><div style='float:right; padding: 10px;'><b>{{$order->customer->f_name??""}} {{$order->customer->l_name??""}}</b><br/>{{$shipping_address->address??""}}</div>");
-    //                 infowindow.open(map, marker);
-    //             }
-    //         })(marker));
-    //         locationbounds.extend(marker.getPosition());
-    //         @endif
-
-    //         google.maps.event.addListenerOnce(map, 'idle', function () {
-    //             map.fitBounds(locationbounds);
-    //         });
-    //     }
-
-    //     // Re-init map before show modal
-    //     $('#locationModal').on('shown.bs.modal', function (event) {
-    //         initializegLocationMap();
-    //     });
-</script> --}}
-
-
 
 <script>
     $(document).ready(function () {

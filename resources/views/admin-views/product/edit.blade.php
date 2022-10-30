@@ -264,7 +264,7 @@
 
 
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label class="control-label">{{\App\CPU\translate('Discount')}}</label>
                                         <input type="number" min="0"
                                                value={{ $product->discount_type=='flat'?\App\CPU\Convert::default($product->discount): $product->discount}} step="0.01"
@@ -272,12 +272,20 @@
                                                class="form-control" required>
                                     </div>
 
-                                    <div class="col-md-6" id="quantity">
+                                    <div class="col-md-4" id="quantity">
                                         <label
                                             class="control-label">{{\App\CPU\translate('total')}} {{\App\CPU\translate('Quantity')}}</label>
                                         <input type="number" min="0" value={{ $product->current_stock }} step="1"
                                                placeholder="{{\App\CPU\translate('Quantity') }}"
                                                name="current_stock" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-4" id="Number">
+                                        <label
+                                            class="control-label">{{\App\CPU\translate('Product')}} {{\App\CPU\translate('Number')}}</label>
+                                        <input type="number" min="0" value={{ $product->num_id }} step="1"
+                                               placeholder="{{\App\CPU\translate('Product_Number') }}"
+                                               name="num_id" class="form-control" required>
                                     </div>
 
 

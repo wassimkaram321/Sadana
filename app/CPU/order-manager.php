@@ -336,7 +336,7 @@ class OrderManager
         }
     }
 
-    public static function generate_order($data)
+    public static function generate_order($data,$pharmacyId)
     {
         $myArray = array();
 
@@ -482,6 +482,14 @@ class OrderManager
                         $offerType = 'normal';
                     }
                 }
+                if($c['pure_price']==1)
+                {
+                    $total_qty=0;
+                    $offerType = 'no offer';
+                    $pure_price=1;
+                }
+                else
+                $pure_price=0;
 
                 $or_d = [
                     'order_id' => $order_id,
@@ -499,6 +507,7 @@ class OrderManager
                     'variation' => $c['variations'],
                     'delivery_status' => 'pending',
                     'shipping_method_id' => null,
+                    'pure_price' => $pure_price,
                     'payment_status' => 'unpaid',
                     'created_at' => now(),
                     'updated_at' => now()
@@ -535,18 +544,43 @@ class OrderManager
             }
         }
 
+
+        //send Alameen system
         if ($user->user_type == "pharmacist") {
             $pharmacy = Pharmacy::where('user_id', '=', $user['id'])->get()->first();
             $userR = User::where('id', '=', $user['id'])->get()->first();
             $orderAlameen = new OrderAlameen;
             $orderAlameen->order_id = $order_id;
-            $orderAlameen->pharmacy_id = $userR->pharmacy_id;
+            if($userR->pharmacy_id!=null)
+            {
+                $orderAlameen->pharmacy_id = $userR->pharmacy_id;
+            }
+            else
+            {
+                $orderAlameen->pharmacy_id = 000000;
+            }
             $orderAlameen->pharmacy_name = $pharmacy->name;
             $orderAlameen->product_details = json_encode($myArray);
             $orderAlameen->status = "pending";
             $orderAlameen->save();
         } else {
             //salesman
+            $pharmacy = Pharmacy::where('id', '=',$pharmacyId)->get()->first();
+            $userR = User::where('id', '=', $pharmacy->user_id)->get()->first();
+            $orderAlameen = new OrderAlameen;
+            $orderAlameen->order_id = $order_id;
+            if($userR->pharmacy_id!=null)
+            {
+                $orderAlameen->pharmacy_id = $userR->pharmacy_id;
+            }
+            else
+            {
+                $orderAlameen->pharmacy_id = 000000;
+            }
+            $orderAlameen->pharmacy_name = $pharmacy->name;
+            $orderAlameen->product_details = json_encode($myArray);
+            $orderAlameen->status = "pending";
+            $orderAlameen->save();
         }
 
 
@@ -598,8 +632,7 @@ class OrderManager
         }
 
         try {
-            $fcm_token = $user->cm_firebase_token;
-            $seller_fcm_token = $seller->cm_firebase_token;
+
             if ($data['payment_method'] != 'cash_on_delivery') {
                 $value = Helpers::order_status_update_message('confirmed');
             } else {
@@ -607,23 +640,54 @@ class OrderManager
             }
 
             if ($value) {
-                $data = [
-                    'title' => translate('order'),
-                    'description' => $value,
-                    'order_id' => $order_id,
-                    'image' => '',
-                ];
-                Helpers::send_push_notif_to_device($fcm_token, $data);
-                Helpers::send_push_notif_to_device($seller_fcm_token, $data);
+                if ($user->user_type == "pharmacist") {
+                    $pharmacy_fcm_token = $user->cm_firebase_token;    //الصيدلية
+                    $pharmacy_idNew = Pharmacy::where('user_id', '=',$user->id)->get()->first();  //معرف الصيدلية
+
+                    $sales_id  = DB::select('select sales_id from sales_pharmacy where pharmacy_id = ?', [$pharmacy_idNew]);
+                    $arr = array();
+                    foreach ($sales_id as $idx) {
+                        array_push($arr, $idx->sales_id);
+                    }
+                    $salesMans = User::whereIn('id', $arr)->get(); //المندوبين
+                    $data = [
+                        'title' => translate('order'),
+                        'description' => $value,
+                        'order_id' => $order_id,
+                        'image' => '',
+                    ];
+                    Helpers::send_push_notif_to_device($pharmacy_fcm_token, $data);
+                    foreach($salesMans as $u)
+                    {
+                        Helpers::send_push_notif_to_device($u->cm_firebase_token, $data);
+                    }
+                }
+                else
+                {
+                    $salesMan_fcm_token = $user->cm_firebase_token;   //المندوب
+                    $pharmacy = Pharmacy::where('id', '=',$pharmacyId)->get()->first();
+                    $userR = User::where('id', '=', $pharmacy->user_id)->get()->first();
+                    $pharmacy_fcm_token = $userR->cm_firebase_token;   //الصيدلية
+
+                    $data = [
+                        'title' => translate('order'),
+                        'description' => $value,
+                        'order_id' => $order_id,
+                        'image' => '',
+                    ];
+                    Helpers::send_push_notif_to_device($salesMan_fcm_token, $data);
+                    Helpers::send_push_notif_to_device($pharmacy_fcm_token, $data);
+                }
+
             }
 
-            Mail::to($user->email)->send(new \App\Mail\OrderPlaced($order_id));
+            //Mail::to($user->email)->send(new \App\Mail\OrderPlaced($order_id));
             // if ($order['seller_is'] == 'seller') {
             //     $seller = Seller::where(['id' => $seller_data->seller_id])->first();
             // } else {
             //     $seller = Admin::where(['admin_role_id' => 1])->first();
             // }
-            Mail::to($seller->email)->send(new \App\Mail\OrderReceivedNotifySeller($order_id));
+            //Mail::to($seller->email)->send(new \App\Mail\OrderReceivedNotifySeller($order_id));
         } catch (\Exception $exception) {
         }
 

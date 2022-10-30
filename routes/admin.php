@@ -610,9 +610,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('analytics-update', 'BusinessSettingsController@analytics_update')->name('analytics-update');
         });
 
-        
+
         Route::group(['prefix' => 'bonuses', 'as' => 'bonuses.'], function () {
             // Bonuses
+            Route::get('get_salve_products', 'BounusController@get_salve_products')->name('get_salve_products');
             Route::get('list', 'BounusController@index')->name('bonuses_list');
             Route::get('create', 'BounusController@create')->name('create');
             Route::post('store', 'BounusController@store')->name('store');

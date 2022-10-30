@@ -27,7 +27,7 @@
                                 <input type="text"
                                     placeholder="Name"
                                     name="city_name" class="w-100 js-example-basic-multiple form-control"
-                                    style="width: 100%;">
+                                    style="width: 100%;" required>
                             </div>
 
                             <div class="col-md-4 w-100">

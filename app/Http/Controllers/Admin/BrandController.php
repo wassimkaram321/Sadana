@@ -26,12 +26,12 @@ class BrandController extends Controller
         $brand->name = $request->name[array_search('en', $request->lang)];
         $brand->image = ImageManager::upload('brand/', 'png', $request->file('image'));
         $brand->status = 1;
-        if($request->has('shipping')){
-            $brand->shipping = 1;
-         }
-         if(!$request->has('shipping')){
-            $brand->shipping = 0;
-         }
+        // if($request->has('shipping')){
+        //     $brand->shipping = 1;
+        //  }
+        //  if(!$request->has('shipping')){
+        //     $brand->shipping = 0;
+        //  }
         $brand->save();
 
         foreach($request->lang as $index=>$key)

@@ -7,7 +7,7 @@
 @endpush
 
 @section('content')
-    <div class="content container-fluid">
+    <div class="content container-fluid" >
         <!-- Page Header -->
         <div class="page-header mb-1">
             <div class="flex-between align-items-center">

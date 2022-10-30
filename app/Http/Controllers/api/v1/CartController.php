@@ -27,7 +27,7 @@ class CartController extends Controller
                 $c['q_featured_offer']=$p->q_featured_offer  ;
                 $c['normal_offer']=$p->normal_offer;
                 $c['featured_offer']=$p->featured_offer;
-                $c['demand_limit']=$p->demand_limit;
+                $c['demand_limit']=(int)$p->demand_limit;
             }
             if($c->order_type=="bag")
             {
@@ -36,7 +36,7 @@ class CartController extends Controller
                 $c['q_featured_offer']=0;
                 $c['normal_offer']=0;
                 $c['featured_offer']=0;
-                $c['demand_limit']=$p->demand_limit;
+                $c['demand_limit']=(int)$p->demand_limit;
             }
 
         }
@@ -62,6 +62,17 @@ class CartController extends Controller
 
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
+        }
+
+        if ($request->type == "product") {
+            $validator = Validator::make($request->all(), [
+                'pure_price' => 'required',
+            ], [
+                'pure_price.required' => translate('Pure price is required!')
+            ]);
+            if ($validator->errors()->count() > 0) {
+                return response()->json(['errors' => Helpers::error_processor($validator)]);
+            }
         }
 
         $cart = CartManager::add_to_cart($request);

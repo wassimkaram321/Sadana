@@ -245,7 +245,7 @@
                                 </div>
                                 <div class="row pt-4">
 
-                                    <div class="col-md-5">
+                                    <div class="col-md-4 col-sm-6 col-lg-4">
                                         <label class="control-label">{{\App\CPU\translate('Discount')}}</label>
                                         <input type="number" min="0" value="{{old('discount')}}" step="0.01"
                                                placeholder="{{\App\CPU\translate('Discount')}}" name="discount"
@@ -254,12 +254,20 @@
 
 
 
-                                    <div class="col-sm-6 col-md-6 col-lg-4" id="quantity">
+                                    <div class="col-sm-6 col-md-4 col-lg-4" id="quantity">
                                         <label
                                             class="control-label">{{\App\CPU\translate('total')}} {{\App\CPU\translate('Quantity')}}</label>
                                         <input type="number" min="0" value="0" step="1"
                                                placeholder="{{\App\CPU\translate('Quantity')}}"
                                                name="current_stock" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-4 col-lg-4" id="Number">
+                                        <label  
+                                            class="control-label">{{\App\CPU\translate('Product')}} {{\App\CPU\translate('Number')}}</label>
+                                        <input type="number" min="0" value="0" step="1"
+                                               placeholder="{{\App\CPU\translate('Product_Number')}}"
+                                               name="num_id" class="form-control" required>
                                     </div>
 
 

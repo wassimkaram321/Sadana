@@ -226,7 +226,7 @@
                                {{$customer['phone']}}
                             </td>
                             <td>
-                                {{$customer['user_type']}}
+                                {{\App\CPU\translate($customer['user_type'])}}
                              </td>
                             <td>
                                 <label class="badge badge-soft-info">

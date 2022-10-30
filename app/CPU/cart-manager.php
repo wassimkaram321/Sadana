@@ -336,7 +336,24 @@ class CartManager
             $cart['customer_id'] = $user->id ?? 0;
             $cart['quantity'] = $request['quantity'];
             /*$data['shipping_method_id'] = $shipping_id;*/
-            $cart['price'] = $price;
+
+
+            //calculation pure price
+            if($request['pure_price']==1)
+            {
+                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                    $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                    $cart['price'] = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $cart['pure_price'] = 1;
+                }
+            }
+            else
+            {
+                $cart['price'] = $price;
+                $cart['pure_price'] = 0;
+            }
+             //end calculation pure price
+
             $cart['tax'] = $tax;
             $cart['slug'] = $product->slug;
             $cart['name'] = $product->name;
@@ -414,7 +431,18 @@ class CartManager
 
         if ($status) {
             $qty = $request->quantity;
+            //Cal Pure Price
+            if($cart['pure_price']==1)
+            {
+                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                    $price = $product->unit_price;
+                    $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                    $pure_price_new = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                }
+            }
+            //End Cal Pure Price
             $cart['quantity'] = $request->quantity;
+            $cart['price'] = $pure_price_new;
             $cart['shipping_cost'] =  CartManager::get_shipping_cost_for_product_category_wise($product, $request->quantity);
         }
 
@@ -648,4 +676,15 @@ class CartManager
     }
 
 
+    public static function pure_price_calculation($price,$offer,$qty)
+    {
+        if($offer==0)
+            $pure_price=$price;
+        else
+        {
+            $pure_price=($price*$qty)/($qty+$offer);
+            $pure_price=round($pure_price,-1);
+        }
+         return $pure_price;
+    }
 }

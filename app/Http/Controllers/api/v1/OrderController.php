@@ -82,7 +82,10 @@ class OrderController extends Controller
                 'cart_group_id' => $group_id,
                 'request' => $request,
             ];
-            $order_id = OrderManager::generate_order($data);
+            if($request->user()->user_type=="salesman")
+            $order_id = OrderManager::generate_order($data,$request->pharmacy_id);
+            else
+            $order_id = OrderManager::generate_order($data,0);
 
             $order = Order::find($order_id);
             $order->billing_address = ($request['billing_address_id'] != null) ? $request['billing_address_id'] : $order['billing_address'];
@@ -91,6 +94,10 @@ class OrderController extends Controller
             if($request->user()->user_type=="salesman")
             {
                 $order->orderBy_id = $request->pharmacy_id;
+            }
+            else
+            {
+                $order->orderBy_id = 0;
             }
             $order->save();
 

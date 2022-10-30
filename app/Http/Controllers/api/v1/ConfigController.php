@@ -47,6 +47,7 @@ class ConfigController extends Controller
                 'brand_image_url' => asset('storage/app/public/brand'),
                 'customer_image_url' => asset('storage/app/public/profile'),
                 'banner_image_url' => asset('storage/app/public/banner'),
+                'bag_image_url' => asset('storage/app/public/bag'),
                 'category_image_url' => asset('storage/app/public/category'),
                 'review_image_url' => asset('storage/app/public'),
                 'seller_image_url' => asset('storage/app/public/seller'),

@@ -218,7 +218,7 @@ class WebController extends Controller
                     $shipping_type = isset($seller_shipping)==true?$seller_shipping->shipping_type:'order_wise';
                 }
             }
-            
+
             if($shipping_type == 'order_wise'){
                 $cart_shipping = CartShipping::where('cart_group_id', $cart->cart_group_id)->first();
                 if (!isset($cart_shipping)) {
@@ -227,7 +227,7 @@ class WebController extends Controller
                 }
             }
         }
-        
+
 
         if (count($cart_group_ids) > 0) {
             return view('web-views.checkout-shipping');
@@ -241,7 +241,7 @@ class WebController extends Controller
     public function checkout_payment()
     {
         $cart_group_ids = CartManager::get_cart_group_ids();
-        
+
         $shippingMethod = Helpers::get_business_settings('shipping_method');
         $carts = Cart::whereIn('cart_group_id', $cart_group_ids)->get();
         foreach($carts as $cart)
@@ -288,7 +288,7 @@ class WebController extends Controller
                 'order_group_id' => $unique_id,
                 'cart_group_id' => $group_id
             ];
-            $order_id = OrderManager::generate_order($data);
+            $order_id = OrderManager::generate_order($data,0);
             array_push($order_ids, $order_id);
         }
 

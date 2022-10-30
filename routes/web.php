@@ -12,8 +12,6 @@
  */
 
 
-
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 
@@ -155,9 +153,6 @@ Route::group(['prefix' => 'coupon', 'as' => 'coupon.', 'namespace' => 'Web'], fu
 //check done
 
 // SSLCOMMERZ Start
-
-
-
 
 
 

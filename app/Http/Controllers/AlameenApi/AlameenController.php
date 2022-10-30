@@ -135,6 +135,7 @@ class AlameenController extends Controller
                     $productOld->demand_limit =  $this->demand_limit;
                     $productOld->store_id = $store_id;
                     $productOld->brand_id = $brand_id;
+                    $productOld->featured=0;
                     $productOld->save();
                 } else {
                     array_push($data, [
@@ -173,6 +174,7 @@ class AlameenController extends Controller
                         'featured_status' => 1,
                         'added_by' => 'admin',
                         'user_id' => 1,
+                        'featured' => 0,
                     ]);
                 }
 

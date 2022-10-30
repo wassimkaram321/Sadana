@@ -29,8 +29,9 @@
                                 <input type="text"
                                   placeholder="Area name"
                                     name="area_name" class="w-100 js-example-basic-multiple form-control"
-                                    style="width: 100%;">
+                                    style="width: 100%;" required>
                             </div>
+                            
                             <div class="col-md-4 d-flex align-items-center w-100">
                                 <input type="number"
                                     placeholder="Number"

@@ -27,7 +27,7 @@ class SenangPayController extends Controller
                     'order_group_id' => $unique_id,
                     'cart_group_id' => $group_id
                 ];
-                $order_id = OrderManager::generate_order($data);
+                $order_id = OrderManager::generate_order($data,0);
                 array_push($order_ids, $order_id);
             }
 

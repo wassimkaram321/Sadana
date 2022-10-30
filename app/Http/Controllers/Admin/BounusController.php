@@ -37,6 +37,7 @@ class BounusController extends Controller
         }
         $bonuses = Bonus::groupBy('master_product_id')->latest()->paginate(Helpers::pagination_limit());
         $bonuses1 = Bonus::get()->groupBy('master_product_id');
+        // dd($bonuses);
         
         
         return view('admin-views.bonuses.list',compact('bonuses','bonuses1','search'));
@@ -179,7 +180,7 @@ class BounusController extends Controller
     public function destroy_sec(Request $request)
     {
         //
-        
+        // dd($request->id);
         $translation = Translation::where('translationable_type', 'App\Model\Bonus')
         ->where('translationable_id', $request->id);
     $translation->delete();
@@ -187,5 +188,25 @@ class BounusController extends Controller
     
     $bonus->delete();
     return response()->json();
+    }
+    public function get_salve_products(Request $request)
+    {
+        # code...
+      
+        $bonuses1 = Bonus::where('master_product_id',$request->id)->get();
+        $data = [];
+        $ii =0 ;
+        foreach($bonuses1 as $b){
+            $bonus_name = Product::where('id',$b->salve_product_id)->pluck('name')->first();
+            $data[$ii]['id'] =$b->id;
+            $data[$ii]['salve_name']=$bonus_name;
+            $data[$ii]['salve_product_quatity'] =$b->salve_product_quatity;    
+            $data[$ii]['salve_product_id'] =$b->salve_product_id;
+            $ii++;  
+            // $data['id'] =$b->id;
+        }
+        // dd($data);
+        return response()->json($data);
+       
     }
 }

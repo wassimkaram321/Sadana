@@ -96,6 +96,7 @@ class ProductController extends BaseController
             'q_normal_offer' => 'required|numeric',
             'normal_offer' => 'required|numeric',
             'scientific_formula' => 'required',
+            'num_id' => 'required'
         ], [
             'images.required' => 'Product images is required!',
             'image.required' => 'Product thumbnail is required!',
@@ -121,6 +122,7 @@ class ProductController extends BaseController
 
 
         $p = new Product();
+        $p->featured=0;
         $p->user_id = auth('admin')->id();
         $p->added_by = "admin";
         $p->name = $request->name[array_search('en', $request->lang)];
@@ -157,7 +159,7 @@ class ProductController extends BaseController
 
 
 
-
+        $p->num_id = $request->num_id;
         $p->demand_limit = $request->demand_limit;
         $p->expiry_date = $request->expiry_date;
         $p->production_date = $request->production_date;
@@ -557,7 +559,8 @@ class ProductController extends BaseController
             'q_normal_offer' => 'required|numeric',
             'normal_offer' => 'required|numeric',
             'scientific_formula' => 'required',
-            'store_id' => 'required'
+            'store_id' => 'required',
+            'num_id' => 'required'
 
 
         ], [
@@ -580,8 +583,10 @@ class ProductController extends BaseController
         }
 
         $product = Product::find($id);
-        $product->name = $request->name[array_search('en', $request->lang)];
+        if($product->featured==null)
+            $product->featured=0;
 
+        $product->name = $request->name[array_search('en', $request->lang)];
         $category = [];
         if ($request->category_id != null) {
             array_push($category, [
@@ -616,7 +621,7 @@ class ProductController extends BaseController
         $product->normal_offer = $request->normal_offer;
         $product->q_normal_offer = $request->q_normal_offer;
         $product->scientific_formula = $request->scientific_formula;
-
+        $product->num_id = $request->num_id;
 
         if ($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0) {
             $product->colors = json_encode($request->colors);
@@ -914,6 +919,7 @@ class ProductController extends BaseController
                 $product->expiry_date = $collection['تاريخ الصلاحية'];
                 $product->demand_limit = $collection['حد الطلب'];
                 $product->store_id = $store_id;
+                $product->featured = 0;
                 $product->save();
                 $countUpdate++;
             } else {
@@ -949,6 +955,7 @@ class ProductController extends BaseController
                     'choice_options' => json_encode([]),
                     'variation' => json_encode([]),
                     'featured_status' => 1,
+                    'featured' => 0,
                     'added_by' => 'admin',
                     'user_id' => 1,
                 ]);
@@ -1043,8 +1050,8 @@ class ProductController extends BaseController
             //         return back();
             //     }
             // }
-
-            $product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
+            $product = Product::where('num_id', 'LIKE', '%' . $collection['رمز المادة'] . '%')->get()->first();
+            //$product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
             if (isset($product)) {
                 $product->purchase_price = $collection['السعر'];
                 $product->save();

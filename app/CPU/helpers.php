@@ -485,7 +485,6 @@ class Helpers
     public static function send_push_notif_to_topic($data)
     {
         $key = BusinessSetting::where(['type' => 'push_notification_key'])->first()->value;
-
         $url = "https://fcm.googleapis.com/fcm/send";
         $header = ["authorization: key=" . $key . "",
             "content-type: application/json",

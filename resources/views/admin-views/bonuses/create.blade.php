@@ -192,6 +192,7 @@
                 var newForm = document.createElement("input");
                 
                 var inputContainer = document.getElementById("main");
+                if(selected[selected.length-1] != undefined){
                 newForm.setAttribute("type", "number");
                 newForm.setAttribute("class", "form-control");
                 if(!document.getElementById("form"+selected[selected.length-1])){
@@ -201,6 +202,7 @@
                 newForm.setAttribute("placeholder", "Quantity of product " + selected[selected.length-1]);
                 
                 inputContainer.appendChild(newForm);
+                }
                 }
                 // inputContainer.appendChild(document.createElement("br"));
             // for (var i = 0; i < selected.length; i++) {

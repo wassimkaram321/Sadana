@@ -125,7 +125,7 @@ class OrderController extends Controller
         $customerDetails = User::where('id', $order->customer_id)->get()->first();
 
         $status = false;
-        if ($order->orderBy_id != null) {
+        if ($order->orderBy_id != null || $order->orderBy_id != 0) {
 
             $pharmacy = Pharmacy::where('id', $order->orderBy_id)->get()->first();
             $UserPharmacy = User::where('id', $pharmacy->user_id)->get()->first();

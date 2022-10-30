@@ -70,14 +70,14 @@
                                 </center>
                             </div>
                         </div>
-                        <div class="form-group form-check">
+                        {{-- <div class="form-group form-check">
                             
                             <input type="checkbox" name="shipping" value="shipping"
                                 class="form-check-input" id="shipping">
                             <label class="form-check-label"
                                 style="{{ Session::get('direction') === 'rtl' ? 'margin-right: 1.25rem;' : '' }};"
                                 for="shipping">{{ \App\CPU\translate('Shipping') }}</label>
-                        </div>
+                        </div> --}}
 
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">{{ \App\CPU\translate('save')}}</button>

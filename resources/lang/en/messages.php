@@ -2184,4 +2184,10 @@
   'Second Products' => 'Second Products',
   'Second Products Quantity' => 'Second Products Quantity',
   'Are_you_sure_delete_this_product' => 'Are you sure delete this product',
+  'Product_Number' => 'Product Number',
+  'Order_details' => 'Order details',
+  'Bags_Order_details' => 'Bags Order details',
+  'Contact_info' => 'Contact info',
+  'pharmacy_info' => 'Pharmacy info',
+  'Pure price is required!' => 'Pure price is required!',
 );

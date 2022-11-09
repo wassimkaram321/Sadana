@@ -85,13 +85,13 @@ class BrandController extends Controller
         if ($request->has('image')) {
             $brand->image = ImageManager::update('brand/', $brand['image'], 'png', $request->file('image'));
          }
-         if($request->has('shipping')){
-            $brand->shipping = 1;
-         }
-         if(!$request->has('shipping')){
-            $brand->shipping = 0;
-         }
-         
+        //  if($request->has('shipping')){
+        //     $brand->shipping = 1;
+        //  }
+        //  if(!$request->has('shipping')){
+        //     $brand->shipping = 0;
+        //  }
+
         $brand->save();
         foreach ($request->lang as $index => $key) {
             if ($request->name[$index] && $key != 'en') {

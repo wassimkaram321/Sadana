@@ -438,11 +438,31 @@ class CartManager
                     $price = $product->unit_price;
                     $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
                     $pure_price_new = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $cart['price'] = $pure_price_new;
+                     if($total_qty==0)
+                    {
+                        $cart['pure_price']=0;
+                    }
+                    else
+                    {
+                        $cart['pure_price']=1;
+                    }
                 }
             }
+            else
+            {
+                 if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+                    $price = $product->unit_price;
+                    $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
+                    $pure_price_new = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $cart['price'] = $pure_price_new;
+                    $cart['pure_price']=$request->pure_price;
+                }
+            }
+
+
             //End Cal Pure Price
             $cart['quantity'] = $request->quantity;
-            $cart['price'] = $pure_price_new;
             $cart['shipping_cost'] =  CartManager::get_shipping_cost_for_product_category_wise($product, $request->quantity);
         }
 

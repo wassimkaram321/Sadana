@@ -75,7 +75,7 @@
                                             accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                         <label class="custom-file-label" for="customFileUpload">{{\App\CPU\translate('choose')}} {{\App\CPU\translate('file')}}</label>
                                     </div>
-                                 
+
                                 </div>
                             </div>
                             <div class="col-md-6 mb-2">
@@ -85,7 +85,7 @@
                             </center>
                             </div>
                         </div>
-                        <div class="form-group form-check">
+                        {{-- <div class="form-group form-check">
                             @if($b->shipping == 1)
                             <input checked type="checkbox" name="shipping" value="shipping"
                                 class="form-check-input" id="shipping">
@@ -96,7 +96,7 @@
                             <label class="form-check-label"
                                 style="{{ Session::get('direction') === 'rtl' ? 'margin-right: 1.25rem;' : '' }};"
                                 for="shipping">{{ \App\CPU\translate('Shipping') }}</label>
-                        </div>
+                        </div> --}}
 
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">{{ \App\CPU\translate('update')}}</button>

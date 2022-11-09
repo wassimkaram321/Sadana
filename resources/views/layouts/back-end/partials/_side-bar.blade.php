@@ -60,8 +60,8 @@
                     @php($e_commerce_logo = \App\Model\BusinessSetting::where(['type' =>
                     'company_web_logo'])->first()->value)
                     <a class="navbar-brand" href="{{ route('admin.dashboard.index') }}" aria-label="Front">
-                        <img style="max-height: 66px"
-                            onerror="this.src='{{ asset('public/assets/back-end/img/900x400/sedanah1.png') }}'"
+                        <img style="max-height: 114px"
+                            onerror="this.src='{{ asset('public/assets/back-end/img/900x400/2022-09-06-6317208618c8b.png') }}'"
                             class="navbar-brand-logo-mini for-web-logo" src="{{ asset("
                             storage/app/public/company/$e_commerce_logo") }}" alt="Logo">
                     </a>

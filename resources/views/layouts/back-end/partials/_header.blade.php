@@ -41,7 +41,7 @@
                             <input type="search" class="js-form-search form-control" id="search-bar-input"
                                    placeholder="{{\App\CPU\translate('search')}}" aria-label="Search in front">
                             <div class="input-group">
-                                <diV class="card" id="search-card"
+                                <div class="card" id="search-card"
                                      style="position: absolute;background: white;z-index: 999;width: 100%;display: none; text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}}">
                                     <div class="card-body" id="search-result-box"
                                          style="overflow:scroll; height:400px;overflow-x: hidden">

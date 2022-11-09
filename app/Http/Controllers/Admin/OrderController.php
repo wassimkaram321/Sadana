@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use App\Model\Bag;
 use App\User;
 use App\Model\DeliveryMan;
@@ -125,7 +126,7 @@ class OrderController extends Controller
         $customerDetails = User::where('id', $order->customer_id)->get()->first();
 
         $status = false;
-        if ($order->orderBy_id != null || $order->orderBy_id != 0) {
+        if ($order->orderBy_id != null && $order->orderBy_id != 0) {
 
             $pharmacy = Pharmacy::where('id', $order->orderBy_id)->get()->first();
             $UserPharmacy = User::where('id', $pharmacy->user_id)->get()->first();
@@ -309,34 +310,33 @@ class OrderController extends Controller
         foreach ($orderDetails as $item) {
             $orderProduct = Product::where('id', $item->product_id)->get()->first();
             $product_details = json_decode($item->product_details);
-            $qtyOffers = 0;
 
-            if (isset($orderProduct->q_normal_offer) && $orderProduct->q_normal_offer != 0) {
-                $qtyOffers = ((int)($item->qty / $orderProduct->q_normal_offer)) * $orderProduct->normal_offer;
-            }
-
-            if (isset($orderProduct->q_featured_offer) &&  $orderProduct->q_featured_offer != 0) {
-                $qtyOffers = ((int)($item->qty / $orderProduct->q_featured_offer)) * $orderProduct->featured_offer;
-            }
-            if (isset($orderProduct->name) && isset($orderProduct->expiry_date)) {
                 $storage[] = [
-                    'اسم المادة' =>  $orderProduct->name,
+                    'اسم المادة' =>  $product_details->name,
                     'كمية المادة' => $item->qty,
-                    'بونص المادة' => $qtyOffers,
+                    'بونص المادة' => $item->total_qty,
                     'سعر المادة' => $item->price,
-                    'تاريخ انتهاء الصلاحية' => $orderProduct->expiry_date,
+                    'تاريخ انتهاء الصلاحية' => $product_details->expiry_date,
                 ];
-            } else {
+        }
+
+        $orderBagsDetails = BagsOrdersDetails::where('order_id', $request->order_id)->get();
+        foreach ($orderBagsDetails as $itemBag) {
+            $bag_details = json_decode($itemBag->bag_details);
+
+
+            foreach($bag_details as $bag_detail)
+            {
                 $storage[] = [
-                    'اسم المادة' =>  "غير معروف",
-                    'كمية المادة' => $item->qty,
-                    'بونص المادة' => $qtyOffers,
-                    'سعر المادة' => $item->price,
+                    'اسم المادة' =>  $bag_detail->product_name,
+                    'كمية المادة' => ($itemBag->bag_qty)*($bag_detail->product_count),
+                    'بونص المادة' => 0,
+                    'سعر المادة' => $bag_detail->product_price,
                     'تاريخ انتهاء الصلاحية' => "0000-00-00",
                 ];
             }
-        }
 
+        }
         $userName = User::where('id', $product_details->user_id)->get()->first();
         $xlsx = ".xlsx";
         if (isset($userName->name)) {
@@ -414,6 +414,14 @@ class OrderController extends Controller
     public function update_order(Request $request)
     {
         try {
+
+            $validator = Validator::make($request->all(), [
+                'qty' => 'required',
+            ]);
+            if ($validator->fails()) {
+                Toastr::error('Faild updated!');
+            }
+
                 $product = OrderDetail::where('order_id', '=', $request->order_id)
                     ->where('product_id', '=', $request->product_id)->get()->first();
                 OrderManager::stock_update_on_order_edit_change($product,$request->order_id,$request->qty);

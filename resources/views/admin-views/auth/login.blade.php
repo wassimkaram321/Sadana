@@ -56,7 +56,7 @@
             <svg preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1921 273">
                 <polygon fill="#fff" points="0,273 1921,273 1921,0 "/>
             </svg>
-           
+
         </figure>
         <!-- End SVG Bottom Shape -->
     </div>
@@ -66,9 +66,10 @@
         <label class="badge badge-soft-success float-right" style="z-index: 9;position: absolute;right: 0.5rem;top: 0.5rem;">{{\App\CPU\translate('Software version')}} : {{ env('SOFTWARE_VERSION') }}</label>
         @php($e_commerce_logo=\App\Model\BusinessSetting::where(['type'=>'company_web_logo'])->first()->value)
         <a class="d-flex justify-content-center mb-5" href="javascript:">
-            <img class="z-index-2" src="{{asset("storage/app/public/company/".$e_commerce_logo)}}" alt="Logo"
-            onerror="this.src='{{asset('public/assets/back-end/img/400x400/sadanah.png')}}'"
-                 style="width: 8rem;">
+            <img class="z-index-2" src="{{asset("storage/app/public/company1/".$e_commerce_logo)}}" alt="Logo"
+            onerror="this.src='{{asset('public/assets/back-end/img/900x400/2022-09-06-6317208618c8b.png')}}'"
+                 style="    width: 17rem;
+                 height: 169px;">
         </a>
 
         <div class="row justify-content-center">

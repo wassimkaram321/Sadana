@@ -218,6 +218,11 @@ class CustomerController extends Controller
 
         $details = OrderDetail::where(['order_id' => $request['order_id']])->get();
         $bagDetails = BagsOrdersDetails::where(['order_id' => $request['order_id']])->get();
+        foreach($bagDetails as $bagDetail)
+        {
+             $bagDetail['order_id']=(int)$bagDetail['order_id'];
+             $bagDetail['bag_id']=(int)$bagDetail['bag_id'];
+        }
 
         $details->map(function ($query) {
             $query['variation'] = json_decode($query['variation'], true);
@@ -230,10 +235,10 @@ class CustomerController extends Controller
             return $query;
         });
 
-        $merged = $details->merge($bagDetails);
-        $result = $merged->all();
+        // $merged = $details->merge($bagDetails);
+        // $result = $merged->all();
 
-        return response()->json($result, 200);
+         return response()->json(['products'=>$details,'bags'=>$bagDetails], 200);
     }
 
     public function update_profile(Request $request)

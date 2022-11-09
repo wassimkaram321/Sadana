@@ -48,6 +48,11 @@ class WebController extends Controller
         return redirect()->route('home');
     }
 
+    public function peakLink()
+    {
+        return view('web-views.coming-soon');
+    }
+
     public function home()
     {
         $home_categories = Category::where('home_status', true)->priority()->get();
@@ -104,8 +109,8 @@ class WebController extends Controller
         }
 
         $deal_of_the_day = DealOfTheDay::join('products', 'products.id', '=', 'deal_of_the_days.product_id')->select('deal_of_the_days.*', 'products.unit_price')->where('deal_of_the_days.status', 1)->first();
-
         return view('web-views.home', compact('featured_products', 'topRated', 'bestSellProduct', 'latest_products', 'categories', 'brands', 'deal_of_the_day', 'top_sellers', 'home_categories'));
+
     }
 
     public function flash_deals($id)

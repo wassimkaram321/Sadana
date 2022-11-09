@@ -31,12 +31,6 @@
                 <p>3. {{\App\CPU\translate('Once you have downloaded and filled the format file, upload it in the form
                     below and submit')}}.</p>
 
-                <p> 4. {{\App\CPU\translate('After uploading products you need to edit them and set product images and
-                    choices')}}.</p>
-
-                <p> 5. {{\App\CPU\translate('You can get brand and category id from their list, please input the right
-                    ids')}}.</p>
-
             </div>
         </div>
 

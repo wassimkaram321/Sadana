@@ -1,7 +1,7 @@
 <!-- Header -->
 <div class="card-header">
     <h5 class="card-header-title">
-        <i class="tio-user"></i> {{\App\CPU\translate('top_pharmacies')}}
+        <i class="tio-user"></i> {{\App\CPU\translate('top_Sales_Man')}}
     </h5>
     <i class="tio-poi-user" style="font-size: 45px"></i>
 </div>

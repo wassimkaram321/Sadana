@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], function () {
 
+
+
     Route::get('/', function () {
         return redirect()->route('admin.auth.login');
     });
@@ -197,6 +199,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('bulk-import', 'PharmacyController@bulk_import_data')->name('bulk-import-excel');
             Route::get('bulk-export', 'PharmacyController@bulk_export_data')->name('bulk-export');
 
+            Route::get('exports', 'PharmacyController@generate_excel_all_pharmacies')->name('exports-pharmacies');
 
         });
 
@@ -377,19 +380,29 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         //Bags routes details
         Route::group(['prefix' => 'bag', 'as' => 'bag.', 'middleware' => ['module:product_management']], function () {
 
-            //bag routes
+           //bag routes
            Route::get('list', 'BagController@bag_list')->name('list');
            Route::get('add-new', 'BagController@bag_add_new')->name('add-new');
            Route::post('store', 'BagController@bag_store')->name('store');
 
 
+           Route::post('update/price', 'BagController@bag_update_price')->name('product-update-price');
            Route::get('edit/{id}', 'BagController@bag_edit')->name('edit');
            Route::post('update/{id}', 'BagController@bag_update')->name('update');
 
            Route::post('delete', 'BagController@bag_delete')->name('delete');
 
+
+           //update price product bag
+
+           Route::post('products/list/price/{id}', 'BagController@bag_product_price')->name('bag-product-get-price');
+           //End
+
+
            Route::post('settings/store/{id}', 'BagController@bag_settings_store')->name('settings_store');
            Route::get('settings/{id}', 'BagController@bag_settings')->name('settings');
+
+
            //bag products routes
            Route::get('products/list/{id}', 'BagController@bag_products_list')->name('products-list');
            Route::post('products/store/{bag_id}', 'BagController@bag_products_store')->name('products-store');
@@ -825,7 +838,6 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
 
     /*Route::get('login', 'testController@login')->name('login');*/
 });
-
 
 
 

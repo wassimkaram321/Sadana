@@ -46,6 +46,15 @@ class DashboardController extends Controller
             ->get();
 
         $top_customer = Order::with(['customer'])
+            ->where('customer_type','=','pharmacist')
+            ->select('customer_id', DB::raw('COUNT(customer_id) as count'))
+            ->groupBy('customer_id')
+            ->orderBy("count", 'desc')
+            ->take(6)
+            ->get();
+
+        $top_salesMan = Order::with(['customer'])
+            ->where('customer_type','=','salesman')
             ->select('customer_id', DB::raw('COUNT(customer_id) as count'))
             ->groupBy('customer_id')
             ->orderBy("count", 'desc')
@@ -58,6 +67,13 @@ class DashboardController extends Controller
             ->orderBy("count", 'desc')
             ->take(6)
             ->get();
+
+        $top_brand_by_order_received = OrderDetail::select('brand_id', DB::raw('COUNT(brand_id) as count'))
+            ->groupBy('brand_id')
+            ->orderBy("count", 'desc')
+            ->take(6)
+            ->get();
+
 
         $from = Carbon::now()->startOfYear()->format('Y-m-d');
         $to = Carbon::now()->endOfYear()->format('Y-m-d');
@@ -123,7 +139,9 @@ class DashboardController extends Controller
         $data['most_rated_products'] = $most_rated_products;
         $data['top_store_by_earning'] = $top_store_by_earning;
         $data['top_customer'] = $top_customer;
+        $data['top_salesMan'] = $top_salesMan;
         $data['top_store_by_order_received'] = $top_store_by_order_received;
+        $data['top_brand_by_order_received'] = $top_brand_by_order_received;
 
         $admin_wallet = AdminWallet::where('admin_id', 1)->first();
         $data['inhouse_earning'] = $admin_wallet!=null?$admin_wallet->inhouse_earning:0;

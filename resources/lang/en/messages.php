@@ -2190,4 +2190,11 @@
   'Contact_info' => 'Contact info',
   'pharmacy_info' => 'Pharmacy info',
   'Pure price is required!' => 'Pure price is required!',
+  'pharmacist' => 'Pharmacist',
+  'top_salesMan' => 'Top salesMan',
+  'top_pharmacies' => 'Top pharmacies',
+  'top_Sales_Man' => 'Top Sales Man',
+  'top_brands' => 'Top brands',
+  'Unit_Price' => 'Unit Price',
+  '+' => '+',
 );

@@ -64,7 +64,7 @@
                         </div>
 
 
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
@@ -73,7 +73,7 @@
                                         required>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>
                     </form>

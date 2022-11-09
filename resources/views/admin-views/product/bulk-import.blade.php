@@ -43,7 +43,7 @@
                     <div class="card mt-2 rest-part">
                         <div class="card-header">
                             <h4>{{\App\CPU\translate('Import Products File')}}</h4>
-                            <a href="{{asset('public/assets/product_bulk_format2.xlsx')}}" download=""
+                            <a href="{{asset('public/assets/product_bulk_format10.xlsx')}}" download=""
                                class="btn btn-secondary">{{\App\CPU\translate('Download Format')}}</a>
                         </div>
                         <div class="card-body">

@@ -10,13 +10,13 @@
     <!--to make http ajax request to https-->
     <!--    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
     <!-- Favicon -->
-    <link rel="shortcut icon" href="">
+    <link rel="tio-pharmacy icon" href="">
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
     <!-- CSS Implementing Plugins -->
     <link rel="stylesheet" href="{{asset('public/assets/back-end')}}/css/vendor.min.css">
     <link rel="stylesheet" href="{{asset('public/assets/back-end')}}/css/custom.css">
-    
+
     {{-- <link rel="stylesheet" href="{{asset('public/assets/back-end')}}/css/all.min.css"> --}}
 
     <link rel="stylesheet"

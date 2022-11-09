@@ -61,14 +61,12 @@ class PharmacyController extends Controller
     public function activation(Request $request, $id, $status)
     {
         $User = User::with(['pharmacy'])->where('id', $request->id)->get()->first();
-       // $User = User::find($id);
-        if(!isset($User->pharmacy_id) && $User->pharmacy_id==null)
-        {
+        // $User = User::find($id);
+        if (!isset($User->pharmacy_id) && $User->pharmacy_id == null) {
             Toastr::success('Please enter the missing data before activating (Account Number)');
             return back();
         }
-        if(!isset($User->pharmacy->card_number) && $User->pharmacy->card_number=="")
-        {
+        if (!isset($User->pharmacy->card_number) && $User->pharmacy->card_number == "") {
             Toastr::success('Please enter the missing data before activating (Card Number)');
             return back();
         }
@@ -190,13 +188,13 @@ class PharmacyController extends Controller
     {
 
         try {
-                $collections = (new FastExcel)->import($request->file("pharmacies_file"));
+            $collections = (new FastExcel)->import($request->file("pharmacies_file"));
         } catch (\Exception $exception) {
             Toastr::error('You have uploaded a wrong format file, please upload the right file.');
             return back();
         }
         $data = [];
-        $card_num="";
+        $card_num = "";
         $statusUpdate = 0;
         $statusCreate = 0;
         $skip = ['youtube_video_url', 'details', 'thumbnail'];
@@ -208,14 +206,12 @@ class PharmacyController extends Controller
             $area_id = $this->compare_area($collection['المنطقة'], $group_id);
             $is_active = $this->compare_active($collection['وضع الزبون']);
 
-            if(isset($collection['رقم البطاقة']))
-            {
-                $card_num=$collection['رقم البطاقة'];
+            if (isset($collection['رقم البطاقة'])) {
+                $card_num = $collection['رقم البطاقة'];
             }
             $name1 = (int)trim($collection['رمز الحساب'], " \t.");
-            if($name1!=0)
-            {
-                $user = UserImportExcel::where('num_id', '==', $name1)->get()->first();
+            if ($name1 != 0) {
+                $user = UserImportExcel::where('num_id', '=', $name1)->get()->first();
                 if (isset($user)) {
                     $user->lat = $collection['خط العرض'];
                     $user->lng = $collection['خط الطول'];
@@ -233,7 +229,7 @@ class PharmacyController extends Controller
                     $statusUpdate++;
                 } else {
                     array_push($data, [
-                        'num_id'=> $collection['رمز الحساب'],
+                        'num_id' => $collection['رمز الحساب'],
                         'lat' => $collection['خط العرض'],
                         'lng' => $collection['خط الطول'],
                         'card_number' => $card_num,
@@ -250,7 +246,6 @@ class PharmacyController extends Controller
                     $statusCreate++;
                 }
             }
-
         }
 
         try {
@@ -282,7 +277,7 @@ class PharmacyController extends Controller
     public function  compare_group($group, $cityId)
     {
         $name1 = trim($group, " \t.");
-        $groupDB = Group::where('group_name', '=',$name1)->get()->first();
+        $groupDB = Group::where('group_name', '=', $name1)->get()->first();
         if (isset($groupDB)) {
             return $groupDB->id;
         } else {
@@ -322,7 +317,6 @@ class PharmacyController extends Controller
         } else {
             return 1;
         }
-
     }
 
 
@@ -391,9 +385,17 @@ class PharmacyController extends Controller
         else
             $salesManName2 = "";
 
+            if($user->pharmacy_id!=null)
+            {
+                $account_num=$user->pharmacy_id;
+            }else
+            {
+                $account_num="";
+            }
 
         $storage[] = [
             'الاسم' =>  $user->pharmacy->name,
+            'رمز الحساب' => $account_num,
             'التصنيف' => "New",
             'هاتف 1' => $user->pharmacy->land_number,
             'هاتف 2' => "",
@@ -415,39 +417,41 @@ class PharmacyController extends Controller
         return (new FastExcel($storage))->download($result);
     }
 
-    public function pharmacy_Import_edit(Request $request,$id)
+    public function pharmacy_Import_edit(Request $request, $id)
     {
 
-            $pharmacy=UserImportExcel::findOrFail($id);
-            $cus_area = Area::where('id',$pharmacy->area_id)->get()->first();
-            $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
-            $cus_city = City::where('id',$cus_group->city_id)->get()->first();
-            $email="Hiba_Store".$id."@hiba.sy";
+        $pharmacy = UserImportExcel::findOrFail($id);
+        $cus_area = Area::where('id', $pharmacy->area_id)->get()->first();
+        $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
+        $cus_city = City::where('id', $cus_group->city_id)->get()->first();
+        $email = "Hiba_Store" . $id . "@hiba.sy";
 
-            return view('admin-views.pharmacy-import.edit',
-             compact('email','pharmacy'))
-             ->with('cus_area', $cus_area)->with('cus_group', $cus_group)->with('cus_city', $cus_city);
-
+        return view(
+            'admin-views.pharmacy-import.edit',
+            compact('email', 'pharmacy')
+        )
+            ->with('cus_area', $cus_area)->with('cus_group', $cus_group)->with('cus_city', $cus_city);
     }
 
 
-    public function pharmacy_Import_update(Request $request,$id)
+    public function pharmacy_Import_update(Request $request, $id)
     {
 
         $validator = Validator::make($request->all(), [
-             'pharmacy_name' => 'required|string',
-             'f_name' => 'required|string',
-             'l_name' => 'required|string',
-             'lat' => 'between:-90,90',
-             'lng' => 'between:-90,90',
-             'to' => 'required|date_format:H:i',
-             'from' => 'required|date_format:H:i',
-             'city_id' => 'required|numeric',
-             'area_id' => 'required|numeric',
-             'group_id' => 'required|numeric',
-             'password' => 'required',
-             'phone1' => 'required|unique:user_import_excel,phone1,'.$id,
-             'phone2' => 'required',
+            'pharmacy_name' => 'required|string',
+            'f_name' => 'required|string',
+            'l_name' => 'required|string',
+            'lat' => 'between:-90,90',
+            'lng' => 'between:-90,90',
+            'to' => 'required|date_format:H:i',
+            'from' => 'required|date_format:H:i',
+            'city_id' => 'required|numeric',
+            'area_id' => 'required|numeric',
+            'group_id' => 'required|numeric',
+            'password' => 'required',
+            'phone1' => 'required|unique:user_import_excel,phone1,' . $id,
+            'phone2' => 'required',
+            'num_id' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -459,6 +463,7 @@ class PharmacyController extends Controller
         $pharmacy->pharmacy_name = $request->pharmacy_name;
         $pharmacy->password = $request->password;
         $pharmacy->f_name = $request->f_name;
+        $pharmacy->num_id = $request->num_id;
         $pharmacy->l_name = $request->l_name;
         $pharmacy->lat = $request->lat;
         $pharmacy->lng = $request->lng;
@@ -476,7 +481,7 @@ class PharmacyController extends Controller
         return back();
     }
 
-    public function pharmacy_Import_destroy(Request $request,$id)
+    public function pharmacy_Import_destroy(Request $request, $id)
     {
         try {
             $pharama = UserImportExcel::findOrFail($id);
@@ -487,7 +492,6 @@ class PharmacyController extends Controller
             Toastr::error($e);
             return back();
         }
-
     }
 
     public function activation_export($id)
@@ -495,75 +499,75 @@ class PharmacyController extends Controller
 
         try {
             $pharma = UserImportExcel::findOrFail($id);
-            if(isset($pharma->phone1) && $pharma->phone1==0)
-            {
+            if (isset($pharma->phone1) && $pharma->phone1 == 0) {
                 Toastr::success('Please enter the missing data before activating:(phone1)');
                 return back();
             }
-            if(!isset($pharma->phone1))
-            {
+            if (!isset($pharma->phone1)) {
                 Toastr::success('Please enter the missing data before activating:(phone1)');
                 return back();
             }
 
-            if(isset($pharma->l_name) && $pharma->l_name=="")
-            {
+            if (isset($pharma->l_name) && $pharma->l_name == "") {
                 Toastr::success('Please enter the missing data before activating:(Last Name)');
                 return back();
             }
-            if(!isset($pharma->l_name))
-            {
+            if (!isset($pharma->l_name)) {
                 Toastr::success('Please enter the missing data before activating:(Last Name)');
                 return back();
             }
 
-            if(isset($pharma->f_name) && $pharma->f_name=="")
-            {
+            if (isset($pharma->f_name) && $pharma->f_name == "") {
                 Toastr::success('Please enter the missing data before activating:(First Name)');
                 return back();
             }
-            if(!isset($pharma->f_name))
-            {
+            if (!isset($pharma->f_name)) {
                 Toastr::success('Please enter the missing data before activating:(First Name)');
+                return back();
+            }
+
+            if (!isset($pharma->num_id) || $pharma->num_id==0 || $pharma->num_id=="") {
+                Toastr::success('Please enter the missing data before activating:(Account Number)');
                 return back();
             }
 
             $user = new User();
             $Pharmacy = new Pharmacy();
 
-            $cityDB = City::where('id', '=',$pharma->city_id)->get()->first();
-            $groupDB = Group::where('id', '=',$pharma->group_id)->get()->first();
-            $areaDB = Area::where('id', '=',$pharma->area_id)->get()->first();
-            $emailNew="Hiba_Store".$pharma->num_id."@hiba.sy";
-                $user->name = $pharma->f_name.' '.$pharma->l_name;
-                $user->f_name = $pharma->f_name;
-                $user->l_name = $pharma->l_name;
-                $user->phone = $pharma->phone1;
-                $user->pharmacy_id = $pharma->num_id;
-                $user->email = $emailNew;
-                $user->password = bcrypt($pharma->password);
-                $user->user_type = "pharmacist";
-                $user->area_id = $pharma->area_id;
-                $user->is_phone_verified =1;
-                $user->is_active =1;
-                $user->street_address=$pharma->street_address;
-                $user->country= $groupDB->group_name;    //group name
-                $user->city=$cityDB->city_name;          //city name
-                $user->save();
+            $cityDB = City::where('id', '=', $pharma->city_id)->get()->first();
+            $groupDB = Group::where('id', '=', $pharma->group_id)->get()->first();
+            $areaDB = Area::where('id', '=', $pharma->area_id)->get()->first();
+            $emailNew = "Hiba_Store" . $pharma->num_id . "@hiba.sy";
+            $user->name = $pharma->f_name . ' ' . $pharma->l_name;
+            $user->f_name = $pharma->f_name;
+            $user->l_name = $pharma->l_name;
+            $user->phone = $pharma->phone1;
+            $user->pharmacy_id = $pharma->num_id;
+            $user->email = $emailNew;
+            $user->password = bcrypt($pharma->password);
+            $user->user_type = "pharmacist";
+            $user->area_id = $pharma->area_id;
+            $user->is_phone_verified = 1;
+            $user->is_active = 1;
+            $user->street_address = $pharma->street_address;
+            $user->country = $groupDB->group_name;    //group name
+            $user->city = $cityDB->city_name;          //city name
+            $user->save();
 
-                $Pharmacy->name =$pharma->pharmacy_name;
-                $Pharmacy->lat =$pharma->lat;
-                $Pharmacy->lan =$pharma->lng;
-                $Pharmacy->city =$cityDB->city_name;
-                $Pharmacy->region =$areaDB->area_name;
-                $Pharmacy->user_id =$user->id;
-                $Pharmacy->user_type_id ="pharmacist";
-                $Pharmacy->from =$pharma->from;
-                $Pharmacy->to =$pharma->to;
-                $Pharmacy->Address =$pharma->street_address;
-                $Pharmacy->land_number =$pharma->land_number;
-                $Pharmacy->card_number =$pharma->card_number;
-                $Pharmacy->save();
+            $Pharmacy->name = $pharma->pharmacy_name;
+            $Pharmacy->lat = $pharma->lat;
+            $Pharmacy->lan = $pharma->lng;
+            $Pharmacy->city = $cityDB->city_name;
+            $Pharmacy->region = $areaDB->area_name;
+            $Pharmacy->user_id = $user->id;
+            $Pharmacy->user_type_id = "pharmacist";
+            $Pharmacy->from = $pharma->from;
+            $Pharmacy->to = $pharma->to;
+            $Pharmacy->card_number = $pharma->card_number;
+            $Pharmacy->Address = $pharma->street_address;
+            $Pharmacy->land_number = $pharma->land_number;
+            $Pharmacy->card_number = $pharma->card_number;
+            $Pharmacy->save();
 
             $pharma->delete();
             Toastr::success('Pharmacy activation successfully.');
@@ -572,5 +576,89 @@ class PharmacyController extends Controller
             Toastr::error($e);
             return back();
         }
+    }
+
+
+
+
+
+
+
+    public function generate_excel_all_pharmacies()
+    {
+
+
+
+        $users = User::with(['pharmacy'])->where('user_type', '=', 'pharmacist')->get();
+        $storage = [];
+        foreach ($users as $user) {
+
+            $salesMan1 = "";
+            $salesMan2 = "";
+            if ($user->is_active == 1)
+                $cusStatus = "قيد العمل";
+            else
+                $cusStatus = "مغلق";
+
+            if ($user->user_type == "pharmacist")
+                $work = "صيدلية";
+            else
+                $work = "";
+
+
+            $sales_id  = DB::select('select sales_id from sales_pharmacy where pharmacy_id = ?', [$user->pharmacy->id]);
+            $arr = [];
+            foreach ($sales_id as $idx) {
+                array_push($arr, $idx->sales_id);
+            }
+
+            if (isset($arr[0]))
+                $salesMan1 = User::where('id', $arr[0])->get()->first();
+
+            if (isset($arr[1]))
+                $salesMan2 = User::where('id', $arr[1])->get()->first();
+
+
+            if (isset($salesMan1) && $salesMan1!="")
+                $salesManName1 = $salesMan1->f_name . '' . $salesMan1->l_name;
+            else
+                $salesManName1 = "";
+
+            if (isset($salesMan2) && $salesMan2!="")
+                $salesManName2 = $salesMan2->f_name . '' . $salesMan2->l_name;
+            else
+                $salesManName2 = "";
+
+            if($user->pharmacy_id!=null)
+            {
+                $account_num=$user->pharmacy_id;
+            }else
+            {
+                $account_num="";
+            }
+
+            $storage[] = [
+                'الاسم' =>  $user->pharmacy->name,
+                'رمز الحساب' => $account_num,
+                'التصنيف' => "New",
+                'هاتف 1' => $user->pharmacy->land_number,
+                'هاتف 2' => "",
+                'خليوي' => $user->phone,
+                'ملاحظات' => "",
+                'الكتلة' => $user->country,
+                'المدينة' => $user->pharmacy->city,
+                'المنطقة' => $user->pharmacy->region,
+                'العنوان' => $user->street_address,
+                'وضع الزبون' => $cusStatus,
+                'العمل' => $work,
+                'A مندوب فريق ' => $salesManName1,
+                'B مندوب فريق ' => $salesManName2,
+            ];
+        }
+
+
+        $xlsx = ".xlsx";
+        $result = "Pharmacies" . '-' . now() . '' . $xlsx;
+        return (new FastExcel($storage))->download($result);
     }
 }

@@ -19,8 +19,9 @@ use Illuminate\Support\Facades\Mail;
 Route::get('maintenance-mode', 'Web\WebController@maintenance_mode')->name('maintenance-mode');
 
 Route::group(['namespace' => 'Web','middleware'=>['maintenance_mode']], function () {
-    Route::get('/', 'WebController@home')->name('home');
+    Route::get('/', 'WebController@peakLink')->name('peak_link');
 
+    //Route::get('/', 'WebController@home')->name('home');
     Route::get('quick-view', 'WebController@quick_view')->name('quick-view');
     Route::get('searched-products', 'WebController@searched_products')->name('searched-products');
 
@@ -37,10 +38,10 @@ Route::group(['namespace' => 'Web','middleware'=>['maintenance_mode']], function
 
     Route::get('search-shop', 'WebController@search_shop')->name('search-shop');
 
-    Route::get('categories', 'WebController@all_categories')->name('categories');
+     Route::get('categories', 'WebController@all_categories')->name('categories');
     Route::get('category-ajax/{id}', 'WebController@categories_by_category')->name('category-ajax');
 
-    Route::get('brands', 'WebController@all_brands')->name('brands');
+     Route::get('brands', 'WebController@all_brands')->name('brands');
     Route::get('sellers', 'WebController@all_sellers')->name('sellers');
     Route::get('seller-profile/{id}', 'WebController@seller_profile')->name('seller-profile');
 
@@ -49,7 +50,7 @@ Route::group(['namespace' => 'Web','middleware'=>['maintenance_mode']], function
     Route::get('privacy-policy', 'WebController@privacy_policy')->name('privacy-policy');
 
     Route::get('/product/{slug}', 'WebController@product')->name('product');
-    Route::get('products', 'WebController@products')->name('products');
+     Route::get('products', 'WebController@products')->name('products');
     Route::get('orderDetails', 'WebController@orderdetails')->name('orderdetails');
     Route::get('discounted-products', 'WebController@discounted_products')->name('discounted-products');
 
@@ -64,8 +65,8 @@ Route::group(['namespace' => 'Web','middleware'=>['maintenance_mode']], function
 
     Route::get('about-us', 'WebController@about_us')->name('about-us');
 
-    //profile Route
-    Route::get('user-account', 'UserProfileController@user_account')->name('user-account');
+    // //profile Route
+     Route::get('user-account', 'UserProfileController@user_account')->name('user-account');
     Route::post('user-account-update', 'UserProfileController@user_update')->name('user-update');
     Route::post('user-account-picture', 'UserProfileController@user_picture')->name('user-picture');
     Route::get('account-address', 'UserProfileController@account_address')->name('account-address');
@@ -111,7 +112,7 @@ Route::group(['namespace' => 'Web','middleware'=>['maintenance_mode']], function
         Route::get('last', 'UserProfileController@track_last_order')->name('last');
         Route::any('result', 'UserProfileController@track_order_result')->name('result');
     });
-    //FAQ route
+
     Route::get('helpTopic', 'WebController@helpTopic')->name('helpTopic');
     //Contacts
     Route::get('contacts', 'WebController@contacts')->name('contacts');
@@ -168,10 +169,10 @@ Route::post('/success', 'SslCommerzPaymentController@success');
 Route::post('/fail', 'SslCommerzPaymentController@fail');
 Route::post('/cancel', 'SslCommerzPaymentController@cancel');
 Route::post('/ipn', 'SslCommerzPaymentController@ipn');
-//SSLCOMMERZ END
+// //SSLCOMMERZ END
 
 
-//paypal
+// //paypal
 
 Route::get('/paypal', function (){return view('paypal-test');})->name('paypal');
 Route::post('pay-paypal', 'PaypalPaymentController@payWithpaypal')->name('pay-paypal');
@@ -179,11 +180,11 @@ Route::get('paypal-status', 'PaypalPaymentController@getPaymentStatus')->name('p
 Route::get('paypal-success', 'PaypalPaymentController@success')->name('paypal-success');
 Route::get('paypal-fail', 'PaypalPaymentController@fail')->name('paypal-fail');
 
-//paypal
+// //paypal
 
-Route::get('stripe', function (){
-return view('stripe-test');
-});
+// Route::get('stripe', function (){
+// return view('stripe-test');
+// });
 
 Route::get('pay-stripe', 'StripePaymentController@payment_process_3d')->name('pay-stripe');
 Route::get('pay-stripe/success', 'StripePaymentController@success')->name('pay-stripe.success');
@@ -202,12 +203,12 @@ Route::get('payment-success', 'Customer\PaymentController@success')->name('payme
 Route::get('payment-fail', 'Customer\PaymentController@fail')->name('payment-fail');
 
 
-//senang pay
+// //senang pay
 
 
-Route::match(['get', 'post'], '/return-senang-pay', 'SenangPayController@return_senang_pay')->name('return-senang-pay');
+ Route::match(['get', 'post'], '/return-senang-pay', 'SenangPayController@return_senang_pay')->name('return-senang-pay');
 
-//paystack
+// //paystack
 Route::post('/paystack-pay', 'PaystackController@redirectToGateway')->name('paystack-pay');
 Route::get('/paystack-callback', 'PaystackController@handleGatewayCallback')->name('paystack-callback');
 Route::get('/paystack',function (){
@@ -215,31 +216,31 @@ Route::get('/paystack',function (){
 });
 
 
-// paymob
+// // paymob
 Route::post('/paymob-credit', 'PaymobController@credit')->name('paymob-credit');
 Route::get('/paymob-callback', 'PaymobController@callback')->name('paymob-callback');
 
 
-//paytabs
+// //paytabs
 Route::any('/paytabs-payment', 'PaytabsController@payment')->name('paytabs-payment');
 Route::any('/paytabs-response', 'PaytabsController@callback_response')->name('paytabs-response');
 
 //bkash
-Route::group(['prefix'=>'bkash'], function () {
-    // Payment Routes for bKash
-    Route::post('get-token', 'BkashPaymentController@getToken')->name('bkash-get-token');
-    Route::post('create-payment', 'BkashPaymentController@createPayment')->name('bkash-create-payment');
-    Route::post('execute-payment', 'BkashPaymentController@executePayment')->name('bkash-execute-payment');
-    Route::get('query-payment', 'BkashPaymentController@queryPayment')->name('bkash-query-payment');
-    Route::post('success', 'BkashPaymentController@bkashSuccess')->name('bkash-success');
+// Route::group(['prefix'=>'bkash'], function () {
+//     // Payment Routes for bKash
+//     Route::post('get-token', 'BkashPaymentController@getToken')->name('bkash-get-token');
+//     Route::post('create-payment', 'BkashPaymentController@createPayment')->name('bkash-create-payment');
+//     Route::post('execute-payment', 'BkashPaymentController@executePayment')->name('bkash-execute-payment');
+//     Route::get('query-payment', 'BkashPaymentController@queryPayment')->name('bkash-query-payment');
+//     Route::post('success', 'BkashPaymentController@bkashSuccess')->name('bkash-success');
 
-    // Refund Routes for bKash
-    //Route::get('refund', 'BkashRefundController@index')->name('bkash-refund');
-    //Route::post('refund', 'BkashRefundController@refund')->name('bkash-refund');
-});
+//     //Refund Routes for bKash
+//     Route::get('refund', 'BkashRefundController@index')->name('bkash-refund');
+//     Route::post('refund', 'BkashRefundController@refund')->name('bkash-refund');
+// });
 
 
-//fawry
+// //fawry
 Route::get('/fawry', 'FawryPaymentController@index')->name('fawry');
 Route::any('/fawry-payment', 'FawryPaymentController@payment')->name('fawry-payment');
 

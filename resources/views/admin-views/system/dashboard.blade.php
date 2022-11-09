@@ -260,10 +260,15 @@
 
                 <div class="col-lg-6 mb-3">
                     <!-- Card -->
-                    <div class="card h-100">
+                    {{-- <div class="card h-100">
                         @include('admin-views.partials._top-store-by-order',['top_store_by_order_received'=>$data['top_store_by_order_received']])
-                    </div>
+                    </div> --}}
                     <!-- End Card -->
+
+                    <div class="card h-100">
+                        @include('admin-views.partials._top-brands',['top_brands'=>$data['top_brand_by_order_received']])
+                    </div>
+
                 </div>
 
                 <div class="col-lg-6 mb-3">
@@ -294,6 +299,14 @@
                     <!-- Card -->
                     <div class="card h-100">
                         @include('admin-views.partials._top-customer',['top_customer'=>$data['top_customer']])
+                    </div>
+                    <!-- End Card -->
+                </div>
+
+                <div class="col-lg-6 mb-3">
+                    <!-- Card -->
+                    <div class="card h-100">
+                        @include('admin-views.partials._top-salesMan',['top_customer'=>$data['top_salesMan']])
                     </div>
                     <!-- End Card -->
                 </div>

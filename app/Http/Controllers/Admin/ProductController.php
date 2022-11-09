@@ -889,7 +889,7 @@ class ProductController extends BaseController
                 'position' => 10,
             ]);
             $brand_name = trim($collection['المجموعة'], " \t.");
-            $brand = Brand::where('name', '==',$brand_name)->get()->first();
+            $brand = Brand::where('name', '=',$brand_name)->get()->first();
             if (isset($brand)) {
                 $brand_id = $brand->id;
             } else {
@@ -902,9 +902,6 @@ class ProductController extends BaseController
             }
 
             $product = Product::where('num_id', '=',$collection['رمز المادة '])->get()->first();
-
-
-
             if (isset($product)) {
                 $product->num_id = $collection['رمز المادة '];
                 $product->unit_price = $collection['السعر'];
@@ -1008,6 +1005,7 @@ class ProductController extends BaseController
 
             $brand = Brand::findOrFail($item->brand_id);
             $storage[] = [
+                'رمز المادة' => $item->num_id,
                 'المجموعة' => $brand->name,
                 'اسم المادة' => $item->name,
                 'الكمية' => $item->current_stock,
@@ -1050,7 +1048,7 @@ class ProductController extends BaseController
             //         return back();
             //     }
             // }
-            $product = Product::where('num_id', 'LIKE', '%' . $collection['رمز المادة'] . '%')->get()->first();
+            $product = Product::where('num_id', '=',$collection['رمز المادة'])->get()->first();
             //$product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
             if (isset($product)) {
                 $product->purchase_price = $collection['السعر'];

@@ -17,4 +17,8 @@ class Banner extends Model
         return $this->belongsTo(Product::class,'resource_id');
     }
 
+    public function brand(){
+        return $this->belongsTo(Brand::class,'resource_id');
+    }
+
 }

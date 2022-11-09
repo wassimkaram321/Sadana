@@ -17,6 +17,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Model\Translation;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 
 class BagController extends BaseController
@@ -101,13 +102,11 @@ class BagController extends BaseController
             'bag_description' => 'required',
             'end_date' => 'required',
             'demand_limit' => 'required',
-            'total_price_offer' => 'required',
         ], [
             'bag_name.required' => ' Name is required!',
             'bag_description.required' => 'Description name is required!',
             'end_date.required' => 'Expiry date is required!',
             'demand_limit.required' => 'Demand limit is required!',
-            'total_price_offer.required' => 'Price is required!',
         ]);
 
 
@@ -119,7 +118,6 @@ class BagController extends BaseController
             }
             $bag->bag_description = $request->bag_description;
             $bag->end_date = $request->end_date;
-            $bag->total_price_offer = $request->total_price_offer;
             $bag->demand_limit = $request->demand_limit;
             $bag->save();
             Toastr::success('bag updated successfully!');
@@ -156,6 +154,7 @@ class BagController extends BaseController
             ->where("products_bag.bag_id", $id)
             ->get([
                 'products_bag.id as id',
+                'products_bag.bag_id as bag_id',
                 'products.id as product_id', 'products.name', 'products.thumbnail',
                 'products_bag.product_count',
                 'products_bag.product_price', 'products_bag.product_total_price',
@@ -172,6 +171,7 @@ class BagController extends BaseController
             ->select('id', 'name')
             ->get();
         $bag_id = $id;
+        //dd($bag_products);
         return view('admin-views.bag.bag-product-view', compact('bag_products', 'br', 'bag_id'));
     }
 
@@ -316,5 +316,52 @@ class BagController extends BaseController
         }
         $b = $id;
         return view('admin-views.bag.setting', compact('bag', 'b', 'city_id', 'array', 'groups'));
+    }
+
+
+
+    public function bag_product_price(Request $request, $id)
+    {
+        $bagProduct = BagProduct::where('bag_id', '=', $id)
+            ->where('product_id', '=', $request->product_id)->get()->first();
+        return response()->json([
+            'data' => $bagProduct
+        ]);
+    }
+
+
+    public function bag_update_price(Request $request)
+    {
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'product_price' => 'required',
+                'product_count' => 'required',
+            ]);
+            if ($validator->fails()) {
+                Toastr::error('Faild updated!');
+            }
+
+            $bagProduct = BagProduct::where('id', '=', $request->id)->get()->first();
+            $bagProduct->product_price = $request->product_price;
+            $bagProduct->product_count = $request->product_count;
+            if ($bagProduct->is_gift == 0)
+                $bagProduct->product_total_price = ($request->product_count * $request->product_price);
+            else
+                $bagProduct->product_total_price = 0;
+            $bagProduct->save();
+
+
+            $price = DB::table('products_bag')->where('bag_id', $bagProduct->bag_id)->sum('product_total_price');
+            $bag = Bag::findOrFail($bagProduct->bag_id);
+            $bag->total_price_offer = $price;
+            $bag->save();
+
+            Toastr::success('updated successfully!');
+            return back();
+        } catch (\Exception $e) {
+            Toastr::error('Faild updated!');
+            return back();
+        }
     }
 }

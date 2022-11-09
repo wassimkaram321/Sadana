@@ -237,6 +237,15 @@
                                 </div>
                             </div>
 
+                           <div class="col-md-6 col-12">
+                                <div class="form-group">
+                                    <label class="input-label"
+                                        for="exampleFormControlInput1">{{\App\CPU\translate('Account Number')}}<span style="color: red;">*</span></label>
+                                    <input type="number" value="{{$pharmacy['num_id']}}" name="num_id"
+                                        class="form-control" required>
+                                </div>
+                            </div>
+
                         </div>
 
                         <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>

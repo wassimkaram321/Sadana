@@ -3,13 +3,26 @@
 @section('title', \App\CPU\translate('Product Preview'))
 
 @push('css_or_js')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
 
 
         h6{
             margin-bottom: 0px;
-            font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
+             font-weight: 600;
+        }
+
+        h3{
+            /* margin-bottom: 20px; */
+            font-size: 25px;
+             font-weight: 900;
+
+        }
+        i{
+            font-size: 25px;
+            width: 30px;
+            height: 30px;
         }
 
     .checkbox-color label {
@@ -57,12 +70,12 @@
                             <i class="tio-back-ui"></i> {{\App\CPU\translate('Back')}}
                         </a>
                     </div>
-                    <div>
+                    {{-- <div>
                         <a href="{{route('product',$product['slug'])}}" class="btn btn-primary " target="_blank"><i
                                 class="tio-globe"></i> {{ \App\CPU\translate('View') }} {{ \App\CPU\translate('from') }}
                             {{ \App\CPU\translate('Website') }}
                         </a>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -244,90 +257,113 @@
                 </div> --}}
 
 
+
+
+
+
+
+
+
                 <div class="mt-5">
-                    <h4 class="mb-2">{{\App\CPU\translate('Overview')}} :</h4>
+                    <div class="d-flex align-items-center mb-5">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <h3 class="ml-3">{{\App\CPU\translate('Overview')}} :</h3>
+                    </div>
                     <div class="row">
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Price')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-money-bill-1-wave"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Unit price')}} :</h6>
                             <span>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product['unit_price']))}}</span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Discount')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-percent"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Discount')}} :</h6>
                             <span>{{
                                 $product->discount_type=='flat'?(\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product['discount']))):
                                 $product->discount.''.'%'}} </span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Current Stock')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-cubes-stacked"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Current Stock')}} :</h6>
                             <span>{{ $product->current_stock }}</span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Brand Name')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-building"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Brand Name')}} :</h6>
                             <span>{{ $brand->name }}</span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Store Name')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-store"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Store Name')}} :</h6>
                             <span>{{ $store->store_name }}</span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Demand_limit')}} :</h6>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-hand"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Demand_limit')}} :</h6>
                             <span>{{ $product->demand_limit }}</span>
                         </div>
-                        <div class="col-md-3 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Purchase price')}} :</h6>
-                            <span>{{ $product->purchase_price }}</span>
+                        <div class="col-md-4 d-flex align-items-center my-2">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Purchase price')}} :</h6>
+                            <span>{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($product->purchase_price ))}}</span>
                         </div>
+
 
 
                     </div>
 
                     <hr>
 
-                    <h4 class="mb-2 mt-3">{{\App\CPU\translate('Offers')}} :</h4>
+
+                    <div class="d-flex align-items-center mb-5">
+                        <i class="fa-solid fa-plus"></i>
+                        <h3 class="ml-3">{{\App\CPU\translate('Offers')}} :</h3>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Normal')}} :</h6>
+                            <i class="fa-solid fa-star"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Normal')}}:</h6>
                             <span>
-                                {{\App\CPU\translate('every (')}}{{ $product->q_normal_offer }}{{\App\CPU\translate(') product ')}}{{\App\CPU\translate(',offer( ')}}{{$product->normal_offer}}{{\App\CPU\translate(') products for free .')}}</span>
+                                {{ $product->q_normal_offer }}{{\App\CPU\translate('+')}}{{$product->normal_offer}}</span>
                         </div>
                         <div class="col-md-6 d-flex align-items-center">
-                            <h6 class="mr-3">Featured :</h6>
-                            <span>{{\App\CPU\translate('every (')}}{{ $product->q_featured_offer  }}{{\App\CPU\translate(') product ')}}{{\App\CPU\translate(',offer( ')}}{{$product->featured_offer }}{{\App\CPU\translate(') products for free .')}}</span></span>
+                            <i class="fa-solid fa-star"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('featured')}}:</h6>
+                            <span>{{ $product->q_featured_offer}}{{\App\CPU\translate('+')}}{{$product->featured_offer }}</span></span>
                         </div>
                     </div>
 
                     <hr>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <h4 class="mb-2 mt-3">{{\App\CPU\translate('Scientific_formula')}} :</h4>
-                            <div class="row">
-                                <div class="col-12 d-flex align-items-center">
-                                    <span>{{ $product->scientific_formula }}</span>
-                                </div>
-                            </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Details')}} :</h4>
+                            <span>{{ $product->scientific_formula }}</span>
                         </div>
-                        <div class="col-md-6">
-                            <h4 class="mb-2 mt-3">{{\App\CPU\translate('Details')}} :</h4>
-                            <div class="row">
-                                <div class="col-12 d-flex align-items-center">
-                                    <p>{{ $product->details }}</p>
-                                </div>
-                            </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <i class="fa-solid fa-flask"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Scientific_formula')}} :</h4>
+                            <span>{{ $product->details }}</span>
                         </div>
                     </div>
 
                     <hr>
 
 
-                    <h4 class="mb-2 mt-3">{{\App\CPU\translate('Production & expiry date')}} :</h4>
+                    <div class="d-flex align-items-center mb-5">
+                        <i class="fa-regular fa-calendar"></i>
+                        <h3 class="ml-3">{{\App\CPU\translate('Production & expiry date')}} :</h3>
+                    </div>
                     <div class="row">
                         <div class="col-6 d-flex align-items-center">
-                            <h6 class="mr-3">{{\App\CPU\translate('Production date')}} :</h6>
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <h6 class="mr-3 ml-3">{{\App\CPU\translate('Production date')}} :</h6>
                             <span>{{ $product->production_date }}</span>
                         </div>
                         <div class="col-6 d-flex align-items-center">
-                            <h6 class="mr-3"> {{\App\CPU\translate('Expiry date')}}  :</h6>
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                            <h6 class="mr-3 ml-3"> {{\App\CPU\translate('Expiry date')}}  :</h6>
                             <span>{{$product->expiry_date }}</span>
                         </div>
                     </div>
@@ -336,7 +372,14 @@
 
 
 
-                {{-- <div class="row mt-5"> --}}
+
+
+
+
+
+
+
+                <div class="row mt-5">
 
                     {{-- <div class="row" style="margin-left: 9%;">
                         {{\App\CPU\translate('Product Image')}}

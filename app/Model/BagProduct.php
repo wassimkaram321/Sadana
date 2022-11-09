@@ -8,7 +8,12 @@ class BagProduct extends Model
 {
     protected $table = 'products_bag';
     protected $casts = [
-
+        'product_id '=> 'integer',
+        'bag_id '=> 'integer',
+        'product_price'=> 'integer',
+        'product_count'=> 'integer',
+        'product_total_price'=> 'integer',
+        'is_gift'=>'integer',
         'total_price_offer '    => 'integer',
         'bag_status '     => 'integer',
     ];

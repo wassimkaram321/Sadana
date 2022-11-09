@@ -16,6 +16,9 @@ class CartController extends Controller
 {
     public function cart(Request $request)
     {
+
+
+
         $user = Helpers::get_customer($request);
         $cart = Cart::where(['customer_id' => $user->id])->get();
         foreach($cart as $c){
@@ -49,6 +52,9 @@ class CartController extends Controller
         return response()->json($cart, 200);
     }
 
+
+
+
     public function add_to_cart(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -79,6 +85,8 @@ class CartController extends Controller
         return response()->json($cart, 200);
     }
 
+
+
     public function update_cart(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -104,6 +112,8 @@ class CartController extends Controller
 
 
 
+
+
     public function remove_from_cart(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -121,6 +131,9 @@ class CartController extends Controller
         return response()->json(translate('successfully_removed'));
     }
 
+
+
+
     public function remove_all_from_cart(Request $request)
     {
         // $validator = Validator::make($request->all(), [
@@ -137,4 +150,34 @@ class CartController extends Controller
         Cart::where(['customer_id' => $user->id])->delete();
         return response()->json(translate('successfully_removed'));
     }
+
+
+    public function add_to_cart_website(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'carts.*.id' => 'required|numeric',
+            'carts.*.quantity' => 'required|numeric',
+            'carts.*.type' => 'required|string',
+            'carts.*.pure_price' => 'required|numeric',
+            'note' => 'required|string',
+            'delivery_date' => 'required|date',
+        ]);
+
+        if ($validator->errors()->count() > 0) {
+            return response()->json(['errors' => Helpers::error_processor($validator->errors())]);
+        }
+
+        foreach ($request->carts as $cart)
+        {
+            //$cart = CartManager::add_to_cart($cart);
+            //$user = Helpers::get_customer($request);
+            //place order
+        }
+
+        $cart = CartManager::add_to_cart($request);
+        return response()->json($cart, 200);
+    }
+
+
+
 }

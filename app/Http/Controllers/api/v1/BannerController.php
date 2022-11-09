@@ -23,18 +23,21 @@ class BannerController extends Controller
         if ($request['banner_type'] == 'all') {
             $banners = Banner::where(['published' => 1])->with(['product'])->get();
         } elseif ($request['banner_type'] == 'main_banner') {
-            $banners = Banner::where(['published' => 1, 'banner_type' => 'Main Banner'])->with(['product'])->get();
+            $bannersBrand = Banner::where(['published' => 1,'resource_type'=>'brand', 'banner_type' => 'Main Banner'])->with(['brand'])->get();
+            $bannersProduct = Banner::where(['published' => 1,'resource_type'=>'product', 'banner_type' => 'Main Banner'])->with(['product'])->get();
         } else {
             $banners = Banner::where(['published' => 1, 'banner_type' => 'Footer Banner'])->with(['product'])->get();
         }
-        $banners =$banners->map(function($data){
-            
+        $bannersProduct =$bannersProduct->map(function($data){
+
             if($data['resource_type']=='product'){
                 $data['product']=Helpers::product_data_formatting($data['product']);
             }
 
             return $data;
         });
-        return response()->json($banners, 200);
+
+        $result = $bannersProduct->merge($bannersBrand);
+        return response()->json($result, 200);
     }
 }

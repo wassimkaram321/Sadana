@@ -8,7 +8,6 @@ class BagsOrdersDetails extends Model
 {
     protected $table = 'bags_orders_details';
     protected $casts = [
-
         'order_id '    => 'integer',
         'bag_id '     => 'integer',
         'seller_id' => 'integer',

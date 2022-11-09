@@ -270,8 +270,6 @@
             </div>
             <!-- End Card -->
         </div>
-
-
     </div>
     <!-- End Row -->
 
@@ -329,7 +327,6 @@
           success: function (data) {
             $('#userCrudModal').html("Edit Product");
              $('#submit').val("Edit Product");
-            // $('#practice_modal').modal('show');
              $('#order_id').val(data.data.order_id);
              $('#product_id').val(data.data.product_id);
              $('#qty').val(data.data.qty);

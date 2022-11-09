@@ -6,7 +6,7 @@
 <link href="{{asset('public/assets/back-end/css/tags-input.min.css')}}" rel="stylesheet">
 <link href="{{ asset('public/assets/select2/css/select2.min.css')}}" rel="stylesheet">
 @endpush
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
 <div class="content container-fluid">
 
@@ -21,45 +21,48 @@
 
                 <div class="card-header">
 
-                    {{-- <div > --}}
-                        <form class="row w-100 align-items-center" action="{{route('admin.bag.products-store',[$bag_id])}}" method="post" enctype="multipart/form-data">
+                    {{-- <div> --}}
+                        <form class="row w-100 align-items-center"
+                            action="{{route('admin.bag.products-store',[$bag_id])}}" method="post"
+                            enctype="multipart/form-data">
                             @csrf
                             <div class="col-md-4 w-100">
                                 <select
                                     class="w-100 js-example-basic-multiple js-states js-example-responsive form-control"
                                     name="product_id" required>
-                                    <option value="{{null}}" selected disabled>---{{\App\CPU\translate('Select')}}---</option>
+                                    <option value="{{null}}" selected disabled>---{{\App\CPU\translate('Select')}}---
+                                    </option>
                                     @foreach($br as $b)
-                                        <option value="{{$b['id']}}">{{$b['name']}}</option>
+                                    <option value="{{$b['id']}}">{{$b['name']}}</option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div class="col-md-2 d-flex align-items-center w-100">
-                                <input type="number" min="1" step="1"
-                                    placeholder="Count"
-                                    name="product_count" class="w-100 js-example-basic-multiple form-control"
-                                    style="width: 100%;">
+                                <input type="number" min="1" step="1" placeholder="Count" name="product_count"
+                                    class="w-100 js-example-basic-multiple form-control" style="width: 100%;">
 
                             </div>
 
 
                             <div class="col-md-2 d-flex align-items-center w-100">
-                                <input type="checkbox"
-                                    value="1"
-                                    name="free" class=" regular-checkbox w-25 js-example-basic-multiple form-control"
+                                <input type="checkbox" value="1" name="free"
+                                    class=" regular-checkbox w-25 js-example-basic-multiple form-control"
                                     style="width: 100%;width: 20px !important;">
-                                    <label  style="margin-bottom: 0px; margin-left: 8px;">{{\App\CPU\translate('Free')}}</label><br>
+                                <label
+                                    style="margin-bottom: 0px; margin-left: 8px;">{{\App\CPU\translate('Free')}}</label><br>
                             </div>
 
                             <div class="col-md-4 w-100">
-                                <button type="submit" class="btn btn-primary w-100" style="border: none;appearance: none;border-radius: 5px;height:40px">
+                                <button type="submit" class="btn btn-primary w-100"
+                                    style="border: none;appearance: none;border-radius: 5px;height:40px">
                                     {{\App\CPU\translate('Add_product')}}
                                 </button>
                             </div>
                         </form>
 
-                    {{-- </div> --}}
+                        {{--
+                    </div> --}}
                 </div>
 
 
@@ -108,14 +111,19 @@
                                     <td>
                                         <img style="width: 60px;height: 60px"
                                             onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                                            src="{{asset('storage/app/public/product/thumbnail')}}/{{$b['"
-                                            thumbnail"']}}">
+                                            src="{{asset('storage/app/public/product/thumbnail/')}}/{{$b['thumbnail']}}">
                                     </td>
 
                                     <td>
                                         <a class="btn btn-danger btn-sm delete" id="{{$b['id']}}">
-                                            <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete')}}
+                                            <i class="tio-add-to-trash"></i>
                                         </a>
+
+                                        <button href="" id="editCompany" data-toggle="modal"
+                                            data-target='#practice_modal' class="btn btn-primary btn-sm "
+                                            data-product_id="{{$b['product_id']}}" data-id="{{$b['bag_id']}}"><i
+                                                class="tio-edit"></i></button>
+
                                     </td>
 
 
@@ -134,10 +142,38 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="practice_modal">
+        <div class="modal-dialog">
+            <form class="row w-100 align-items-center" action="{{route('admin.bag.product-update-price')}}" method="post">
+                @csrf
+                <div class="modal-content" style="min-height: 150px; padding: 20px">
+                    <input type="hidden" id="id" name="id" value="">
+                    <div class="modal-body mb-4" style="padding: 0px;">
+                        <div>
+                            <p> {{\App\CPU\translate('Price')}}</p>
+                        </div>
+                        <input type="number" name="product_price" id="product_price" value="" class="form-control">
+                        <div>
+                            <p> {{\App\CPU\translate('Quantity')}}</p>
+                        </div>
+                        <input type="number" name="product_count" id="product_count" value="" class="form-control">
+                    </div>
+                    <input type="submit" value="Submit" id="submit" class="btn btn-sm btn-primary py-0"
+                        style="font-size: 1.2em; height: 30px; width: 100%;">
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 @endsection
 
 @push('script')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
 <script>
     $(document).on('click', '.delete', function () {
             var id = $(this).attr("id");
@@ -177,4 +213,46 @@
             width: 'resolve'
         });
 </script>
+
+
+<script>
+    $(document).ready(function () {
+
+    $.ajaxSetup({
+        headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+    });
+
+    $('body').on('click', '#editCompany', function (event) {
+
+        event.preventDefault();
+        var id = $(this).data('id');                    //bag_id
+        var product_id = $(this).data('product_id');    //product_id
+        console.log(id);
+        console.log(product_id);
+        $.ajax({
+          url: 'price/'+id,
+          type: "POST",
+          data: {
+            product_id: product_id,
+          },
+          dataType: 'json',
+          success: function (data) {
+            console.log(data.data);
+             $('#userCrudModal').html("Edit Product Price");
+             $('#submit').val("Edit Product Price");
+             $('#id').val(data.data.id);
+             $('#product_price').val(data.data.product_price);
+             $('#product_count').val(data.data.product_count);
+          }
+      });
+
+    });
+
+   });
+</script>
+
+
+
 @endpush

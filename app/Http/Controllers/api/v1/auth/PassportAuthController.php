@@ -24,7 +24,7 @@ class PassportAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'f_name' => 'required',
             'l_name' => 'required',
-            'email' => 'required|unique:users',
+           // 'email' => 'required|unique:users',
             'phone' => 'required|unique:users',
             'password' => 'required',
             'pharmacy_name' => 'required',
@@ -48,13 +48,14 @@ class PassportAuthController extends Controller
         $city=City::where('id',$group->city_id)->get()->first();
 
         //$temporary_token = Str::random(40);
-
+        $token = rand(100000, 999999);
+        $email="Hiba_Store".$token."@hiba.sy";
         //return response()->json(['token' => $area], 200);
         $user = User::create([
             'name'=> $request->f_name.' '.$request->l_name,
             'f_name' => $request->f_name,
             'l_name' => $request->l_name,
-            'email' => $request->email,
+            'email' =>  $email,
             'phone' => $request->phone,
             'city' => $city->city_name,
             'country'=>$group->group_name,
@@ -66,6 +67,7 @@ class PassportAuthController extends Controller
         ]);
         $user->user_type="pharmacist";
         $user->save();
+
         $pharmacy=Pharmacy::create([
             'name' => $request->pharmacy_name,
             'land_number' => $request->land_number,
@@ -80,6 +82,12 @@ class PassportAuthController extends Controller
             'region'=> $area->area_name,
             'user_id'=>$user->id
         ]);
+
+        if($request->has('from_pm') && $request->has('to_pm'))
+        {
+            $pharmacy->from_pm=$request->from_pm;
+            $pharmacy->to_pm=$request->to_pm;
+        }
 
         $user->pharmacy()->save($pharmacy);
 
@@ -150,7 +158,15 @@ class PassportAuthController extends Controller
             //     return response()->json(['temporary_token' => $user->temporary_token], 200);
             // }
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return response()->json(['status'=>200,'user_type'=> $user->user_type ,'token' => $token], 200);
+
+            if($user->user_type=="salesman")
+                $details_user = User::where(['id' => $user->id])->get()->first();
+            else
+                 $details_user = User::with(['pharmacy'])->where('id','=',$user->id)->get()->first();
+
+
+            return response()->json(['status'=>200,'user_type'=> $user->user_type ,'token' => $token ,'details'=>$details_user], 200);
+
         } else {
             $errors = [];
             array_push($errors, ['code' => 'auth-001', 'message' => translate('Customer_not_found_or_Account_has_been_suspended_or_wrong_password')]);

@@ -390,6 +390,7 @@ class OrderManager
             }
         }
 
+        $OrderId=(int)$order_id;
         $or = [
             'id' => $order_id,
             'verification_code' => rand(100000, 999999),
@@ -431,10 +432,10 @@ class OrderManager
                     $ccc['product_name'] = $p->name;
                     $ccc['brand_name'] = $b->name;
                 }
-
+                $bagId=$c->product_id;
                 $or_dd = [
-                    'order_id' => $order_id,
-                    'bag_id' => $c['product_id'],
+                    'order_id' => $OrderId,
+                    'bag_id' => $bagId,
                     'seller_id' => $c['seller_id'],
                     'bag_details' => json_encode($bagProducts, true),
                     'bag_qty' => $c['quantity'],
@@ -509,6 +510,7 @@ class OrderManager
                     'shipping_method_id' => null,
                     'pure_price' => $pure_price,
                     'payment_status' => 'unpaid',
+                    'brand_id' => $product->brand_id,
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
@@ -644,7 +646,7 @@ class OrderManager
                     $pharmacy_fcm_token = $user->cm_firebase_token;    //الصيدلية
                     $pharmacy_idNew = Pharmacy::where('user_id', '=',$user->id)->get()->first();  //معرف الصيدلية
 
-                    $sales_id  = DB::select('select sales_id from sales_pharmacy where pharmacy_id = ?', [$pharmacy_idNew]);
+                    $sales_id  = DB::select('select sales_id from sales_pharmacy where pharmacy_id = ?', [$pharmacy_idNew->id]);
                     $arr = array();
                     foreach ($sales_id as $idx) {
                         array_push($arr, $idx->sales_id);
@@ -659,7 +661,14 @@ class OrderManager
                     Helpers::send_push_notif_to_device($pharmacy_fcm_token, $data);
                     foreach($salesMans as $u)
                     {
-                        Helpers::send_push_notif_to_device($u->cm_firebase_token, $data);
+                        $dataa = [
+                            'title' => translate('order'),
+                            'description' => "تم تلقي طلبية من صيدلية : (". $pharmacy_idNew->name ."),". $value,
+                            'order_id' => $order_id,
+                            'image' => '',
+                        ];
+
+                        Helpers::send_push_notif_to_device($u->cm_firebase_token, $dataa);
                     }
                 }
                 else
@@ -675,8 +684,14 @@ class OrderManager
                         'order_id' => $order_id,
                         'image' => '',
                     ];
+                    $datas = [
+                        'title' => translate('order'),
+                        'description' => "تم تلقي طلبية من مندوب : (". $user->name ."),". $value,
+                        'order_id' => $order_id,
+                        'image' => '',
+                    ];
                     Helpers::send_push_notif_to_device($salesMan_fcm_token, $data);
-                    Helpers::send_push_notif_to_device($pharmacy_fcm_token, $data);
+                    Helpers::send_push_notif_to_device($pharmacy_fcm_token, $datas);
                 }
 
             }

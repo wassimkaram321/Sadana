@@ -60,6 +60,13 @@ class OrderController extends Controller
 
     public function place_order(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'delivery_date' => 'required|date',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        }
+
         if($request->user()->user_type=="salesman")
         {
             $validator = Validator::make($request->all(), [
@@ -99,6 +106,7 @@ class OrderController extends Controller
             {
                 $order->orderBy_id = 0;
             }
+            $order->delivery_date =$request->delivery_date;
             $order->save();
 
             array_push($order_ids, $order_id);

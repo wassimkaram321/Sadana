@@ -23,11 +23,12 @@
         <div class="row" style="margin-top: 20px">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header row">
 
 
                         <!-- Search -->
-                        <form action="{{ url()->current() }}" method="GET">
+                        <form action="{{ url()->current() }}" method="GET" class="col-md-6">
+
                             <div class="input-group input-group-merge input-group-flush">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
@@ -39,7 +40,14 @@
                                     aria-label="Search orders" value="{{ $search }}" required>
                                 <button type="submit" class="btn btn-primary">{{ \App\CPU\translate('Search') }}</button>
                             </div>
+
                         </form>
+
+                        <div class="col-md-6 d-flex justify-content-right">
+                            <a class="text-body mr-3" target="_blank" href={{route('admin.pharmacy.exports-pharmacies')}}>
+                                <i class="tio-print mr-1"></i> {{\App\CPU\translate('Export')}} {{\App\CPU\translate('excel')}}
+                            </a>
+                        </div>
                         <!-- End Search -->
 
 

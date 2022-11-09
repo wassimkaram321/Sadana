@@ -702,6 +702,7 @@ class POSController extends Controller
                         'variation' => $c['variations'],
                         'variant' => $c['variant'],
                         'variation' => json_encode($c['variations']),
+                        'brand_id' => $product->brand_id,
                         'created_at' => now(),
                         'updated_at' => now()
                     ];
@@ -770,7 +771,7 @@ class POSController extends Controller
             'updated_at' => now(),
         ];
         DB::table('orders')->insertGetId($or);
-        $this->save_order_alameen($user['pharmacy_id'],$order_id,$myArray);
+        $this->save_order_alameen($user_id,$user['pharmacy_id'],$order_id,$myArray);
         session()->forget($cart_id);
         session(['last_order' => $order_id]);
         Toastr::success(\App\CPU\translate('order_placed_successfully'));
@@ -778,13 +779,13 @@ class POSController extends Controller
     }
 
 
-    public function save_order_alameen($user_id,$order_id,$product_details)
+    public function save_order_alameen($user_id,$pharmacyId,$order_id,$product_details)
     {
 
         $pharmacy=Pharmacy::where('user_id','=',$user_id)->get()->first();
         $orderAlameen=new OrderAlameen;
         $orderAlameen->order_id=$order_id;
-        $orderAlameen->pharmacy_id=$pharmacy->id;
+        $orderAlameen->pharmacy_id=$pharmacyId;
         $orderAlameen->pharmacy_name=$pharmacy->name;
         $orderAlameen->product_details=json_encode($product_details);
         $orderAlameen->status="delivered";

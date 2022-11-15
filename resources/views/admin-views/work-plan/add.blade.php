@@ -26,6 +26,13 @@
         border: 0.0625rem solid #e7eaf3 !important;
 
     }
+    .form-control11{
+
+        width: calc(1.6em) !important;
+        height: calc(1.6em) !important;
+        margin-left: 30px;
+        margin-right: 30px;
+    }
 </style>
 
 @push('css_or_js')
@@ -62,11 +69,11 @@
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <div class="row">
+                            <div class="row" style="text-align: {{Session::get('direction') == "rtl" ? 'right' : 'left' }};">
                                 <div class="col-md-6 col-sm-12">
 
                                     <div class="form-group">
-                                        <label class="input-label" for="exampleFormControlInput1">{{
+                                        <label class="input-label" for="exampleFormControlInput1" >{{
                                             \App\CPU\translate('Begin_date') }}</label>
                                         <input type="date" name="begin_date" class="form-control"
                                             placeholder="Begin Date" required>
@@ -115,6 +122,13 @@
                                     <select class="js-example-basic-single" multiple="multiple" name="pharamcies_ids[]">
                                     </select>
                                 </div>
+
+                                <div class="col-md-4 col-sm-6 d-flex mt-4" style="flex-direction: {{Session::get('direction') == "rtl" ? 'row-reverse' : 'row' }};
+                                justify-content: {{Session::get('direction') == "rtl" ? 'right' : 'left' }};">
+                                    <label for="name">{{\App\CPU\translate('Check_All')}}</label>
+                                    <input class="form-control11" type="checkbox" name="check_all">
+                                </div>
+
                             </div>
 
                         </div>

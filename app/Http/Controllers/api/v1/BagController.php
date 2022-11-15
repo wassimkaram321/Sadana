@@ -6,6 +6,7 @@ use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\Model\Bag;
 use App\Model\Area;
+use App\Model\PlanDetails;
 use App\Model\BagsSetting;
 use App\Model\BagProduct;
 use App\Pharmacy;
@@ -13,7 +14,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
-
+use function App\CPU\translate;
 class BagController extends Controller
 {
     public function get_bags(Request $request)
@@ -36,16 +37,18 @@ class BagController extends Controller
                 $group = Area::where('id', '=', $area_id)->get()->first();
                 $user_group_id = $group->group_id;
                 $vip = $userPh->pharmacy->vip;
+                $pharmacyId = $pharmacy->id;
             } else {
                 $area_id = $user->area_id;
                 $group = Area::where('id', '=', $area_id)->get()->first();
                 $user_group_id = $group->group_id;
                 $vip = $user->pharmacy->vip;
+                $pharmacyId = $user->pharmacy->id;
             }
 
             $today = Carbon::now();
             $bags = Bag::whereDate('end_date', '>=', $today->format('Y-m-d'))
-            ->where('bag_status','=',1)
+                ->where('bag_status', '=', 1)
                 ->get()->makeHidden(
                     [
                         'updated_at', 'created_at', 'deleted_at'
@@ -60,13 +63,21 @@ class BagController extends Controller
                     if ($bagSetting->vip == 1 && $vip == 1) {
                         array_push($details, $bag);
                     } elseif ($bagSetting->vip == 0 && $vip == 0 || $bagSetting->vip == 0 && $vip == 1 || $bagSetting->vip == 1 && $vip == 0) {
-                        if ($bagSetting->custom == 0 && $bagSetting->vip == 0 && $vip == 0) {
+                        if ($bagSetting->custom == 0 && $bagSetting->vip == 0 && $vip == 0 && $bagSetting->custom_pharmacy == 0) {
                             array_push($details, $bag);
                         }
                         if ($bagSetting->custom == 1) {
                             $group_ids = json_decode($bagSetting->group_ids);
                             for ($i = 0; $i < count($group_ids); $i++) {
                                 if ($group_ids[$i] == $user_group_id) {
+                                    array_push($details, $bag);
+                                }
+                            }
+                        }
+                        if ($bagSetting->custom_pharmacy == 1) {
+                            $pharmacy_ids = json_decode($bagSetting->pharmacy_ids);
+                            for ($i = 0; $i < count($pharmacy_ids); $i++) {
+                                if ($pharmacy_ids[$i] == $pharmacyId) {
                                     array_push($details, $bag);
                                 }
                             }
@@ -95,4 +106,7 @@ class BagController extends Controller
 
         return response()->json($bag_products, 200);
     }
+
+
+  
 }

@@ -153,7 +153,6 @@ class ProductManager
     {
         $key = explode(' ', $name);
        // $key = [base64_decode($name)];
-
         $paginator = Product::active()->with(['rating'])->where(function ($q) use ($key) {
             foreach ($key as $value) {
                 $q->orWhere('name', 'like', "%{$value}%");

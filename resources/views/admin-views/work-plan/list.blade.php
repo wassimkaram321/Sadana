@@ -94,6 +94,11 @@
                                     </td>
                                     <td>
 
+                                        <a class="btn btn-success btn-sm"
+                                        href="{{route('admin.sales-man.work-plan-details',[$p['id']])}}">
+                                         <i class="tio-visible"></i>{{\App\CPU\translate('Details')}}
+                                        </a>
+
                                         <a class="btn btn-primary btn-sm"
                                            href="{{route('admin.sales-man.work-plan-edit',[$p['id']])}}">
                                             <i class="tio-edit"></i>{{\App\CPU\translate('Edit')}}

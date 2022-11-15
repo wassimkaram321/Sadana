@@ -12,7 +12,9 @@ use App\Model\BagsSetting;
 use App\Model\BagsOrdersDetails;
 use App\Model\BagProduct;
 use App\Model\City;
+use App\Pharamcy;
 use App\Model\Product;
+use App\Pharmacy;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -278,7 +280,9 @@ class BagController extends BaseController
             $bagsSetting->vip = 0;
             $bagsSetting->non_vip = 0;
             $bagsSetting->custom = 0;
+            $bagsSetting->custom_pharmacy = 0;
             $bagsSetting->group_ids = "";
+            $bagsSetting->pharmacy_ids = "";
 
             if ($request->all == 0)
                 $bagsSetting->all = 1;
@@ -286,10 +290,17 @@ class BagController extends BaseController
                 $bagsSetting->vip = 1;
             elseif ($request->all == 2)
                 $bagsSetting->non_vip = 1;
-            else {
+            elseif ($request->all == 3)
+            {
                 $bagsSetting->custom = 1;
                 $bagsSetting->group_ids = json_encode($request->group_ids);
             }
+            else   //Custom Pharmacy
+            {
+                $bagsSetting->custom_pharmacy = 1;
+                $bagsSetting->pharmacy_ids = json_encode($request->pharamcies_ids);
+            }
+
             $bagsSetting->save();
             Toastr::success('Updated successfully!');
             return back();
@@ -304,6 +315,7 @@ class BagController extends BaseController
     {
         $city_id = 0;
         $array = array();
+        $array2=array();
         $groups = [];
         $bag = BagsSetting::where('bag_id', '=', $id)->get()->first();
         if ($bag->group_ids != "") {
@@ -314,8 +326,14 @@ class BagController extends BaseController
             $groupsSelected = Group::whereIn("id", $array)->get();
             $groups = Group::where('city_id', '=', $city_id)->get();
         }
+        if($bag->pharmacy_ids !="" && $bag->pharmacy_ids !=null)
+        {
+            $array2 = json_decode($bag->pharmacy_ids);
+            $pharmaciesSelected = Pharmacy::whereIn("id", $array2)->get();
+        }
         $b = $id;
-        return view('admin-views.bag.setting', compact('bag', 'b', 'city_id', 'array', 'groups'));
+        $pharmacies=Pharmacy::get();
+        return view('admin-views.bag.setting', compact('bag', 'b', 'city_id', 'array', 'groups','pharmacies','array2'));
     }
 
 

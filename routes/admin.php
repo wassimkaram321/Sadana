@@ -805,6 +805,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('work-plan/update/{id}', 'WorkPlanController@work_plan_update')->name('work-plan-update');
             Route::post('work-plan/activation', 'WorkPlanController@work_plan_activation')->name('work-plan-activation');
             Route::get('work-plan/get/pharmacies/{saler_id}', 'WorkPlanController@work_plan_pharmacies')->name('work-plan-pharmacies');
+            Route::get('work-plan/get/details/{plan_id}', 'WorkPlanController@work_plan_details')->name('work-plan-details');
+
 
             Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
 

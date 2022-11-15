@@ -65,7 +65,6 @@
                         <div class="form-group">
                             <div class="row">
 
-
                                 <div class="col-md-12 col-sm-12 justify-content-center mb-4">
 
                                     {{-- <label for="name">{{\App\CPU\translate('Setting')}}</label> --}}
@@ -110,15 +109,24 @@
                                             </div>
                                         </div>
 
+
+                                        <div class="form-control">
+                                            <div class="custom-control custom-radio">
+                                                <input type="radio" class="custom-control-input" value="4" name="all"
+                                                    id="custom_pharmacy" {{(isset($bag->custom_pharmacy) && $bag->custom_pharmacy==1)?'checked':''}}>
+                                                <label class="custom-control-label"
+                                                    for="custom_pharmacy">{{\App\CPU\translate('Custom_Pharmacy')}}</label>
+                                            </div>
+                                        </div>
+
+
+
                                     </div>
 
                                 </div>
 
-
-
-
                             </div>
-
+                         {{-- Begin row for custom group --}}
                             <div class="row"  id="dis" style="display: none">
                                 <div class="col-md-6 col-sm-12">
                                     <label for="">{{\App\CPU\translate('Choose City')}}</label>
@@ -134,11 +142,7 @@
                                     </span>
                                     @enderror
                                 </div>
-
-
                                 <div class="col-md-6 col-sm-12">
-
-
                                     <div class="form-group w-100">
                                         <label for="">{{\App\CPU\translate('Choose group')}}</label>
                                         <select multiple="multiple" name="group_ids[]"
@@ -151,8 +155,23 @@
                                     </div>
 
                                 </div>
-
                             </div>
+                         {{-- End row custom group --}}
+
+
+                       {{-- Begin row for custom pharmacy --}}
+                        <div class="row"  id="dis_pharmacy" style="display: none">
+                            <div class="col-md-12 col-sm-12">
+                                <label for="name">{{\App\CPU\translate('Choose_pharmacies')}}</label>
+                                <select class="js-example-basic-single" multiple="multiple" name="pharamcies_ids[]">
+                                    @foreach ($pharmacies as $pharmacy)
+                                    <option value="{{$pharmacy->id}}" {{is_array($array2) && in_array($pharmacy->id, $array2) ? 'selected' : '' }}>{{$pharmacy->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                       {{-- End row custom pharmacy --}}
+
 
                         </div>
                     </div>
@@ -212,9 +231,6 @@
 
 </script>
 
-
-
-
 <script>
 
     $("document").ready(function() {
@@ -224,12 +240,24 @@
             document.getElementById("dis").style.display = "flex";
         }
 
-     $('#all_custom').on('change', function() {
+        if(document.getElementById("custom_pharmacy").checked==true)
+        {
+            document.getElementById("dis_pharmacy").style.display = "flex";
+        }
+
+    $('#all_custom').on('change', function() {
         document.getElementById("dis").style.display = "flex";
+        document.getElementById("dis_pharmacy").style.display = "none";
+    });
+
+    $('#custom_pharmacy').on('change', function() {
+        document.getElementById("dis_pharmacy").style.display = "flex";
+        document.getElementById("dis").style.display = "none";
     });
 
     $('#all_on,#all_onoff,#all_off').on('change', function() {
         document.getElementById("dis").style.display = "none";
+        document.getElementById("dis_pharmacy").style.display = "none";
     });
 
 });

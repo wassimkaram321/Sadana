@@ -66,7 +66,7 @@ class ProductController extends BaseController
     public function view($id)
     {
         $product = Product::with(['reviews'])->where(['id' => $id])->first();
-      //  dd($product->images);
+        //  dd($product->images);
         $reviews = Review::where(['product_id' => $id])->paginate(Helpers::pagination_limit());
         $brand = Brand::where(['id' => $product->brand_id])->first();
         $store = Store::where(['id' => $product->store_id])->first();
@@ -122,7 +122,7 @@ class ProductController extends BaseController
 
 
         $p = new Product();
-        $p->featured=0;
+        $p->featured = 0;
         $p->user_id = auth('admin')->id();
         $p->added_by = "admin";
         $p->name = $request->name[array_search('en', $request->lang)];
@@ -528,7 +528,7 @@ class ProductController extends BaseController
     public function edit($id)
     {
         $product = Product::withoutGlobalScopes()->with('translations')->find($id);
-       // $product->images=json_decode($product->images,true);
+        // $product->images=json_decode($product->images,true);
         $product_category = json_decode($product->category_ids);
         $product->colors = json_decode($product->colors);
         $categories = Category::where(['parent_id' => 0])->get();
@@ -583,8 +583,8 @@ class ProductController extends BaseController
         }
 
         $product = Product::find($id);
-        if($product->featured==null)
-            $product->featured=0;
+        if ($product->featured == null)
+            $product->featured = 0;
 
         $product->name = $request->name[array_search('en', $request->lang)];
         $category = [];
@@ -723,9 +723,7 @@ class ProductController extends BaseController
                     $product_images[] = ImageManager::upload('product/', 'png', $img);
                 }
                 $product->images = json_encode($product_images);
-            }
-            else
-            {
+            } else {
                 $product_images = json_decode($product->images);
             }
 
@@ -845,7 +843,7 @@ class ProductController extends BaseController
             return back();
         }
 
- $countUpdate=0;
+        $countUpdate = 0;
         $data = [];
         $dataUpdate = [];
         $skip = ['youtube_video_url', 'details', 'thumbnail', 'حد الطلبة'];
@@ -889,7 +887,7 @@ class ProductController extends BaseController
                 'position' => 10,
             ]);
             $brand_name = trim($collection['المجموعة'], " \t.");
-            $brand = Brand::where('name', '=',$brand_name)->get()->first();
+            $brand = Brand::where('name', '=', $brand_name)->get()->first();
             if (isset($brand)) {
                 $brand_id = $brand->id;
             } else {
@@ -901,7 +899,7 @@ class ProductController extends BaseController
                 $brand_id = $NewBrand->id;
             }
 
-            $product = Product::where('num_id', '=',$collection['رمز المادة '])->get()->first();
+            $product = Product::where('num_id', '=', $collection['رمز المادة '])->get()->first();
             if (isset($product)) {
                 $product->num_id = $collection['رمز المادة '];
                 $product->unit_price = $collection['السعر'];
@@ -922,7 +920,7 @@ class ProductController extends BaseController
             } else {
 
                 array_push($data, [
-                    'num_id' =>$collection['رمز المادة '],
+                    'num_id' => $collection['رمز المادة '],
                     'brand_id' => $brand_id,
                     'name' => $collection['اسم المادة'],
                     'unit_price' => $collection['السعر'],
@@ -961,7 +959,7 @@ class ProductController extends BaseController
         if (count($data) > 0) {
             DB::table('products')->insert($data);
         }
-        Toastr::success(count($data) . ' - Products imported successfully! and ('.$countUpdate.') Products updated successfully!');
+        Toastr::success(count($data) . ' - Products imported successfully! and (' . $countUpdate . ') Products updated successfully!');
         return back();
     }
 
@@ -1037,7 +1035,7 @@ class ProductController extends BaseController
 
 
         $data = [];
-        $statusUpdate=0;
+        $statusUpdate = 0;
         $skip = ['youtube_video_url', 'details', 'thumbnail'];
 
         foreach ($collections as $collection) {
@@ -1048,7 +1046,7 @@ class ProductController extends BaseController
             //         return back();
             //     }
             // }
-            $product = Product::where('num_id', '=',$collection['رمز المادة'])->get()->first();
+            $product = Product::where('num_id', '=', $collection['رمز المادة'])->get()->first();
             //$product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
             if (isset($product)) {
                 $product->purchase_price = $collection['السعر'];
@@ -1057,7 +1055,7 @@ class ProductController extends BaseController
             }
         }
 
-        Toastr::success('('.$statusUpdate. ') Products purchase price updated successfully!');
+        Toastr::success('(' . $statusUpdate . ') Products purchase price updated successfully!');
         return back();
     }
 }

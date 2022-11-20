@@ -211,7 +211,7 @@
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <label for="name">{{ \App\CPU\translate('expiry date') }}</label>
                                     <input type="date" step="0.01" name="expiry_date"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
+                                        class="js-example-basic-multiple form-control" style="width: 100%;" required>
                                 </div>
                             </div>
 
@@ -263,7 +263,7 @@
                                     </div>
 
                                     <div class="col-sm-6 col-md-4 col-lg-4" id="Number">
-                                        <label  
+                                        <label
                                             class="control-label">{{\App\CPU\translate('Product')}} {{\App\CPU\translate('Number')}}</label>
                                         <input type="number" min="0" value="0" step="1"
                                                placeholder="{{\App\CPU\translate('Product_Number')}}"

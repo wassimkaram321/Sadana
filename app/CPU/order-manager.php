@@ -492,6 +492,9 @@ class OrderManager
                 else
                 $pure_price=0;
 
+                $pharmacy = Pharmacy::where('id',$user->id)->get()->first();
+                OrderManager::products_points($user->id,$product,$order_id,$c['quantity']);
+
                 $or_d = [
                     'order_id' => $order_id,
                     'product_id' => $c['product_id'],
@@ -710,37 +713,6 @@ class OrderManager
     }
 
 
-    public function products_points($pharmacy_id, $products)
-    {
-        # code...
-        $points = 0;
-        $productpoint = ProductPoint::wheretype('product')->get();
-        foreach ($productpoint as $p) {
-
-            foreach ($products as $product) {
-
-                $idx = json_decode($p->type_id);
-                if (in_array($product->id, $idx)) {
-                    $points = $points + $p->points;
-                }
-            }
-        }
-        if ($points != 0) {
-            $pharmacy = PharmaciesPoints::where('pharmacy_id', $pharmacy_id)->first();
-            if (isset($pharmacy)) {
-                $pharmacy->points = $pharmacy->points + $points;
-                $pharmacy->save();
-            } else {
-                $pharmacy_points = new PharmaciesPoints();
-                $pharmacy_points->pharmacy_id = $pharmacy_id;
-                $pharmacy_points->points = $points;
-                $pharmacy_points->save();
-            }
-        }
-        return $points;
-    }
-
-
     public function bags_points($pharmacy_id, $bags)
     {
         # code...
@@ -844,6 +816,36 @@ class OrderManager
                 }
             }
         }
+    }
+
+
+    public static  function products_points($pharmacy_id, $product,$order_id,$product_quantity)
+    {
+        # code...
+        $points = 0;
+        $productpoint = ProductPoint::wheretype('product')->get();
+        foreach ($productpoint as $p) {
+
+            // foreach ($products as $product) {
+
+                $idx = json_decode($p->type_id);
+                if (in_array($product->id, $idx)) {
+                    $points = $points + $p->points;
+                }
+            // }
+        }
+
+        if ($points != 0) {
+                $points = $points*$product_quantity;
+                $pharmacy_points = new PharmaciesPoints();
+                $pharmacy_points->points = $pharmacy_points->points + $points;
+
+                $pharmacy_points->pharmacy_id = $pharmacy_id;
+                $pharmacy_points->point_order_id = $order_id;
+                $pharmacy_points->points = $points;
+                $pharmacy_points->save();
+        }
+        return $points;
     }
 
 

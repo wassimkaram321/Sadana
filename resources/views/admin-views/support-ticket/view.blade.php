@@ -189,11 +189,11 @@
                                         <td>{{$ticket->subject}}</td>
                                         <td>{{$ticket->priority}}</td>
                                         <td><label class="switch"><input type="checkbox" class="status"
-                                                                         id="{{$ticket->id}}" <?php if ($ticket->status == 'open') echo "checked" ?>><span
+                                                                         id="{{$ticket->id}}" {{  ($ticket->status = 'open'? 'checked' : '') }}  ><span
                                                     class="slider round"></span></label></td>
                                         <td>
                                             <a href="{{route('admin.support-ticket.singleTicket',$ticket['id'])}}"
-                                               class="btn btn-primary   btn-sm">{{\App\CPU\translate('View')}}</a>
+                                               class="btn btn-primary btn-sm">{{\App\CPU\translate('View')}}</a>
                                         </td>
                                     </tr>
                                 @endforeach

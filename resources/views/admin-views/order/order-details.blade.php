@@ -277,6 +277,19 @@
                             </p>
                             @endif
                         </div>
+
+                        <div class="col-6 pt-2">
+                            @if ($order->delivery_date !=null)
+                            <span class="font-weight-bold text-capitalize">
+                                {{\App\CPU\translate('delivery_date')}} :
+                            </span>
+                            <p class="pl-1">
+                                {{$order->delivery_date}}
+                            </p>
+                            @endif
+                        </div>
+
+
                     </div>
                 </div>
                 <!-- End Header -->

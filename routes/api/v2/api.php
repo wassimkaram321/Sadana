@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace' => 'api\v2', 'prefix' => 'v2', 'middleware' => ['api_lang']], function () {
+
+
+
     Route::group(['prefix' => 'seller', 'namespace' => 'seller'], function () {
 
         Route::get('seller-info', 'SellerController@seller_info');
@@ -42,7 +45,7 @@ Route::group(['namespace' => 'api\v2', 'prefix' => 'v2', 'middleware' => ['api_l
             Route::get('list', 'RefundController@list');
             Route::get('refund-details', 'RefundController@refund_details');
             Route::post('refund-status-update', 'RefundController@refund_status_update');
-            
+
         });
 
         Route::group(['prefix' => 'shipping'], function () {
@@ -77,6 +80,7 @@ Route::group(['namespace' => 'api\v2', 'prefix' => 'v2', 'middleware' => ['api_l
         Route::group(['prefix' => 'auth', 'namespace' => 'auth'], function () {
             Route::post('login', 'LoginController@login');
         });
+
 
         Route::group(['middleware' => ['delivery_man_auth']], function () {
             Route::get('info', 'DeliveryManController@info');

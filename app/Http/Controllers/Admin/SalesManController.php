@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\DB;
 use App\Model\City;
+use App\Model\SalerTeam;
 use App\Model\Area;
 use App\Model\Group;
 use Illuminate\Support\Facades\Crypt;
@@ -42,6 +43,10 @@ class SalesManController extends Controller
         }
 
         $sales_men = $sales_men->latest()->where(['user_type' => 'salesman'])->paginate(25)->appends($query_param);
+        foreach ($sales_men as $saler) {
+            $team = SalerTeam::where('saler_id', '=',$saler->id)->get()->first();
+            $saler['team'] = $team->team;
+        }
         return view('admin-views.sales-man.list', compact('sales_men', 'search'));
     }
 
@@ -70,11 +75,11 @@ class SalesManController extends Controller
     {
 
         $all_areas_assign = [];
-        $all_groups_assign=[];
+        $all_groups_assign = [];
         $sm = User::where(['id' => $id])->first();
         $pharma_id  = DB::select('select pharmacy_id from sales_pharmacy where sales_id = ?', [$id]);
         $area_id  = DB::select('select area_id from sales_area where sales_id = ?', [$id]);
-        $group_id  = DB::select('select group_id from sales_group where sales_id = ?',[$id]);
+        $group_id  = DB::select('select group_id from sales_group where sales_id = ?', [$id]);
 
         $arr = array();
         foreach ($pharma_id as $idx) {
@@ -126,8 +131,8 @@ class SalesManController extends Controller
         } else {
             $all_groups = Group::all();
         }
-       // dd($all_groups_assign);
-        return view('admin-views.sales-man.view', compact('sm', 'pharmacies','all_groups','all_groups_assign', 'all_pharmacies', 'all_areas', 'all_areas_assign'));
+        // dd($all_groups_assign);
+        return view('admin-views.sales-man.view', compact('sm', 'pharmacies', 'all_groups', 'all_groups_assign', 'all_pharmacies', 'all_areas', 'all_areas_assign'));
     }
 
 
@@ -152,14 +157,12 @@ class SalesManController extends Controller
         foreach ($pharmacies as $pharma) {
             $query = DB::table('sales_pharmacy')
                 ->select(['id'])
-                ->where('sales_id','=',$id)
-                ->where('pharmacy_id','=',$pharma)
+                ->where('sales_id', '=', $id)
+                ->where('pharmacy_id', '=', $pharma)
                 ->get()->first();
-            if(isset($query)==false)
-            {
+            if (isset($query) == false) {
                 $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
             }
-
         }
         return redirect()->back();
     }
@@ -201,12 +204,11 @@ class SalesManController extends Controller
             foreach ($users as $user) {
                 $pharmacy = Pharmacy::where('user_id', $user->id)->get()->first();
                 $query = DB::table('sales_pharmacy')
-                ->select(['id'])
-                ->where('sales_id','=',$id)
-                ->where('pharmacy_id','=',$pharmacy->id)
-                ->get()->first();
-                if(isset($query)==false)
-                {
+                    ->select(['id'])
+                    ->where('sales_id', '=', $id)
+                    ->where('pharmacy_id', '=', $pharmacy->id)
+                    ->get()->first();
+                if (isset($query) == false) {
                     DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
                 }
             }
@@ -216,10 +218,10 @@ class SalesManController extends Controller
 
 
     //Group
-    public function unassign_group(Request $request,$id)
+    public function unassign_group(Request $request, $id)
     {
         $group_id = $id;
-        $array_area=[];
+        $array_area = [];
         $validator = Validator::make($request->all(), [
             'saler_id' => 'required',
         ], [
@@ -227,9 +229,8 @@ class SalesManController extends Controller
         ]);
         $decrypted = Crypt::decrypt($request->saler_id);
 
-        $area_ids=Area::where('group_id','=',$group_id)->get(['id']);
-        foreach($area_ids as $a)
-        {
+        $area_ids = Area::where('group_id', '=', $group_id)->get(['id']);
+        foreach ($area_ids as $a) {
             array_push($array_area, $a->id);
         }
         $pharmacies = Pharmacy::join("users", "users.id", "=", "pharmacies.user_id")
@@ -241,8 +242,7 @@ class SalesManController extends Controller
         foreach ($pharmacies as $pharma) {
             DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $pharma['pharma_id'] . ' AND sales_id=' . $decrypted . '');
         }
-        foreach($area_ids as $a)
-        {
+        foreach ($area_ids as $a) {
             DB::delete('delete FROM sales_area WHERE area_id =' . $a->id . ' AND sales_id=' . $decrypted . '');
         }
         DB::delete('delete FROM sales_group WHERE group_id =' . $group_id . ' AND sales_id=' . $decrypted . '');
@@ -258,27 +258,24 @@ class SalesManController extends Controller
             $areas = Area::where('group_id', '=', $group_id)->get();
             foreach ($areas as $area) {
                 $query = DB::table('sales_area')
-                ->select(['id'])
-                ->where('sales_id','=',$id)
-                ->where('area_id','=',$area->id)
-                ->get()->first();
-                if(isset($query)==false)
-                {
+                    ->select(['id'])
+                    ->where('sales_id', '=', $id)
+                    ->where('area_id', '=', $area->id)
+                    ->get()->first();
+                if (isset($query) == false) {
                     DB::insert('insert into sales_area (sales_id, area_id) values (?, ?)', [$id, $area->id]);
                 }
                 $users = User::with(['pharmacy'])->where('area_id', $area->id)->where('user_type', 'pharmacist')->get();
                 foreach ($users as $user) {
                     $pharmacy = Pharmacy::where('user_id', $user->id)->get()->first();
                     $query = DB::table('sales_pharmacy')
-                    ->select(['id'])
-                    ->where('sales_id','=',$id)
-                    ->where('pharmacy_id','=',$pharmacy->id)
-                    ->get()->first();
-                    if(isset($query)==false)
-                    {
+                        ->select(['id'])
+                        ->where('sales_id', '=', $id)
+                        ->where('pharmacy_id', '=', $pharmacy->id)
+                        ->get()->first();
+                    if (isset($query) == false) {
                         DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharmacy->id]);
                     }
-
                 }
             }
         }
@@ -290,16 +287,20 @@ class SalesManController extends Controller
     {
         $request->validate([
             'f_name' => 'required',
-            'email' => 'required',
             'phone' => 'required',
-            'email' => 'required|unique:users',
-            'phone' => 'required|unique:users',
+            'email' => 'required|unique:users,email',
+            'phone' => 'required|unique:users,phone',
             'area_id' => 'required',
             'group_id' => 'required',
             'city_id' => 'required',
+            'team_char' => 'required',
         ], [
-            'f_name.required' => 'First name is required!'
+            'email.required' => 'Email is required!',
+            'phone.required' => 'Phone is required!',
+            'f_name.required' => 'First name is required!',
+            'team_char.required' => 'Team is required!'
         ]);
+
 
         $area = Area::where('id', $request->area_id)->get()->first();
         $group = Group::where('id', $area->group_id)->get()->first();
@@ -319,6 +320,12 @@ class SalesManController extends Controller
         $sm->phone = $request->phone;
         $sm->password = bcrypt($request->password);
         $sm->save();
+
+
+        $team = new SalerTeam();
+        $team->saler_id = $sm->id;
+        $team->team = $request->team_char;
+        $team->save();
 
         Toastr::success('Sales-man added successfully!');
         return redirect('admin/sales-man/list');

@@ -16,15 +16,16 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required',
-            'password' => 'required|min:6'
+            //'email' => 'required',
+            'password' => 'required|min:6',
+            'phone' => 'required|min:10'
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $d_man = DeliveryMan::where(['email' => $request['email']])->first();
+        $d_man = DeliveryMan::where(['phone' => $request['phone']])->first();
         if (isset($d_man) && $d_man['is_active'] == 1 && Hash::check($request->password, $d_man->password)) {
             $token = Str::random(50);
             $d_man->auth_token = $token;

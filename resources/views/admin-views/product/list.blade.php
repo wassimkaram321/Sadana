@@ -64,6 +64,7 @@
                                 <th>{{\App\CPU\translate('selling_price')}}</th>
                                 <th>{{\App\CPU\translate('featured')}}</th>
                                 <th>{{\App\CPU\translate('Active')}} {{\App\CPU\translate('status')}}</th>
+                                <th>{{\App\CPU\translate('Pure_price_status')}}</th>
                                 <th style="width: 5px" class="text-center">{{\App\CPU\translate('Action')}}</th>
                             </tr>
                             </thead>
@@ -96,6 +97,15 @@
                                             <span class="slider round"></span>
                                         </label>
                                     </td>
+
+                                    <td>
+                                        <label class="switch switch-pure_price_status">
+                                            <input type="checkbox" class="pure_price_status"
+                                                   id="{{$p['id']}}" {{$p->pure_price_status == 1?'checked':''}}>
+                                            <span class="slider round"></span>
+                                        </label>
+                                    </td>
+
                                     <td>
                                         <a class="btn btn-info btn-sm"
                                            href="{{route('admin.product.view',[$p['id']])}}">
@@ -178,6 +188,41 @@
                 }
             });
         });
+
+
+        $(document).on('change', '.pure_price_status', function () {
+            var id = $(this).attr("id");
+            if ($(this).prop("checked") == true) {
+                var pure_price_status = 1;
+            } else if ($(this).prop("checked") == false) {
+                var pure_price_status = 0;
+            }
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "{{route('admin.product.pure-price-status-update')}}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    status: pure_price_status
+                },
+                success: function (data) {
+                    if(data.success == true) {
+                        toastr.success('{{\App\CPU\translate('Pure price status updated successfully')}}');
+                    }
+                    else if(data.success == false) {
+                        toastr.error('{{\App\CPU\translate('Pure price status updated failed')}}');
+                        setTimeout(function(){
+                            location.reload();
+                        }, 2000);
+                    }
+                }
+            });
+        });
+
 
         function featured_status(id) {
             $.ajaxSetup({

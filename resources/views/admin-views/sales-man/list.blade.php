@@ -44,14 +44,14 @@
                                     <!-- End Search -->
                                 </form>
                             </div>
-                            
+
                             <div class="col-12 col-md-8 text-right">
                                 <a href="{{route('admin.sales-man.add')}}" class="btn btn-primary pull-right"><i
                                         class="tio-add-circle"></i> {{\App\CPU\translate('add')}} {{\App\CPU\translate('salesman')}}
                                 </a>
                             </div>
                         </div>
-                        
+
                     </div>
                     <!-- End Header -->
 
@@ -62,8 +62,8 @@
                             <thead class="thead-light">
                             <tr>
                                 <th>{{\App\CPU\translate('#')}}</th>
-                                <th style="width: 30%">{{\App\CPU\translate('name')}}</th>
-                                
+                                <th>{{\App\CPU\translate('name')}}</th>
+                                <th>{{\App\CPU\translate('Team')}}</th>
                                 <th>{{\App\CPU\translate('email')}}</th>
                                 <th>{{\App\CPU\translate('phone')}}</th>
                                 {{-- <th>{{\App\CPU\translate('status')}}</th> --}}
@@ -81,6 +81,11 @@
                                             {{$sm['f_name'].' '.$sm['l_name']}}
                                         </span>
                                     </td>
+
+                                    <td>
+                                        {{$sm['team']}}
+                                    </td>
+
                                     {{-- <td>
                                         <div style="overflow-x: hidden;overflow-y: hidden">
                                             <img width="60" style="border-radius: 50%;height: 60px; width: 60px;"

@@ -21,6 +21,7 @@
             </ol>
         </nav>
 
+        
         <!-- Content Row -->
         <div class="row">
             <div class="col-md-12">
@@ -85,6 +86,7 @@
                         </div>
                     </div>
 
+
                     <div class="card mt-2 rest-part">
                         <div class="card-header">
                             <h4>{{\App\CPU\translate('General Info')}}</h4>
@@ -135,6 +137,7 @@
                                 </div>
 
                             </div>
+
 
                             <div class="form-group">
                                 <div class="row">
@@ -212,6 +215,7 @@
                     </div>
 
 
+
                     <div class="card mt-2 rest-part">
                         <div class="card-header">
                             <h4>{{ \App\CPU\translate('Production & expiry date') }}</h4>
@@ -229,13 +233,12 @@
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <label for="name">{{ \App\CPU\translate('expiry date') }}</label>
                                     <input  value={{$product->expiry_date}} type="date" step="0.01" name="expiry_date"
-                                        class="js-example-basic-multiple form-control" style="width: 100%;">
+                                        class="js-example-basic-multiple form-control" style="width: 100%;" required>
                                 </div>
                             </div>
 
                         </div>
                     </div>
-
 
 
 

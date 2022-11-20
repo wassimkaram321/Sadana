@@ -17,6 +17,7 @@ class CreatePharmaciesPointsTable extends Migration
             $table->id();
             $table->integer('pharmacy_id');
             $table->integer('points');
+            $table->integer('point_order_id');
             $table->timestamps();
         });
     }

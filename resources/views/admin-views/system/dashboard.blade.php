@@ -89,6 +89,33 @@
                 </div>
             </div>
 
+
+
+
+
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row flex-between gx-2 gx-lg-3 mb-2">
+                        <div>
+                            <h4><i style="font-size: 30px"
+                                   class="tio-chart-bar-4"></i>{{\App\CPU\translate('dashboard_system_statistics')}}</h4>
+                        </div>
+
+                    </div>
+                    <div class="row gx-2 gx-lg-3" id="order_stats">
+                        @include('admin-views.partials._dashboard-system-stats',['data'=>$data])
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
             <!-- End Stats -->
             <div class="card mb-3">
                 <div class="card-body">

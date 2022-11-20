@@ -177,7 +177,7 @@
 
 
                             <td>
-                                @if($pharmacyPlan->site_match=='match' || $pharmacyPlan->site_match==1)
+                                @if($pharmacyPlan->site_match==1)
                                     <span class="badge badge-soft-success">
                                       <span class="legend-indicator bg-success"
                                             style="{{Session::get('direction') === "rtl" ? 'margin-right: 0;margin-left: .4375rem;' : 'margin-left: 0;margin-right: .4375rem;'}}"></span>{{\App\CPU\translate('Matching')}}

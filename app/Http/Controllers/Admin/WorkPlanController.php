@@ -45,10 +45,13 @@ class WorkPlanController extends Controller
 
     public function work_plan_add()
     {
-        $salesman = User::where('user_type', '=', "salesman")->get();
+
+        $salerSelected = WorkPlan::get(['saler_id']);
+        $salesman = User::where('user_type','=','salesman')->whereNotIn('id', $salerSelected)->get();
         return view('admin-views.work-plan.add', compact('salesman'));
     }
 
+    
     public function work_plan_store(Request $request)
     {
 
@@ -177,11 +180,11 @@ class WorkPlanController extends Controller
                 $site_match = 0;
                 $street_address = " ";
                 $pharmacy = Pharmacy::where('id', '=', $c->Wpharmacy_id)->get()->first();
-                $res=$this->get_location($c->Wlat, $c->Wlng);
+                $res = $this->get_location($c->lat, $c->lng);
                 $c['pharmacy_name'] = $pharmacy->name;
                 $c['area'] = $res["area"];
                 $c['street_address'] = $res["street"];
-                $c['site_match'] = $this->site_match($c->Wlat,$c->Wlng,$pharmacy->lat,$pharmacy->lan);
+                $c['site_match'] = $this->site_match($c->Wlat, $c->Wlng, $pharmacy->lat, $pharmacy->lan);
             }
         } catch (Exception $e) {
             return redirect('admin/sales-man/work-plans/list');
@@ -192,39 +195,38 @@ class WorkPlanController extends Controller
     public function get_location($lat, $lng)
     {
 
-        $res=array();
+        $res = array();
         try {
-        $apikey = "AIzaSyCPsxZeXKcSYK1XXw0O0RbrZiI_Ekou5DY";
-        $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apikey";
-        $header = array(
-            "authorization: key=" . $apikey . "",
-            "content-type: application/json"
-        );
-        $ch = curl_init();
-        $timeout = 120;
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        // Get URL content
-        $result =curl_exec($ch);
+            $apikey = "AIzaSyCPsxZeXKcSYK1XXw0O0RbrZiI_Ekou5DY";
+            $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apikey";
+            $header = array(
+                "authorization: key=" . $apikey . "",
+                "content-type: application/json"
+            );
+            $ch = curl_init();
+            $timeout = 120;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            // Get URL content
+            $result = curl_exec($ch);
 
-        $result=json_decode($result);
-        // close handle to release resources
-        curl_close($ch);
+            $result = json_decode($result);
+            // close handle to release resources
+            curl_close($ch);
 
-       return $res=[
-        'area' => $result->results[0]->address_components[2]->long_name,
-        'street'=> $result->results[0]->address_components[1]->long_name
-       ];
-    } catch (Exception $e) {
-        return $res=[
-            'area' => " ",
-            'street'=> " "
-           ];
-    }
-
+            return $res = [
+                'area' => $result->results[0]->address_components[2]->long_name,
+                'street' => $result->results[0]->address_components[1]->long_name
+            ];
+        } catch (Exception $e) {
+            return $res = [
+                'area' => " ",
+                'street' => " "
+            ];
+        }
     }
 
 

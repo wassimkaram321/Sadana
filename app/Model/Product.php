@@ -30,6 +30,7 @@ class Product extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'shipping_cost'=>'float',
+        'pure_price_status'=>'integer',
         'multiply_qty'=> 'integer',
         'temp_shipping_cost'=>'float',
         'is_shipping_cost_updated'=>'integer',

@@ -90,7 +90,7 @@ class ProductController extends BaseController
 
             'demand_limit' => 'required|gt:-1|numeric',
             'expiry_date' => 'required|date',
-            'production_date' => 'required|date',
+            //'production_date' => 'required|date',
             'q_featured_offer' => 'required|numeric',
             'featured_offer' => 'required|numeric',
             'q_normal_offer' => 'required|numeric',
@@ -162,7 +162,7 @@ class ProductController extends BaseController
         $p->num_id = $request->num_id;
         $p->demand_limit = $request->demand_limit;
         $p->expiry_date = $request->expiry_date;
-        $p->production_date = $request->production_date;
+        $p->production_date = 2022-11-02;
         $p->q_featured_offer = $request->q_featured_offer;
         $p->featured_offer = $request->featured_offer;
         $p->normal_offer = $request->normal_offer;
@@ -459,6 +459,28 @@ class ProductController extends BaseController
             'success' => $success,
         ], 200);
     }
+
+
+    public function pure_price_status_update(Request $request)
+    {
+        $product = Product::where(['id' => $request['id']])->first();
+        $success = 1;
+        if ($request['status'] == 1) {
+            if ($product->added_by == 'seller' && $product->request_status == 0) {
+                $success = 0;
+            } else {
+                $product->pure_price_status = $request['status'];
+            }
+        } else {
+            $product->pure_price_status = $request['status'];
+        }
+        $product->save();
+        return response()->json([
+            'success' => $success,
+        ], 200);
+    }
+
+
     public function updated_shipping(Request $request)
     {
 
@@ -553,7 +575,7 @@ class ProductController extends BaseController
 
             'demand_limit' => 'required|gt:-1|numeric',
             'expiry_date' => 'required|date',
-            'production_date' => 'required|date',
+           // 'production_date' => 'required|date',
             'q_featured_offer' => 'required|numeric',
             'featured_offer' => 'required|numeric',
             'q_normal_offer' => 'required|numeric',
@@ -615,7 +637,6 @@ class ProductController extends BaseController
 
         $product->demand_limit = $request->demand_limit;
         $product->expiry_date = $request->expiry_date;
-        $product->production_date = $request->production_date;
         $product->q_featured_offer = $request->q_featured_offer;
         $product->featured_offer = $request->featured_offer;
         $product->normal_offer = $request->normal_offer;

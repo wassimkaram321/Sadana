@@ -6,6 +6,7 @@ use App\Pharmacy;
 use App\CPU\Helpers;
 use App\User;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class PharmacyController extends Controller
@@ -110,6 +111,23 @@ class PharmacyController extends Controller
     public function destroy(Pharmacy $pharmacy)
     {
         //
+    }
+
+    public function pharmacy_points(Request $request)
+    {
+        //
+        $user = Helpers::get_customer($request);
+
+        try {
+        $points = DB::table('pharmacies_points')->where('pharmacy_id',$user->id)->sum('points');
+
+        $points = (int)$points;
+        } catch (\Exception $e) {
+            return response()->json(['errors' => $e], 403);
+        }
+
+        return response()->json($points, 200);
+
     }
 
 

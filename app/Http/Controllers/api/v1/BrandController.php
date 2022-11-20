@@ -19,7 +19,6 @@ class BrandController extends Controller
             );
         } catch (\Exception $e) {
         }
-
         return response()->json($brands, 200);
     }
 

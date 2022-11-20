@@ -53,6 +53,9 @@ class SupportTicketController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ];
+        $data=SupportTicket::where('id','=',$request->id)->get()->first();
+        $data->status="open";
+        $data->save();
         SupportTicketConv::insert($reply);
         return redirect()->back();
     }

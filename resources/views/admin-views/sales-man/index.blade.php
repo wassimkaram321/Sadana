@@ -68,7 +68,7 @@
                                 <div class="col-md-6 col-12">
 
                                     <div class="form-group">
-                                        <label for="">Choose City</label>
+                                        <label for="">{{ \App\CPU\translate('Choose_City') }}</label>
                                         <select name="city_id" class="form-control @error('city') is-invalid @enderror">
                                             <option value="">select</option>
                                             @foreach (App\Model\City::all() as $key => $city)
@@ -83,7 +83,7 @@
 
                                     </div>
                                     <div class="form-group">
-                                        <label for="">Choose area</label>
+                                        <label for="">{{ \App\CPU\translate('Choose_area') }}</label>
                                         <select name="area_id" class="form-control @error('area') is-invalid @enderror">
                                             <option value="">select</option>
                                         </select>
@@ -96,12 +96,29 @@
                                 <div class="col-md-6 col-12">
 
                                     <div class="form-group">
-                                        <label for="">Choose group</label>
+                                        <label for="">{{ \App\CPU\translate('Choose_group')}}</label>
                                         <select name="group_id" class="form-control @error('group') is-invalid @enderror" required>
                                             <option value="0" selected disabled>select</option>
                                         </select>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="">Choose Team</label>
+                                        <select name="team_char" class="form-control @error('group') is-invalid @enderror" required>
+                                            <option value="A" selected >Team A</option>
+                                            <option value="B" selected >Team B</option>
+                                            <option value="C" selected >Team C</option>
+                                            <option value="D" selected >Team D</option>
+                                            <option value="E" selected >Team E</option>
+                                            <option value="F" selected >Team F</option>
+                                            <option value="G" selected >Team G</option>
+                                            <option value="H" selected >Team H</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6 col-12">
 
                                     <div class="form-group">
                                         <label class="input-label"
@@ -109,6 +126,7 @@
                                         <input type="text" name="password" class="form-control"
                                             placeholder="Ex : password" required>
                                     </div>
+
                                 </div>
 
                             </div>

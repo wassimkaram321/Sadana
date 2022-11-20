@@ -71,7 +71,18 @@ class CustomerController extends Controller
 
     public function get_support_tickets(Request $request)
     {
-        return response()->json(SupportTicket::where('customer_id', $request->user()->id)->get(), 200);
+        $tickets=SupportTicket::where('customer_id', $request->user()->id)->get();
+        foreach($tickets as $ticket)
+        {
+            if($ticket['status']=='open')
+                $ticket['status']=1;   //open
+            elseif($ticket['status']=='close')
+                $ticket['status']=0;   //close
+            else
+                $ticket['status']=2;  //pending
+        }
+        return response()->json($tickets, 200);
+
     }
 
     public function get_support_ticket_conv($ticket_id)

@@ -2228,4 +2228,38 @@
   'Choose_area' => 'Choose area',
   'Choose_group' => 'Choose group',
   'Team' => 'Team',
+  'scheduling List (Orders Pending and Proccing)' => 'Scheduling List (Orders Pending and Proccing)',
+  'scheduling_list : ' => 'Scheduling list : ',
+  'Orders -> ' => 'Orders -  ',
+  'Confirmed ,' => 'Confirmed  ',
+  'Confirmed |' => 'Confirmed |',
+  'Orders (' => 'Orders (',
+  'Processing )' => 'Processing )',
+  'Salers Report' => 'Salers Report',
+  'Sales team sales ( Order Report )' => 'Sales team sales ( Order Report )',
+  'Sales Team ( Order Report )' => 'Sales Team ( Order Report )',
+  'Total Price ' => 'Total Price ',
+  'InHouse bag sale report' => 'InHouse bag sale report',
+  'InHouse product sale
+                        report' => 'InHouse product sale
+                        report',
+  'InHouse bag sale
+                        report' => 'InHouse bag sale
+                        report',
+  'Order Report Overview' => 'Order Report Overview',
+  'Show data by date
+                                range' => 'Show data by date
+                                range',
+  'Tasks' => 'Tasks',
+  'Work Plan Board' => 'Work Plan Board',
+  'Thursday' => 'Thursday',
+  'Friday' => 'Friday',
+  'Saturday' => 'Saturday',
+  'Sunday' => 'Sunday',
+  'Monday' => 'Monday',
+  'Tuesday' => 'Tuesday',
+  'Wednesday' => 'Wednesday',
+  'Payment status updated' => 'Payment status updated',
+  'Begin_Plan:' => 'Begin Plan:',
+  'End_Plan:' => 'End Plan:',
 );

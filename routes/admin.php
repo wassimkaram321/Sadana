@@ -628,6 +628,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
         Route::group(['prefix' => 'bonuses', 'as' => 'bonuses.'], function () {
             // Bonuses
             Route::get('get_salve_products', 'BounusController@get_salve_products')->name('get_salve_products');
+            Route::get('get_main_products', 'BounusController@get_main_products')->name('get_main_products');
             Route::get('list', 'BounusController@index')->name('bonuses_list');
             Route::get('create', 'BounusController@create')->name('create');
             Route::post('store', 'BounusController@store')->name('store');
@@ -671,6 +672,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('payment-status', 'OrderController@payment_status')->name('payment-status');
             Route::post('productStatus', 'OrderController@productStatus')->name('productStatus');
             Route::get('generate-invoice/{id}', 'OrderController@generate_invoice')->name('generate-invoice');
+
             Route::get('inhouse-order-filter', 'OrderController@inhouse_order_filter')->name('inhouse-order-filter');
 
 
@@ -689,7 +691,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('add-pharmacy-man/{order_id}/{d_man_id}', 'OrderController@add_pharmacy_man')->name('add-pharmacy-man');
 
            //generate excel file
+           Route::get('generate-excel/all', 'OrderController@generate_excel_all')->name('generate-excel-all');
             Route::get('generate-excel/{order_id}', 'OrderController@generate_excel')->name('generate-excel');
+
         });
 
 
@@ -797,6 +801,9 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('update/{id}', 'SalesManController@update')->name('update');
             Route::get('preview/{id}', 'SalesManController@preview')->name('preview');
 
+
+            Route::get('orders/team', 'SalesManController@orders_report_team')->name('orders-report-teams');
+            Route::any('team/set-date', 'SalesManController@set_date')->name('team-set-date');
             //Work Plan
             Route::get('work-plans/list', 'WorkPlanController@work_plans_list')->name('work-plans');
             Route::get('work-plan/add', 'WorkPlanController@work_plan_add')->name('work-plan-add');
@@ -808,6 +815,8 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('work-plan/get/pharmacies/{saler_id}', 'WorkPlanController@work_plan_pharmacies')->name('work-plan-pharmacies');
             Route::get('work-plan/get/details/{plan_id}', 'WorkPlanController@work_plan_details')->name('work-plan-details');
 
+            Route::get('work-plan/tasks/{id}', 'WorkPlanController@work_plan_tasks')->name('work-plan-tasks');
+            Route::post('work-plan/task/store/{id}', 'WorkPlanController@work_plan_task_store')->name('work-plan-task-store');
 
             Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
 

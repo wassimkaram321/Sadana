@@ -7,150 +7,158 @@
 @endpush
 
 @section('content')
-    <div class="content container-fluid">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="media mb-3">
-                <!-- Avatar -->
-                <div class="avatar avatar-xl avatar-4by3 {{Session::get('direction') === "rtl" ? 'ml-2' : 'mr-2'}}">
-                    <img class="avatar-img" src="{{asset('public/assets/back-end')}}/svg/illustrations/order.png"
-                         alt="Image Description">
-                </div>
-                <!-- End Avatar -->
-
-                <div class="media-body">
-                    <div class="row">
-                        <div class="col-lg mb-3 mb-lg-0 {{Session::get('direction') === "rtl" ? 'mr-2' : 'ml-2'}}"
-                             style="display: block; text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
-                            <div>
-                                <h1 class="page-header-title">{{\App\CPU\translate('Order')}} {{\App\CPU\translate('Report')}}  {{\App\CPU\translate('Overview')}}</h1>
-                            </div>
-
-                            <div class="row align-items-center">
-                                <div class="flex-between col-auto">
-                                    <h5 class="text-muted {{Session::get('direction') === "rtl" ? 'ml-1' : 'mr-1'}}">{{\App\CPU\translate('Admin')}}
-                                        :</h5>
-                                    <h5 class="text-muted">{{auth('admin')->user()->name}}</h5>
-                                </div>
-
-                                <div class="col-auto">
-                                    <div class="row align-items-center g-0">
-                                        <h5 class="text-muted col-auto {{Session::get('direction') === "rtl" ? 'pl-2' : 'pr-2'}}">{{\App\CPU\translate('Date')}}</h5>
-
-                                        <!-- Flatpickr -->
-                                        <h5 class="text-muted">( {{session('from_date')}} - {{session('to_date')}}
-                                            )</h5>
-                                        <!-- End Flatpickr -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-auto">
-                            <div class="d-flex">
-                                <a class="btn btn-icon btn-primary rounded-circle" href="{{route('admin.dashboard')}}">
-                                    <i class="tio-home-outlined"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="content container-fluid">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="media mb-3">
+            <!-- Avatar -->
+            <div class="avatar avatar-xl avatar-4by3 {{Session::get('direction') === " rtl" ? 'ml-2' : 'mr-2' }}">
+                <img class="avatar-img" src="{{asset('public/assets/back-end')}}/svg/illustrations/order.png"
+                    alt="Image Description">
             </div>
-            <!-- End Media -->
+            <!-- End Avatar -->
 
-            <!-- Nav -->
-            <!-- Nav -->
-            <div class="js-nav-scroller hs-nav-scroller-horizontal">
-            <span class="hs-nav-scroller-arrow-prev" style="display: none;">
-              <a class="hs-nav-scroller-arrow-link" href="javascript:;">
-                <i class="tio-chevron-{{Session::get('direction') === "rtl" ? 'right' : 'left'}}"></i>
-              </a>
-            </span>
-
-                <span class="hs-nav-scroller-arrow-next" style="display: none;">
-              <a class="hs-nav-scroller-arrow-link" href="javascript:;">
-                <i class="tio-chevron-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}"></i>
-              </a>
-            </span>
-
-                <ul class="nav nav-tabs page-header-tabs" id="projectsTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="javascript:">{{\App\CPU\translate('Overview')}}</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- End Nav -->
-        </div>
-        <!-- End Page Header -->
-
-        <div class="row border-bottom border-right border-left border-top">
-            <div class="col-lg-12">
-                <form action="{{route('admin.report.set-date')}}" method="post">
-                    @csrf
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="mb-3">
-                                <label for="exampleInputEmail1"
-                                       class="form-label">{{\App\CPU\translate('Show data by date range')}}</label>
-                            </div>
+            <div class="media-body">
+                <div class="row">
+                    <div class="col-lg mb-3 mb-lg-0 {{Session::get('direction') === " rtl" ? 'mr-2' : 'ml-2' }}"
+                        style="display: block; text-align: {{Session::get('direction') === " rtl" ? 'right' : 'left'
+                        }};">
+                        <div>
+                            <h1 class="page-header-title">{{\App\CPU\translate('Order Report Overview')}}</h1>
                         </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <input type="date" value="{{date('Y-m-d',strtotime(session('from_date')))}}" name="from" id="from_date"
-                                       class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <input type="date" name="to" value="{{date('Y-m-d',strtotime(session('to_date')))}}" id="to_date"
-                                       class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <button type="submit"
-                                        class="btn btn-primary btn-block">{{\App\CPU\translate('Show')}}</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
 
-            @php
-                $from = session('from_date');
-                $to = session('to_date');
-                $total=\App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [$from, $to])->count();
-                if($total==0){
-                   $total=.01;
-                }
-            @endphp
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
-            @php
-                $delivered=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'delivered'])->whereBetween('created_at', [$from, $to])->count()
-            @endphp
-            <!-- Card -->
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <!-- Media -->
-                                <div class="media">
-                                    <i class="tio-shopping-cart nav-icon"></i>
-
-                                    <div class="media-body">
-                                        <h4 class="mb-1">{{\App\CPU\translate('Delivered')}}</h4>
-                                        <span class="font-size-sm text-success">
-                                          <i class="tio-trending-up"></i> {{$delivered}}
-                                        </span>
-                                    </div>
-                                </div>
-                                <!-- End Media -->
+                        <div class="row align-items-center">
+                            <div class="flex-between col-auto">
+                                <h5 class="text-muted {{Session::get('direction') === " rtl" ? 'ml-1' : 'mr-1' }}">
+                                    {{\App\CPU\translate('Admin')}}
+                                    :</h5>
+                                <h5 class="text-muted">{{auth('admin')->user()->name}}</h5>
                             </div>
 
                             <div class="col-auto">
-                                <!-- Circle -->
-                                <div class="js-circle"
-                                     data-hs-circles-options='{
+                                <div class="row align-items-center g-0">
+                                    <h5 class="text-muted col-auto {{Session::get('direction') === " rtl" ? 'pl-2'
+                                        : 'pr-2' }}">{{\App\CPU\translate('Date')}}</h5>
+
+                                    <!-- Flatpickr -->
+                                    <h5 class="text-muted">( {{session('from_date')}} - {{session('to_date')}}
+                                        )</h5>
+                                    <!-- End Flatpickr -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-auto">
+                        <div class="d-flex">
+                            <a class="btn btn-icon btn-primary rounded-circle" href="{{route('admin.dashboard')}}">
+                                <i class="tio-home-outlined"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Media -->
+
+        <!-- Nav -->
+        <!-- Nav -->
+        <div class="js-nav-scroller hs-nav-scroller-horizontal">
+            <span class="hs-nav-scroller-arrow-prev" style="display: none;">
+                <a class="hs-nav-scroller-arrow-link" href="javascript:;">
+                    <i class="tio-chevron-{{Session::get('direction') === " rtl" ? 'right' : 'left' }}"></i>
+                </a>
+            </span>
+
+            <span class="hs-nav-scroller-arrow-next" style="display: none;">
+                <a class="hs-nav-scroller-arrow-link" href="javascript:;">
+                    <i class="tio-chevron-{{Session::get('direction') === " rtl" ? 'left' : 'right' }}"></i>
+                </a>
+            </span>
+
+            <ul class="nav nav-tabs page-header-tabs" id="projectsTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" href="javascript:">{{\App\CPU\translate('Overview')}}</a>
+                </li>
+            </ul>
+        </div>
+        <!-- End Nav -->
+    </div>
+    <!-- End Page Header -->
+
+    <div class="row border-bottom border-right border-left border-top">
+        <div class="col-lg-12">
+            <form action="{{route('admin.report.set-date')}}" method="post">
+                @csrf
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">{{\App\CPU\translate('Show data by date
+                                range')}}</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="mb-3">
+                            <input type="date" value="{{date('Y-m-d',strtotime(session('from_date')))}}" name="from"
+                                id="from_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="mb-3">
+                            <input type="date" name="to" value="{{date('Y-m-d',strtotime(session('to_date')))}}"
+                                id="to_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit"
+                                class="btn btn-primary btn-block mx-2">{{\App\CPU\translate('Show')}}</button>
+
+                            <a  style="margin-top:0px" class="btn btn-success btn-block mx-2" target="_blank"
+                            href={{ route('admin.orders.generate-excel-all')}}><i class="tio-print mr-1"></i> {{ \App\CPU\translate('Export') }}
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @php
+        $from = session('from_date');
+        $to = session('to_date');
+        $total=\App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [$from, $to])->count();
+        if($total==0){
+        $total=.01;
+        }
+        @endphp
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
+            @php
+            $delivered=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'delivered'])->whereBetween('created_at',
+            [$from, $to])->count()
+            @endphp
+            <!-- Card -->
+            <div class="card card-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Media -->
+                            <div class="media">
+                                <i class="tio-shopping-cart nav-icon"></i>
+
+                                <div class="media-body">
+                                    <h4 class="mb-1">{{\App\CPU\translate('Delivered')}}</h4>
+                                    <span class="font-size-sm text-success">
+                                        <i class="tio-trending-up"></i> {{$delivered}}
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- End Media -->
+                        </div>
+
+                        <div class="col-auto">
+                            <!-- Circle -->
+                            <div class="js-circle" data-hs-circles-options='{
                                        "value": {{round(($delivered/$total)*100)}},
                                        "maxValue": 100,
                                        "duration": 2000,
@@ -164,42 +172,42 @@
                                        "textClass": "circle-custom-text",
                                        "textColor": "green"
                                      }'></div>
-                                <!-- End Circle -->
-                            </div>
+                            <!-- End Circle -->
                         </div>
-                        <!-- End Row -->
                     </div>
+                    <!-- End Row -->
                 </div>
-                <!-- End Card -->
             </div>
+            <!-- End Card -->
+        </div>
 
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
             @php
-                $returned=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'returned'])->whereBetween('created_at', [$from, $to])->count()
+            $returned=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'returned'])->whereBetween('created_at',
+            [$from, $to])->count()
             @endphp
             <!-- Card -->
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <!-- Media -->
-                                <div class="media">
-                                    <i class="tio-shopping-cart-off nav-icon"></i>
+            <div class="card card-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Media -->
+                            <div class="media">
+                                <i class="tio-shopping-cart-off nav-icon"></i>
 
-                                    <div class="media-body">
-                                        <h4 class="mb-1">{{\App\CPU\translate('Returned')}}</h4>
-                                        <span class="font-size-sm text-warning">
-                                          <i class="tio-trending-up"></i> {{$returned}}
-                                        </span>
-                                    </div>
+                                <div class="media-body">
+                                    <h4 class="mb-1">{{\App\CPU\translate('Returned')}}</h4>
+                                    <span class="font-size-sm text-warning">
+                                        <i class="tio-trending-up"></i> {{$returned}}
+                                    </span>
                                 </div>
-                                <!-- End Media -->
                             </div>
+                            <!-- End Media -->
+                        </div>
 
-                            <div class="col-auto">
-                                <!-- Circle -->
-                                <div class="js-circle"
-                                     data-hs-circles-options='{
+                        <div class="col-auto">
+                            <!-- Circle -->
+                            <div class="js-circle" data-hs-circles-options='{
                            "value": {{round(($returned/$total)*100)}},
                            "maxValue": 100,
                            "duration": 2000,
@@ -213,42 +221,42 @@
                            "textClass": "circle-custom-text",
                            "textColor": "#ec9a3c"
                          }'></div>
-                                <!-- End Circle -->
-                            </div>
+                            <!-- End Circle -->
                         </div>
-                        <!-- End Row -->
                     </div>
+                    <!-- End Row -->
                 </div>
-                <!-- End Card -->
             </div>
+            <!-- End Card -->
+        </div>
 
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
             @php
-                $failed=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'failed'])->whereBetween('created_at', [$from, $to])->count()
+            $failed=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'failed'])->whereBetween('created_at',
+            [$from, $to])->count()
             @endphp
             <!-- Card -->
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <!-- Media -->
-                                <div class="media">
-                                    <i class="tio-message-failed nav-icon"></i>
+            <div class="card card-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Media -->
+                            <div class="media">
+                                <i class="tio-message-failed nav-icon"></i>
 
-                                    <div class="media-body">
-                                        <h4 class="mb-1">{{\App\CPU\translate('Failed')}}</h4>
-                                        <span class="font-size-sm text-danger">
-                                          <i class="tio-trending-up"></i> {{$failed}}
-                                        </span>
-                                    </div>
+                                <div class="media-body">
+                                    <h4 class="mb-1">{{\App\CPU\translate('Failed')}}</h4>
+                                    <span class="font-size-sm text-danger">
+                                        <i class="tio-trending-up"></i> {{$failed}}
+                                    </span>
                                 </div>
-                                <!-- End Media -->
                             </div>
+                            <!-- End Media -->
+                        </div>
 
-                            <div class="col-auto">
-                                <!-- Circle -->
-                                <div class="js-circle"
-                                     data-hs-circles-options='{
+                        <div class="col-auto">
+                            <!-- Circle -->
+                            <div class="js-circle" data-hs-circles-options='{
                            "value": {{round(($failed/$total)*100)}},
                            "maxValue": 100,
                            "duration": 2000,
@@ -262,42 +270,42 @@
                            "textClass": "circle-custom-text",
                            "textColor": "darkred"
                          }'></div>
-                                <!-- End Circle -->
-                            </div>
+                            <!-- End Circle -->
                         </div>
-                        <!-- End Row -->
                     </div>
+                    <!-- End Row -->
                 </div>
-                <!-- End Card -->
             </div>
+            <!-- End Card -->
+        </div>
 
-            <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
+        <div class="col-sm-6 col-lg-3 mb-3 mb-lg-6">
             @php
-                $canceled=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'processing'])->whereBetween('created_at', [$from, $to])->count()
+            $canceled=\App\Model\Order::where('order_type','default_type')->where(['order_status'=>'processing'])->whereBetween('created_at',
+            [$from, $to])->count()
             @endphp
             <!-- Card -->
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <!-- Media -->
-                                <div class="media">
-                                    <i class="tio-flight-cancelled nav-icon"></i>
+            <div class="card card-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Media -->
+                            <div class="media">
+                                <i class="tio-flight-cancelled nav-icon"></i>
 
-                                    <div class="media-body">
-                                        <h4 class="mb-1">{{\App\CPU\translate('Processing')}}</h4>
-                                        <span class="font-size-sm text-muted">
-                                          <i class="tio-trending-up"></i> {{$canceled}}
-                                        </span>
-                                    </div>
+                                <div class="media-body">
+                                    <h4 class="mb-1">{{\App\CPU\translate('Processing')}}</h4>
+                                    <span class="font-size-sm text-muted">
+                                        <i class="tio-trending-up"></i> {{$canceled}}
+                                    </span>
                                 </div>
-                                <!-- End Media -->
                             </div>
+                            <!-- End Media -->
+                        </div>
 
-                            <div class="col-auto">
-                                <!-- Circle -->
-                                <div class="js-circle"
-                                     data-hs-circles-options='{
+                        <div class="col-auto">
+                            <!-- Circle -->
+                            <div class="js-circle" data-hs-circles-options='{
                            "value": {{round(($canceled/$total)*100)}},
                            "maxValue": 100,
                            "duration": 2000,
@@ -311,68 +319,57 @@
                            "textClass": "circle-custom-text",
                            "textColor": "gray"
                          }'></div>
-                                <!-- End Circle -->
-                            </div>
+                            <!-- End Circle -->
                         </div>
-                        <!-- End Row -->
                     </div>
+                    <!-- End Row -->
                 </div>
-                <!-- End Card -->
             </div>
+            <!-- End Card -->
         </div>
-        <!-- End Stats -->
-        <hr>
-        <!-- Card -->
-        <div class="card mb-3 mb-lg-5 border-bottom border-right border-left border-top">
-            <!-- Header -->
-            <div class="card-header">
-                @php
-                    $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
-                    $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
-                    $total=\App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [$from, $to])->count()
-                @endphp
-                <div class="flex-start">
-                    <h6 class="card-subtitle mt-1">Total orders of {{date('Y')}} : </h6>
-                    <h6 class="h3 {{Session::get('direction') === "rtl" ? 'mr-sm-2' : 'ml-sm-2'}}">{{round($total)}}</h6>
-                </div>
-
-                <!-- Unfold -->
-                <div class="hs-unfold">
-                    <a class="js-hs-unfold-invoker btn btn-white"
-                       href="{{route('admin.orders.list',['status'=>'all'])}}">
-                        <i class="tio-shopping-cart-outlined {{Session::get('direction') === "rtl" ? 'ml-1' : 'mr-1'}}"></i> {{\App\CPU\translate('Orders')}}
-                    </a>
-                </div>
-                <!-- End Unfold -->
-            </div>
-            <!-- End Header -->
-
-        @php
-            $delivered=[];
+    </div>
+    <!-- End Stats -->
+    <hr>
+    <!-- Card -->
+    <div class="card mb-3 mb-lg-5 border-bottom border-right border-left border-top">
+        <!-- Header -->
+        <div class="card-header">
+            @php
             $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
             $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
+            $total=\App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [$from,
+            $to])->count()
+            @endphp
+            <div class="flex-start">
+                <h6 class="card-subtitle mt-1">Total orders of {{date('Y')}} : </h6>
+                <h6 class="h3 {{Session::get('direction') === " rtl" ? 'mr-sm-2' : 'ml-sm-2' }}">{{round($total)}}</h6>
+            </div>
 
-            $data=\App\Model\Order::where('order_type','default_type')
-            ->where(['order_status'=>'delivered'])->select(
-            \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
-            \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
-            )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
-
-            for ($inc = 1; $inc <= 12; $inc++) {
-            $delivered[$inc] = 0;
-            foreach ($data as $match) {
-                if ($match['month'] == $inc) {
-                    $delivered[$inc] = $match['count'];
-                }
-            }
-        }
-
-        @endphp
+            <!-- Unfold -->
+            <div class="hs-unfold">
+                <a class="js-hs-unfold-invoker btn btn-white" href="{{route('admin.orders.list',['status'=>'all'])}}">
+                    <i class="tio-shopping-cart-outlined {{Session::get('direction') === " rtl" ? 'ml-1' : 'mr-1'
+                        }}"></i> {{\App\CPU\translate('Orders')}}
+                </a>
+            </div>
+            <!-- End Unfold -->
+        </div>
+        <!-- End Header -->
 
         @php
-            $ret=[];
+        $delivered=[];
+        $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
+        $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
 
-            $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
+        $data=\App\Model\Order::where('order_type','default_type')
+        ->where(['order_status'=>'delivered'])->select(
+        \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
+        \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
+        )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
+
+        for ($inc = 1; $inc <= 12; $inc++) { $delivered[$inc]=0; foreach ($data as $match) { if ($match['month']==$inc)
+            { $delivered[$inc]=$match['count']; } } } @endphp @php $ret=[]; $from=\Carbon\Carbon::now()->
+            startOfYear()->format('Y-m-d');
             $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
 
             $data=\App\Model\Order::where('order_type','default_type')
@@ -381,69 +378,35 @@
             \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
             )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
 
-            for ($inc = 1; $inc <= 12; $inc++) {
-            $ret[$inc] = 0;
-            foreach ($data as $match) {
-                if ($match['month'] == $inc) {
-                    $ret[$inc] = $match['count'];
-                }
-            }
-        }
-        @endphp
+            for ($inc = 1; $inc <= 12; $inc++) { $ret[$inc]=0; foreach ($data as $match) { if ($match['month']==$inc) {
+                $ret[$inc]=$match['count']; } } } @endphp @php $fai=[]; $from=\Carbon\Carbon::now()->
+                startOfYear()->format('Y-m-d');
+                $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
 
-        @php
-            $fai=[];
+                $data=\App\Model\Order::where('order_type','default_type')
+                ->where(['order_status'=>'failed'])->select(
+                \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
+                \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
+                )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
 
-            $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
-            $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
+                for ($inc = 1; $inc <= 12; $inc++) { $fai[$inc]=0; foreach ($data as $match) { if
+                    ($match['month']==$inc) { $fai[$inc]=$match['count']; } } } @endphp @php $can=[];
+                    $from=\Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
+                    $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
 
-            $data=\App\Model\Order::where('order_type','default_type')
-            ->where(['order_status'=>'failed'])->select(
-            \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
-            \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
-            )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
+                    $data=\App\Model\Order::where('order_type','default_type')
+                    ->where(['order_status'=>'canceled'])->select(
+                    \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
+                    \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
+                    )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
 
-            for ($inc = 1; $inc <= 12; $inc++) {
-            $fai[$inc] = 0;
-            foreach ($data as $match) {
-                if ($match['month'] == $inc) {
-                    $fai[$inc] = $match['count'];
-                }
-            }
-        }
-        @endphp
-
-
-        @php
-            $can=[];
-
-            $from = \Carbon\Carbon::now()->startOfYear()->format('Y-m-d');
-            $to = \Carbon\Carbon::now()->endOfYear()->format('Y-m-d');
-
-            $data=\App\Model\Order::where('order_type','default_type')
-            ->where(['order_status'=>'canceled'])->select(
-            \Illuminate\Support\Facades\DB::raw('COUNT(id) as count'),
-            \Illuminate\Support\Facades\DB::raw('YEAR(created_at) year, MONTH(created_at) month')
-            )->whereBetween('created_at', [$from, $to])->groupby('year', 'month')->get()->toArray();
-
-            for ($inc = 1; $inc <= 12; $inc++) {
-            $can[$inc] = 0;
-            foreach ($data as $match) {
-                if ($match['month'] == $inc) {
-                    $can[$inc] = $match['count'];
-                }
-            }
-        }
-
-        $max_order=\App\CPU\BackEndHelper::max_orders();
-        @endphp
-
-        <!-- Body -->
-            <div class="card-body">
-                <!-- Bar Chart -->
-                <div class="chartjs-custom" style="height: 18rem;">
-                    <canvas class="js-chart"
-                            data-hs-chartjs-options='{
+                    for ($inc = 1; $inc <= 12; $inc++) { $can[$inc]=0; foreach ($data as $match) { if
+                        ($match['month']==$inc) { $can[$inc]=$match['count']; } } }
+                        $max_order=\App\CPU\BackEndHelper::max_orders(); @endphp <!-- Body -->
+                        <div class="card-body">
+                            <!-- Bar Chart -->
+                            <div class="chartjs-custom" style="height: 18rem;">
+                                <canvas class="js-chart" data-hs-chartjs-options='{
                         "type": "line",
                         "data": {
                            "labels": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
@@ -543,139 +506,150 @@
                           }
                         }
                       }'>
-                    </canvas>
+                                </canvas>
+                            </div>
+                            <!-- End Bar Chart -->
+                        </div>
+                        <!-- End Body -->
+    </div>
+    <!-- End Card -->
+
+    <div class="row">
+        <div class="col-lg-12 mb-3 mb-lg-12">
+            <!-- Card -->
+            <div class="card h-100">
+                <!-- Header -->
+                <div class="card-header">
+                    <h4 class="card-header-title">{{\App\CPU\translate('Weekly')}} {{\App\CPU\translate('Report')}}
+                    </h4>
+
+                    <!-- Nav -->
+                    <ul class="nav nav-segment" id="eventsTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="this-week-tab" data-toggle="tab" href="#this-week"
+                                role="tab">
+                                {{\App\CPU\translate('This')}} {{\App\CPU\translate('week')}}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="last-week-tab" data-toggle="tab" href="#last-week" role="tab">
+                                {{\App\CPU\translate('Last')}} {{\App\CPU\translate('week')}}
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- End Nav -->
                 </div>
-                <!-- End Bar Chart -->
-            </div>
-            <!-- End Body -->
-        </div>
-        <!-- End Card -->
+                <!-- End Header -->
 
-        <div class="row">
-            <div class="col-lg-12 mb-3 mb-lg-12">
-                <!-- Card -->
-                <div class="card h-100">
-                    <!-- Header -->
-                    <div class="card-header">
-                        <h4 class="card-header-title">{{\App\CPU\translate('Weekly')}} {{\App\CPU\translate('Report')}} </h4>
-
-                        <!-- Nav -->
-                        <ul class="nav nav-segment" id="eventsTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="this-week-tab" data-toggle="tab" href="#this-week"
-                                   role="tab">
-                                    {{\App\CPU\translate('This')}} {{\App\CPU\translate('week')}}
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="last-week-tab" data-toggle="tab" href="#last-week" role="tab">
-                                    {{\App\CPU\translate('Last')}} {{\App\CPU\translate('week')}}
-                                </a>
-                            </li>
-                        </ul>
-                        <!-- End Nav -->
-                    </div>
-                    <!-- End Header -->
-
-                    <!-- Body -->
-                    <div class="card-body card-body-height">
+                <!-- Body -->
+                <div class="card-body card-body-height">
                     @php
-                        $orders= \App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->paginate(20);
+                    $orders= \App\Model\Order::where('order_type','default_type')->whereBetween('created_at',
+                    [now()->startOfWeek(), now()->endOfWeek()])->paginate(20);
                     @endphp
                     <!-- Tab Content -->
-                        <div class="tab-content" id="eventsTabContent">
-                            <div class="tab-pane fade show active" id="this-week" role="tabpanel"
-                                 aria-labelledby="this-week-tab">
-                                <!-- Card -->
-                                @foreach($orders as $order)
-                                    <a class="card card-border-{{Session::get('direction') === "rtl" ? 'right' : 'left'}} border-{{Session::get('direction') === "rtl" ? 'right' : 'left'}}-primary shadow-none rounded-0"
-                                       href="{{route('admin.orders.details',['id'=>$order['id']])}}">
-                                        <div class="card-body py-0">
-                                            <div class="row">
-                                                <div class="col-sm mb-2 mb-sm-0">
-                                                    <h2 class="font-weight-normal mb-1">#{{$order['id']}} <small
-                                                            class="font-size-sm text-body text-uppercase">{{\App\CPU\translate('Orders')}} {{\App\CPU\translate('ID')}}</small>
-                                                    </h2>
-                                                    <h5 class="text-hover-primary mb-0">{{\App\CPU\translate('Order')}} {{\App\CPU\translate('Amount')}}
-                                                        : {{\App\CPU\BackEndHelper::usd_to_currency($order['order_amount'])}} {{\App\CPU\BackEndHelper::currency_symbol()}}</h5>
-                                                    <small
-                                                        class="text-body">{{date('d M Y',strtotime($order['created_at']))}}</small>
-                                                </div>
-
-                                                <div class="col-sm-auto align-self-sm-end">
-                                                    <!-- Avatar Group -->
-                                                    <div class="">
-                                                        {{\App\CPU\translate('Orders')}}  {{str_replace('_',' ',$order['order_status']) }}
-                                                        <br>
-                                                    </div>
-                                                    <!-- End Avatar Group -->
-                                                </div>
-                                            </div>
-                                            <!-- End Row -->
+                    <div class="tab-content" id="eventsTabContent">
+                        <div class="tab-pane fade show active" id="this-week" role="tabpanel"
+                            aria-labelledby="this-week-tab">
+                            <!-- Card -->
+                            @foreach($orders as $order)
+                            <a class="card card-border-{{Session::get('direction') === " rtl" ? 'right' : 'left' }}
+                                border-{{Session::get('direction')==="rtl" ? 'right' : 'left' }}-primary shadow-none
+                                rounded-0" href="{{route('admin.orders.details',['id'=>$order['id']])}}">
+                                <div class="card-body py-0">
+                                    <div class="row">
+                                        <div class="col-sm mb-2 mb-sm-0">
+                                            <h2 class="font-weight-normal mb-1">#{{$order['id']}} <small
+                                                    class="font-size-sm text-body text-uppercase">{{\App\CPU\translate('Orders')}}
+                                                    {{\App\CPU\translate('ID')}}</small>
+                                            </h2>
+                                            <h5 class="text-hover-primary mb-0">{{\App\CPU\translate('Order')}}
+                                                {{\App\CPU\translate('Amount')}}
+                                                : {{\App\CPU\BackEndHelper::usd_to_currency($order['order_amount'])}}
+                                                {{\App\CPU\BackEndHelper::currency_symbol()}}</h5>
+                                            <small class="text-body">{{date('d M
+                                                Y',strtotime($order['created_at']))}}</small>
                                         </div>
-                                    </a>
-                                    <!-- End Card -->
-                                    <hr>
-                                @endforeach
-                                <div class="card">
-                                    <div class="card-footer">
-                                        {!! $orders->links() !!}
+
+                                        <div class="col-sm-auto align-self-sm-end">
+                                            <!-- Avatar Group -->
+                                            <div class="">
+                                                {{\App\CPU\translate('Orders')}} {{str_replace('_','
+                                                ',$order['order_status']) }}
+                                                <br>
+                                            </div>
+                                            <!-- End Avatar Group -->
+                                        </div>
                                     </div>
+                                    <!-- End Row -->
                                 </div>
-                            </div>
-
-                            @php
-                                $orders= \App\Model\Order::where('order_type','default_type')->whereBetween('created_at', [now()->subDays(7)->startOfWeek(), now()->subDays(7)->endOfWeek()])->paginate(20);
-                            @endphp
-
-                            <div class="tab-pane fade" id="last-week" role="tabpanel" aria-labelledby="last-week-tab">
-                                @foreach($orders as $order)
-                                    <a class="card card-border-{{Session::get('direction') === "rtl" ? 'right' : 'left'}} border-{{Session::get('direction') === "rtl" ? 'right' : 'left'}}-primary shadow-none rounded-0"
-                                       href="{{route('admin.orders.details',['id'=>$order['id']])}}">
-                                        <div class="card-body py-0">
-                                            <div class="row">
-                                                <div class="col-sm mb-2 mb-sm-0">
-                                                    <h2 class="font-weight-normal mb-1">#{{$order['id']}} <small
-                                                            class="font-size-sm text-body text-uppercase">{{\App\CPU\translate('ID')}}</small>
-                                                    </h2>
-                                                    <h5 class="text-hover-primary mb-0">{{\App\CPU\translate('Order')}} {{\App\CPU\translate('Amount')}}
-                                                        : {{\App\CPU\BackEndHelper::usd_to_currency($order['order_amount'])}} {{\App\CPU\BackEndHelper::currency_symbol()}}</h5>
-                                                    <small
-                                                        class="text-body">{{date('d M Y',strtotime($order['created_at']))}}</small>
-                                                </div>
-
-                                                <div class="col-sm-auto align-self-sm-end">
-                                                    <!-- Avatar Group -->
-                                                    <div class="text-capitalize">
-                                                        {{\App\CPU\translate('Status')}} <strong>
-                                                            : {{ str_replace('_',' ',$order['order_status']) }}
-                                                            <br></strong>
-                                                    </div>
-                                                    <!-- End Avatar Group -->
-                                                </div>
-                                            </div>
-                                            <!-- End Row -->
-                                        </div>
-                                    </a>
-                                    <!-- End Card -->
-                                    <hr>
-                                @endforeach
-                                <div class="card">
-                                    <div class="card-footer">
-                                        {!! $orders->links() !!}
-                                    </div>
+                            </a>
+                            <!-- End Card -->
+                            <hr>
+                            @endforeach
+                            <div class="card">
+                                <div class="card-footer">
+                                    {!! $orders->links() !!}
                                 </div>
                             </div>
                         </div>
-                        <!-- End Tab Content -->
+
+                        @php
+                        $orders= \App\Model\Order::where('order_type','default_type')->whereBetween('created_at',
+                        [now()->subDays(7)->startOfWeek(), now()->subDays(7)->endOfWeek()])->paginate(20);
+                        @endphp
+
+                        <div class="tab-pane fade" id="last-week" role="tabpanel" aria-labelledby="last-week-tab">
+                            @foreach($orders as $order)
+                            <a class="card card-border-{{Session::get('direction') === " rtl" ? 'right' : 'left' }}
+                                border-{{Session::get('direction')==="rtl" ? 'right' : 'left' }}-primary shadow-none
+                                rounded-0" href="{{route('admin.orders.details',['id'=>$order['id']])}}">
+                                <div class="card-body py-0">
+                                    <div class="row">
+                                        <div class="col-sm mb-2 mb-sm-0">
+                                            <h2 class="font-weight-normal mb-1">#{{$order['id']}} <small
+                                                    class="font-size-sm text-body text-uppercase">{{\App\CPU\translate('ID')}}</small>
+                                            </h2>
+                                            <h5 class="text-hover-primary mb-0">{{\App\CPU\translate('Order')}}
+                                                {{\App\CPU\translate('Amount')}}
+                                                : {{\App\CPU\BackEndHelper::usd_to_currency($order['order_amount'])}}
+                                                {{\App\CPU\BackEndHelper::currency_symbol()}}</h5>
+                                            <small class="text-body">{{date('d M
+                                                Y',strtotime($order['created_at']))}}</small>
+                                        </div>
+
+                                        <div class="col-sm-auto align-self-sm-end">
+                                            <!-- Avatar Group -->
+                                            <div class="text-capitalize">
+                                                {{\App\CPU\translate('Status')}} <strong>
+                                                    : {{ str_replace('_',' ',$order['order_status']) }}
+                                                    <br></strong>
+                                            </div>
+                                            <!-- End Avatar Group -->
+                                        </div>
+                                    </div>
+                                    <!-- End Row -->
+                                </div>
+                            </a>
+                            <!-- End Card -->
+                            <hr>
+                            @endforeach
+                            <div class="card">
+                                <div class="card-footer">
+                                    {!! $orders->links() !!}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- End Body -->
+                    <!-- End Tab Content -->
                 </div>
-                <!-- End Card -->
+                <!-- End Body -->
             </div>
+            <!-- End Card -->
         </div>
-        <!-- End Row -->
     </div>
+    <!-- End Row -->
+</div>
 @endsection
 
 @push('script')
@@ -684,13 +658,12 @@
 
 @push('script_2')
 
-    <script src="{{asset('public/assets/back-end')}}/vendor/chart.js/dist/Chart.min.js"></script>
-    <script
-        src="{{asset('public/assets/back-end')}}/vendor/chartjs-chart-matrix/dist/chartjs-chart-matrix.min.js"></script>
-    <script src="{{asset('public/assets/back-end')}}/js/hs.chartjs-matrix.js"></script>
+<script src="{{asset('public/assets/back-end')}}/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="{{asset('public/assets/back-end')}}/vendor/chartjs-chart-matrix/dist/chartjs-chart-matrix.min.js"></script>
+<script src="{{asset('public/assets/back-end')}}/js/hs.chartjs-matrix.js"></script>
 
-    <script>
-        $(document).on('ready', function () {
+<script>
+    $(document).on('ready', function () {
 
             // INITIALIZATION OF FLATPICKR
             // =======================================================
@@ -873,10 +846,10 @@
                 var circle = $.HSCore.components.HSCircles.init($(this));
             });
         });
-    </script>
+</script>
 
-    <script>
-        $('#from_date,#to_date').change(function () {
+<script>
+    $('#from_date,#to_date').change(function () {
             let fr = $('#from_date').val();
             let to = $('#to_date').val();
             if (fr != '' && to != '') {
@@ -891,5 +864,5 @@
             }
 
         })
-    </script>
+</script>
 @endpush

@@ -25,6 +25,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\TrustProxies::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
@@ -81,7 +82,8 @@ class Kernel extends HttpKernel
         'actch' => ActivationCheckMiddleware::class,
         'api_lang' => APILocalizationMiddleware::class,
         'maintenance_mode' => MaintenanceModeMiddleware::class,
-        'delivery_man_auth' => DeliveryManAuth::class
+        'delivery_man_auth' => DeliveryManAuth::class,
+        'cors' => \App\Http\Middleware\Cors::class
     ];
 
     /**

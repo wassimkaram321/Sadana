@@ -52,7 +52,7 @@
                                     </div>
                                     <input type="hidden" name="lang[]" value="{{$lang}}">
                                 @endforeach
-                                
+
                                 <div class="form-group">
                                     <label for="name">{{ \App\CPU\translate('brand_logo')}}</label><span class="badge badge-soft-danger">( {{\App\CPU\translate('ratio')}} 1:1 )</span>
                                     <div class="custom-file" style="text-align: left" required>
@@ -61,7 +61,7 @@
                                         <label class="custom-file-label" for="customFileUpload">{{\App\CPU\translate('choose')}} {{\App\CPU\translate('file')}}</label>
                                     </div>
                                 </div>
-                                
+
                             </div>
                             <div class="col-md-6">
                                 <center>
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                         {{-- <div class="form-group form-check">
-                            
+
                             <input type="checkbox" name="shipping" value="shipping"
                                 class="form-check-input" id="shipping">
                             <label class="form-check-label"
@@ -91,6 +91,12 @@
 @endsection
 
 @push('script')
+
+
+
+
+
+
 <script>
         $(".lang_link").click(function (e) {
             e.preventDefault();
@@ -113,6 +119,15 @@
             $('#dataTable').DataTable();
         });
     </script>
+
+
+
+
+
+
+
+
+
     <script src="{{asset('public/assets/back-end')}}/js/select2.min.js"></script>
     <script>
         $(".js-example-theme-single").select2({

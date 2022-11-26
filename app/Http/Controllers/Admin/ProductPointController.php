@@ -387,8 +387,6 @@ class ProductPointController extends Controller
     public function order_points_store(Request $request)
     {
         //
-
-
         $request->validate([
             // 'type' => 'required',
             // 'type_id' => 'required',
@@ -408,6 +406,10 @@ class ProductPointController extends Controller
         Toastr::success('Order Points added successfully!');
         return back();
     }
+
+
+
+
     public function order_points_destroy(Request $request)
     {
         //
@@ -419,6 +421,10 @@ class ProductPointController extends Controller
         $productpoint->delete();
         return response()->json();
     }
+
+
+
+
     public function pharmacies_points(Request $request)
     {
         # code...
@@ -428,16 +434,18 @@ class ProductPointController extends Controller
         if ($request->has('search'))
         {
             $key = explode(' ', $request['search']);
+
             $pharmacies = PharmaciesPoints::where(function ($q) use ($key) {
                 foreach ($key as $value) {
                     $q->Where('name', 'like', "%{$value}%");
                 }
             });
+
             $query_param = ['search' => $request['search']];
         }else{
             $pharmacies = new PharmaciesPoints();
         }
-        $pharmacies = PharmaciesPoints::with('pharmacy')->orderBy('points')->latest()->paginate(Helpers::pagination_limit());
+        $pharmacies = PharmaciesPoints::groupBy('pharmacy_id')->with('pharmacy')->selectRaw('sum(points) as sum, pharmacy_id')->latest()->paginate(Helpers::pagination_limit());
 
         return view('admin-views.points.pharmacies_points',compact('pharmacies','search'));
 

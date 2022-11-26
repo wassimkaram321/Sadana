@@ -81,18 +81,18 @@ Route::group(['namespace' => 'api\v2', 'prefix' => 'v2', 'middleware' => ['api_l
             Route::post('login', 'LoginController@login');
         });
 
-
         Route::group(['middleware' => ['delivery_man_auth']], function () {
-            Route::get('info', 'DeliveryManController@info');
-            Route::get('current-orders', 'DeliveryManController@get_current_orders');
-            Route::get('all-orders', 'DeliveryManController@get_all_orders');
+            Route::get('info', 'DeliveryManController@info'); //Done
+            Route::get('current-orders', 'DeliveryManController@get_current_orders'); //Done
+            Route::get('all-orders', 'DeliveryManController@get_all_orders'); //Done and between data Done
+            Route::put('update-order-status', 'DeliveryManController@update_order_status'); //Done
+            Route::put('update-payment-status', 'DeliveryManController@order_payment_status_update'); //Done
+            Route::get('order-details', 'DeliveryManController@get_order_details'); //Done
+            Route::put('update-fcm-token', 'DeliveryManController@update_fcm_token'); //Done
+
+            Route::get('last-location', 'DeliveryManController@get_last_location');
             Route::post('record-location-data', 'DeliveryManController@record_location_data');
             Route::get('order-delivery-history', 'DeliveryManController@get_order_history');
-            Route::put('update-order-status', 'DeliveryManController@update_order_status');
-            Route::put('update-payment-status', 'DeliveryManController@order_payment_status_update');
-            Route::get('order-details', 'DeliveryManController@get_order_details');
-            Route::get('last-location', 'DeliveryManController@get_last_location');
-            Route::put('update-fcm-token', 'DeliveryManController@update_fcm_token');
         });
     });
 });

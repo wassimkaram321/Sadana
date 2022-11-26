@@ -62,22 +62,24 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="store_name">{{ \App\CPU\translate('Main Product') }}</label>
-                                        <select required class="js-example-basic-multiple" name="first_product">
+                                        <select id="dnd2" onchange="myFunction2(this)" required
+                                        class="js-example-basic-multiple" name="first_product[]" multiple="multiple">
                                             @foreach ($products as $product)
                                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                                             @endforeach
                                         </select>
-                                        <div class="form-group">
-                                            <label for="quantity">{{ \App\CPU\translate('Quantity') }}</label>
-                                            <input type="number" name="first_product_q" class="form-control"
-                                                id="first_product_q" value="{{ old('quantity') }}"
-                                                placeholder="{{ \App\CPU\translate('Ex') }} : {{ \App\CPU\translate('2') }}">
-                                        </div>
+                                        <!--<div class="form-group">-->
+                                        <!--    <label for="quantity">{{ \App\CPU\translate('Quantity') }}</label>-->
+                                        <!--    <input type="number" name="first_product_q" class="form-control"-->
+                                        <!--        id="first_product_q" value="{{ old('quantity') }}"-->
+                                        <!--        placeholder="{{ \App\CPU\translate('Ex') }} : {{ \App\CPU\translate('2') }}">-->
+                                        <!--</div>-->
+                                         <div id="sec"class="form-group"></div>
                                     </div>
                                 </div>
 
 
-                                <div id="id3" class="col-md-12">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="store_name">{{ \App\CPU\translate('Other Products') }}</label>
                                         <select id="dnd" onchange="myFunction(this)" required
@@ -86,16 +88,11 @@
                                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                                             @endforeach
                                         </select>
-                                        {{-- <div class="form-group">
-                                            <label for="quantity">{{ \App\CPU\translate('Quantity') }}</label>
-                                            <input type="number" name="sec_products_q" class="form-control"
-                                                id="sec_products_q" value="{{ old('quantity') }}"
-                                                placeholder="{{ \App\CPU\translate('Ex') }} : {{ \App\CPU\translate('2') }}">
-                                        </div> --}}
+
                                     </div>
                                     <div id="main"class="form-group"></div>
                                 </div>
-                               
+
 
                             </div>
 
@@ -190,7 +187,7 @@
             }
 
                 var newForm = document.createElement("input");
-                
+
                 var inputContainer = document.getElementById("main");
                 if(selected[selected.length-1] != undefined){
                 newForm.setAttribute("type", "number");
@@ -198,21 +195,16 @@
                 if(!document.getElementById("form"+selected[selected.length-1])){
                 newForm.setAttribute("id", "form" + selected[selected.length-1]);
                 newForm.setAttribute("name", "form" +'[]');
-                
-                newForm.setAttribute("placeholder", "Quantity of product " + selected[selected.length-1]);
-                
+
+                newForm.setAttribute("placeholder", "Quantity of second product " + selected[selected.length-1]);
+
                 inputContainer.appendChild(newForm);
                 }
                 }
-                // inputContainer.appendChild(document.createElement("br"));
-            // for (var i = 0; i < selected.length; i++) {
-                
-               
-            // }
+
             for (var option of document.getElementById('dnd').options) {
                 if (!option.selected) {
-                    // selected.push(option.value);
-                    // var element = document.getElementById("Photo1");
+
                     if(document.getElementById("form"+option.value)){
                         var child=document.getElementById("form"+option.value);
                         child.parentNode.removeChild(child);
@@ -220,21 +212,49 @@
                 }
             }
 
-            //     var opts = [], opt;
-            //     var len = sel.options.length;
-            //     for (var i = 0; i < len; i++) {
-            //         opt = sel.options[i];
+        }
+    </script>
+    <script type="text/javascript">
+        function myFunction2(sel) {
+            var selected2 = [];
 
-            //         if (opt.selected) {
-            //         opts.push(opt);
-            //         // console.log(opt);
-            //         // alert(opt.value);
-            //     }
-            // }
-            // // console.log('mmm',opts[opts.length-1].value);
-            // var name = opts[opts.length-1].value;
+            for (var option of document.getElementById('dnd2').options) {
 
-            //     $('#main').append('<div id= "div1"class="form-group c"><label></label><input type="number"></div>');
+                if (option.selected) {
+                    selected2.push(option.value);
+
+                }
+            }
+
+
+                var newForm1 = document.createElement("input");
+
+                var inputContainer1 = document.getElementById("sec");
+
+                if(selected2[selected2.length-1] != undefined){
+                newForm1.setAttribute("type", "number");
+                newForm1.setAttribute("class", "form-control");
+                if(!document.getElementById("main"+selected2[selected2.length-1])){
+                    newForm1.setAttribute("id", "main" + selected2[selected2.length-1]);
+                    newForm1.setAttribute("name", "main" +'[]');
+
+                    newForm1.setAttribute("placeholder", "Quantity of main product " + selected2[selected2.length-1]);
+
+                    inputContainer1.appendChild(newForm1);
+                    console.log(document.getElementById("sec"));
+                }
+                }
+
+            for (var option of document.getElementById('dnd2').options) {
+                if (!option.selected2) {
+
+                    if(document.getElementById("form"+option.value)){
+                        var child=document.getElementById("form"+option.value);
+                        child.parentNode.removeChild(child);
+                    }
+                }
+            }
+
         }
     </script>
 @endpush

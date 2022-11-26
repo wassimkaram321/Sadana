@@ -104,7 +104,7 @@
 
                     </div>
                     <div class="row gx-2 gx-lg-3" id="order_stats">
-                        @include('admin-views.partials._dashboard-system-stats',['data'=>$data])
+                        @include('admin-views.partials._dashboard-system-stats',['data'=>$systems])
                     </div>
                 </div>
             </div>

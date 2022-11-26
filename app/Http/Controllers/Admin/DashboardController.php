@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Model\AdminWallet;
 use App\Model\Brand;
 use App\Model\Order;
+use App\Model\DeliveryMan;
+use App\Model\Visitors;
 use App\Model\OrderDetail;
 use App\Model\OrderTransaction;
 use App\Model\Product;
@@ -150,7 +152,15 @@ class DashboardController extends Controller
         $data['pending_amount'] = $admin_wallet!=null?$admin_wallet->pending_amount:0;
         $data['total_tax_collected'] = $admin_wallet!=null?$admin_wallet->total_tax_collected:0;
 
-        return view('admin-views.system.dashboard', compact('data', 'inhouse_data', 'seller_data', 'commission_data'));
+
+        $systems=[
+           "pharmacies" =>User::where('user_type','=','pharmacist')->count(),
+           "salers" => User::where('user_type','=','salesman')->count(),
+           "deliveries" => DeliveryMan::count(),
+           "visitors" => Visitors::count()
+        ];
+      
+        return view('admin-views.system.dashboard', compact('data', 'inhouse_data', 'seller_data', 'commission_data','systems'));
     }
 
     public function order_stats(Request $request)

@@ -93,6 +93,10 @@
                                         </label>
                                     </td>
                                     <td>
+                                        <a class="btn btn-secondary btn-sm"
+                                        href="{{route('admin.sales-man.work-plan-tasks',[$p['id']])}}">
+                                         <i class="tio-visible"></i>{{\App\CPU\translate('Tasks')}}
+                                        </a>
 
                                         <a class="btn btn-success btn-sm"
                                         href="{{route('admin.sales-man.work-plan-details',[$p['id']])}}">
@@ -105,7 +109,7 @@
                                         </a>
                                         <a class="btn btn-danger btn-sm" href="javascript:"
                                            onclick="form_alert('plan-{{$p['id']}}','Want to delete this item ?')">
-                                            <i class="tio-add-to-trash"></i> {{\App\CPU\translate('Delete')}}
+                                            <i class="tio-add-to-trash"></i>{{\App\CPU\translate('Delete')}}
                                         </a>
                                         <form action="{{route('admin.sales-man.work-plan-delete',[$p['id']])}}"
                                               method="post" id="plan-{{$p['id']}}">

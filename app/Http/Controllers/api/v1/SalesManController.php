@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Pharmacy;
 use App\Model\WorkPlan;
+use App\Model\WorkPlanTask;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use function App\CPU\translate;
@@ -37,15 +38,27 @@ class SalesManController extends Controller
         return response()->json($pharmacies, 200);
     }
 
-
     public function get_work_plans(Request $request)
     {
         $id=$request->user()->id;
         $plans= WorkPlan::where(['saler_id' => $id])->where('status_plan','=',1)->get();
-
         foreach($plans as $plan)
         {
-            $pharmaciesSelectedArray = json_decode($plan['pharmacies'], true);
+            $point_date=$plan->begin_plan;
+            if(!isset($request['task_date']))
+            {
+                $pharmaciesSelectedArray = WorkPlanTask::where([['task_plan_id','=',$plan->id]
+                ,['task_date','=',$plan->begin_plan]])
+                ->get(['pharmacy_id']);
+
+            }else
+            {
+                $pharmaciesSelectedArray = WorkPlanTask::where([['task_plan_id','=',$plan->id]
+                ,['task_date','=',$request['task_date']]])
+                ->get(['pharmacy_id']);
+                $point_date=$request['task_date'];
+            }
+            //$pharmaciesSelectedArray = json_decode($plan['pharmacies'], true);
             $pharmacies = Pharmacy::whereIn('id', $pharmaciesSelectedArray)->get([
                 'id','name','lat','lan','city','region','user_type_id as user_type','vip','from','to',
                 'Address','land_number'
@@ -55,12 +68,14 @@ class SalesManController extends Controller
             {
                 $planPharma = PlanDetails::where('work_plan_id', '=', $plan->id)
                 ->where('Wpharmacy_id', '=', $pharmacy->id)->get()->first();
+
                 if(isset($planPharma))
                     $pharmacy['visited']=1;
                 else
                     $pharmacy['visited']=0;
             }
             $plan['pharmacies'] = $pharmacies;
+            $plan['point_date']=$point_date;
         }
        return response()->json($plans, 200);
     }
@@ -83,12 +98,25 @@ class SalesManController extends Controller
         try {
             $plan = PlanDetails::where('work_plan_id', '=', $request->work_plan_id)
                 ->where('Wpharmacy_id', '=', $request->pharmacy_id)->get()->first();
-            $plan->visited = $request->visited;
-            $plan->Wnote = $request->note;
-            $plan->Wlat = $request->lat;
-            $plan->Wlng = $request->lng;
-            $plan->visit_time = now();  // $current_date_time = date('Y-m-d H:i:s');
-            $plan->save();
+                if(isset($plan))
+                {
+                    $plan->visited = $request->visited;
+                    $plan->Wnote = $request->note;
+                    $plan->Wlat = $request->lat;
+                    $plan->Wlng = $request->lng;
+                    $plan->visit_time = now();  // $current_date_time = date('Y-m-d H:i:s');
+                    $plan->update();
+                }
+                else{
+                    $plan =new PlanDetails;
+                    $plan->visited = $request->visited;
+                    $plan->Wnote = $request->note;
+                    $plan->Wlat = $request->lat;
+                    $plan->Wlng = $request->lng;
+                    $plan->visit_time = now(); 
+                    $plan->save();
+                }
+
             return response()->json(['status'=>200 ,'message' => translate('The visit has been registered successfully')], 200);
         } catch (\Exception $e) {
             return response()->json(['status'=>403 ,'message' => translate('error')], 403);

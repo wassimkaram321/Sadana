@@ -36,4 +36,5 @@ class BagsOrdersDetails extends Model
         'updated_at'
     ];
 
+  
 }

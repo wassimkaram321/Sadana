@@ -1489,6 +1489,15 @@
                                         <span class="text-truncate">{{ \App\CPU\translate('Salers list') }}</span>
                                     </a>
                                 </li>
+
+                                <li class="nav-item {{ Request::is('admin/sales-man/orders/team') ? 'active' : '' }}">
+                                    <a class="nav-link" href="{{ route('admin.sales-man.orders-report-teams') }}">
+                                        {{-- <span class="tio-chart-bar-1 nav-icon"></span> --}}
+                                        <span class="tio-circle nav-indicator-icon"></span>
+                                        <span class="text-truncate">{{ \App\CPU\translate('Salers Report') }}</span>
+                                    </a>
+                                </li>
+
                             </ul>
                         </li>
                         @endif

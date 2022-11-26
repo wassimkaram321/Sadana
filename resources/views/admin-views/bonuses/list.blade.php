@@ -47,8 +47,9 @@ use App\Model\Product;
                                 <thead class="thead-light">
                                     <tr>
 
-                                        <th scope="col">{{ \App\CPU\translate('Main Product') }}</th>
-                                        <th scope="col">{{ \App\CPU\translate('Quantity') }}</th>
+                                        <!--<th scope="col">{{ \App\CPU\translate('Main Product') }}</th>-->
+                                        <th scope="col">{{ \App\CPU\translate('Product') }}</th>
+                                        <!--<th scope="col">{{ \App\CPU\translate('Quantity') }}</th>-->
                                         {{-- <th scope="col">{{ \App\CPU\translate('Second Products')}}</th>
                                     <th scope="col">{{ \App\CPU\translate('Second Products Quantity')}}</th> --}}
                                         <th scope="col" style="width: 100px" class="text-center">
@@ -61,38 +62,38 @@ use App\Model\Product;
                                     @foreach ($bonuses as $k => $b)
                                         <tr>
 
-                                            {{-- <td class="text-center">{{$bonuses->firstItem()+$k}}</td> --}}
+
                                             @php
-                                                
+
                                                 $master_name = Product::where('id', $b->master_product_id)
                                                     ->pluck('name')
                                                     ->first();
                                                 $slave_name = Product::where('id', $b->salve_product_id)
                                                     ->pluck('name')
                                                     ->first();
+
+                                                //
+                                                $idx = json_decode($b->master_product_id);
+                                                $idx2 = json_decode($b->master_product_quatity);
+
+                                                //
+
                                             @endphp
+                                            <td>Bonus ({{$b->id}})</td>
 
-                                            <td>
-                                                {{ $master_name }}
-
-                                            </td>
-
-                                            <td>
-                                                {{ $b['master_product_quatity'] }}
-                                            </td>
 
 
                                             <td>
 
                                                 <button type="button" class="btn btn-sm btn-primary view"
                                                     data-toggle="modal" data-target="#exampleModal"
-                                                    data-id="{{ $b['master_product_id'] }}">
+                                                    data-id="{{ $b['id'] }}">
 
                                                     <i class="tio-add-circle"></i>
                                                     {{ \App\CPU\translate('View') }}
                                                 </button>
                                                 <a class="btn btn-danger btn-sm delete1"
-                                                    id="{{ $b['master_product_id'] }}">
+                                                    id="{{ $b['id'] }}">
                                                     <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete') }}
                                                 </a>
 
@@ -111,8 +112,72 @@ use App\Model\Product;
                     </div>
                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                         aria-hidden="true">
-                        <div class="modal-dialog centered" style="justify-content: center">
+                        <div class="modal-dialog centered" id ="eee" style="justify-content: center">
                             <div class="modal-content" style="width: 800px !important;height: 800px;">
+                                <div class="modal-header">
+
+                                    <div class="table-responsive">
+                                        <table
+                                            style="text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};"
+                                            class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
+                                            <thead class="thead-light">
+                                                <tr>
+
+
+                                                    <th scope="col">{{ \App\CPU\translate('Main Products') }}</th>
+                                                    <th scope="col">{{ \App\CPU\translate('Main Products Quantity') }}
+                                                    </th>
+                                                    <th scope="col" style="width: 100px" class="text-center">
+                                                        {{ \App\CPU\translate('action') }}
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="bodyData1">
+
+                                                {{-- @foreach ($bonuses1 as $b)
+                                                    @foreach ($b as $c)
+                                                        <tr>
+
+
+                                                            @php
+
+                                                                $slave_name = Product::where('id', $c->salve_product_id)
+                                                                    ->pluck('name')
+                                                                    ->first();
+                                                            @endphp
+
+
+
+
+
+                                                            <td>
+                                                                {{ $slave_name }}
+                                                            </td>
+                                                            <td>
+                                                                {{ $c['salve_product_quatity'] }}
+                                                            </td>
+
+
+                                                            <td>
+
+                                                                <a class="btn btn-danger btn-sm delete"
+                                                                    id="{{ $c['salve_product_id'] }}">
+                                                                    <i class="tio-add-to-trash"></i>
+                                                                    {{ \App\CPU\translate('Delete') }}
+                                                                </a>
+
+                                                            </td>
+
+                                                        </tr>
+                                                    @endforeach
+                                                @endforeach --}}
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
                                 <div class="modal-header">
 
                                     <div class="table-responsive">
@@ -131,6 +196,7 @@ use App\Model\Product;
                                                     </th>
                                                 </tr>
                                             </thead>
+
                                             <tbody id="bodyData">
 
                                                 {{-- @foreach ($bonuses1 as $b)
@@ -139,7 +205,7 @@ use App\Model\Product;
 
 
                                                             @php
-                                                                
+
                                                                 $slave_name = Product::where('id', $c->salve_product_id)
                                                                     ->pluck('name')
                                                                     ->first();
@@ -177,8 +243,10 @@ use App\Model\Product;
                                     </div>
                                 </div>
 
+
                             </div>
                         </div>
+
                     </div>
                     @if (count($bonuses) == 0)
                         <div class="text-center p-4">
@@ -203,6 +271,13 @@ use App\Model\Product;
         // table.removeChild(table);
 
         });
+        $('#exampleModal').on('hidden.bs.modal', function (e) {
+        // console.log("Hey !! I am unloading... ");
+        var table = document.getElementById('bodyData1');
+        table.innerHTML = "";
+        // table.removeChild(table);
+
+        });
 
 
 
@@ -217,49 +292,114 @@ use App\Model\Product;
                     });
                     var url1 = '{{ route('admin.bonuses.get_salve_products', 'id:id') }}';
                     url1 = url1.replace('id:id', 'id=' + id);
+
+                    var url2 = '{{ route('admin.bonuses.get_main_products', 'id:id') }}';
+                    url2 = url2.replace('id:id', 'id=' + id);
                     $.ajax({
 
                         url: url1,
                         method: 'GET',
                         dataType: 'json',
-                        // data: {id:id,bonuses1:bonuses1},
 
-                        // data: {bonuses1:bonuses1},
                         success: function(dataResult) {
-                            console.log(dataResult);
-                            // toastr.success(
-                            //     '{{ \App\CPU\translate('store_deleted_successfully') }}');
-                            // location.reload();
+
                             var resultData = dataResult;
+                            // console.log(dataResult);
                             var bodyData = '';
                             var i = 1;
                             $.each(resultData, function(index, row) {
                                 var editUrl = '/' + row.id + "/edit";
                                 bodyData += "<tr>"
-                                bodyData += "</td><td>" + row.salve_name +
-                                    "</td><td>" + row.salve_product_quatity + "</td><td>" +  "<button class='btn btn-danger btn-sm delete' value='" +
-                                    row.salve_product_id +
-                                    "' style='margin-left:20px;'>Delete</button></td>"; +
-                                    "</td>" +
-                                    "<td>" 
-                                    // "</td><td><a class='btn btn-primary' href='" +
-                                    // editUrl + "'>Edit</a>" +
-                                   
+                                bodyData += "<td>"
+                                $.each(row.salve_name, function(index, id){
+
+                                    bodyData +=  id  +"<br>"
+                                })
+
+
+                                bodyData += "</td>"
+                                bodyData += "<td>"
+                                $.each(row.salve_product_quatity, function(index, id){
+                                    // console.log('id'+id);
+                                    bodyData +=  id  +"<br>"
+                                })
+                                bodyData += "</td>"
+                                bodyData += "<td>"
+                                $.each(row.salve_product_id, function(index, id){
+
+                                    bodyData +=   "<button class='btn btn-danger btn-sm delete' value='"+id+"'> Delete</button>";
+                                    bodyData +=  "<br>"
+
+                                })
+
+
+
+
                                 bodyData += "</tr>";
 
                             })
                             $("#bodyData").append(bodyData);
-                            
+
 
                         }
                     });
-                
+                    $.ajax({
+
+                        url: url2,
+                        method: 'GET',
+                        dataType: 'json',
+
+                        success: function(dataResult) {
+
+                            var resultData = dataResult;
+                            console.log(dataResult);
+                            var bodyData = '';
+                            var i = 1;
+                            $.each(resultData, function(index, row) {
+                                var editUrl = '/' + row.id + "/edit";
+                                bodyData += "<tr>"
+                                bodyData += "<td>"
+                                $.each(row.master_name, function(index, id){
+
+                                    bodyData +=  id  +"<br>"
+                                })
+
+
+                                bodyData += "</td>"
+                                bodyData += "<td>"
+                                $.each(row.master_product_quatity, function(index, id){
+                                    // console.log('id'+id);
+                                    bodyData +=  id  +"<br>"
+                                })
+                                bodyData += "</td>"
+                                bodyData += "<td>"
+                                $.each(row.master_product_id, function(index, id2){
+
+                                    bodyData +=   "<button class='btn btn-danger btn-sm delete' data-main_id ="+id+" value='"+id2+"'> Delete</button>";
+                                    bodyData +=  "<br>"
+
+                                })
+
+
+
+
+                                bodyData += "</tr>";
+
+                            })
+                            $("#bodyData1").append(bodyData);
+
+
+                        }
+                    });
+
         });
     </script>
     <script>
         $(document).on('click', '.delete', function() {
             var id = $(this).attr("value");
-            
+            var main = $(this).attr("data-main_id");
+
+
             Swal.fire({
                 title: '{{ \App\CPU\translate('Are_you_sure_delete_this_product') }}?',
                 text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this') }}!",
@@ -278,7 +418,8 @@ use App\Model\Product;
                         url: "{{ route('admin.bonuses.delete_sec') }}",
                         method: 'POST',
                         data: {
-                            id: id
+                            id: id,
+                            main: main
                         },
                         success: function() {
                             toastr.success(

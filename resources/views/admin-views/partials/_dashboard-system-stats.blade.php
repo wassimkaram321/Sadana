@@ -6,7 +6,7 @@
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                     <h6 class="card-subtitle" style="color: #413d4b!important;">{{\App\CPU\translate('visitors')}}</h6>
                     <span class="card-title h2" style="color: #413d4b!important;">
-                       55
+                        {{$data['visitors']}}
                     </span>
                 </div>
                 <div class="mt-2">
@@ -27,7 +27,7 @@
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                     <h6 class="card-subtitle" style="color: #413d4b!important;">{{\App\CPU\translate('pharmacies')}}</h6>
                      <span class="card-title h2" style="color: #413d4b!important;">
-                       15
+                        {{$data['pharmacies']}}
                      </span>
                 </div>
 
@@ -49,7 +49,7 @@
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                     <h6 class="card-subtitle" style="color: #413d4b!important;">{{\App\CPU\translate('Sales_Man')}}</h6>
                     <span class="card-title h2" style="color: #413d4b!important;">
-                        12
+                        {{$data['salers']}}
                     </span>
                 </div>
 
@@ -71,7 +71,7 @@
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                     <h6 class="card-subtitle" style="color: #413d4b!important;">{{\App\CPU\translate('Delivery_Man')}}</h6>
                     <span class="card-title h2" style="color: #413d4b!important;">
-                       10
+                        {{$data['deliveries']}}
                     </span>
                 </div>
 

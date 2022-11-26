@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Model\Order;
 use App\Model\Product;
 use App\Model\OrderDetail;
+use App\Model\Visitors;
 use App\Model\ShippingAddress;
 use App\Model\BagsOrdersDetails;
 use App\Model\SupportTicket;
@@ -308,5 +309,30 @@ class CustomerController extends Controller
         ]);
 
         return response()->json(['message' => translate('successfully updated!')], 200);
+    }
+
+
+    public function visitors(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'serial_number' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        }
+        $visitor=Visitors::where('serial_number','=',$request->serial_number)->get()->first();
+        if(isset($visitor))
+        {
+            return response()->json(['message' => 'The user is already visitor!!!'], 200);
+        }
+        else
+        {
+            $visitorNew = new Visitors();
+            $visitorNew->serial_number = $request->serial_number;
+            $visitorNew->save();
+            return response()->json(['message' => 'successfully add!'], 200);
+        }
     }
 }

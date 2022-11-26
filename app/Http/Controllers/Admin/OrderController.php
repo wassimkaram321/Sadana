@@ -6,6 +6,7 @@ use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\App;
 use App\Model\Bag;
 use App\User;
 use App\Model\DeliveryMan;
@@ -23,6 +24,7 @@ use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Pharmacy;
 use Exception;
+use Illuminate\Support\Facades\Session;
 
 class OrderController extends Controller
 {
@@ -449,4 +451,50 @@ class OrderController extends Controller
             return back();
         }
     }
+
+    public function generate_excel_all(Request $request)
+    {
+
+        $from = session('from_date');
+        $to = session('to_date');
+
+        $orderDetails = Order::whereBetween('created_at', [$from, $to])->get();
+        $storage = [];
+
+        foreach ($orderDetails as $item) {
+            if($item->customer_type=="pharmacist")
+            {
+                $user = User::where('id', $item->customer_id)->get()->first();
+                $pharmacy = Pharmacy::where('user_id', $item->customer_id)->get()->first();
+            }
+            else
+            {
+                $pharmacy = Pharmacy::where('id', $item->orderBy_id)->get()->first();
+                $user = User::where('id', $pharmacy->user_id)->get()->first();
+            }
+                $order_status=translate($item->order_status);
+                $order_paid=translate($item->payment_status);
+                $storage[] = [
+                    'رقم الطلبية' =>$item->id,
+                    'اسم الزبون' => $pharmacy->name,
+                    'السعر الاجمالي' => $item->order_amount,
+                    'المنطقة' => $pharmacy->region,
+                    'العنوان' => $pharmacy->Address,
+                    'رقم الهاتف' => $user->phone,
+                    'حالة الطلبية' => $order_status,
+                    'حالة الدفع' => $order_paid,
+                    'تاريخ الطلبية' => $item->created_at,
+                    'تاريخ التسليم' => $item->delivery_date,
+                    'رقم البطاقة' => $pharmacy->card_number,
+                    'رقم الحساب' => $user->pharmacy_id,
+                    'رقم الكشف' =>$item->Detection_number,
+                ];
+        }
+
+        $xlsx = ".xlsx";
+        $result = 'الطلبيات'.now().''.$xlsx;
+        return (new FastExcel($storage))->download($result);
+
+    }
+
 }

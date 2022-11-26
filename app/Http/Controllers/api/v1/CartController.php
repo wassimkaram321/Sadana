@@ -27,7 +27,7 @@ class CartController extends Controller
             {
                 $p = Product::whereid($c->product_id)->first();
                 $c['q_normal_offer']=$p->q_normal_offer;
-                $c['q_featured_offer']=$p->q_featured_offer  ;
+                $c['q_featured_offer']=$p->q_featured_offer;
                 $c['normal_offer']=$p->normal_offer;
                 $c['featured_offer']=$p->featured_offer;
                 $c['demand_limit']=(int)$p->demand_limit;

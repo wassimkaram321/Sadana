@@ -15,45 +15,51 @@ class BrandManager
 
     public static function get_products($brand_id)
     {
-        $products = Product::where(['brand_id' => $brand_id])->where('status','=',1)->get()
-         ->makeHidden(
-                [
-                    'added_by', 'user_id', 'category_ids',
-                    'flash_deal', 'video_provider', 'video_url', 'colors',
-                    'variant_product', 'attributes', 'choice_options', 'variation',
-                    'published', 'tax', 'tax_type','attachment',
-                    'meta_title', 'meta_description', 'meta_image', 'request_status','denied_note',
-                    'temp_shipping_cost', 'is_shipping_cost_updated', 'store_id', 'num_id',
-                    'created_at', 'updated_at','min_qty','multiply_qty','shipping_cost',
-                ]
-            )
-        ->toArray();
+        $products =Product::active()->with(['rating'])->where(['brand_id' => $brand_id])->where('status','=',1)->get()
+        ->makeHidden(
+               [
+                   'added_by', 'user_id', 'category_ids',
+                   'flash_deal', 'video_provider', 'video_url', 'colors',
+                   'variant_product', 'attributes', 'choice_options', 'variation',
+                   'published', 'tax', 'tax_type','attachment',
+                   'meta_title', 'meta_description', 'meta_image', 'request_status','denied_note',
+                   'temp_shipping_cost', 'is_shipping_cost_updated', 'store_id', 'num_id',
+                   'created_at', 'updated_at','min_qty','multiply_qty','shipping_cost',
+               ]
+               );
 
+        // $products = Product::where(['brand_id' => $brand_id])->where('status','=',1)->get()
+        //  ->makeHidden(
+        //         [
+        //             'added_by', 'user_id', 'category_ids',
+        //             'flash_deal', 'video_provider', 'video_url', 'colors',
+        //             'variant_product', 'attributes', 'choice_options', 'variation',
+        //             'published', 'tax', 'tax_type','attachment',
+        //             'meta_title', 'meta_description', 'meta_image', 'request_status','denied_note',
+        //             'temp_shipping_cost', 'is_shipping_cost_updated', 'store_id', 'num_id',
+        //             'created_at', 'updated_at','min_qty','multiply_qty','shipping_cost',
+        //         ]
+        //         );
 
 
         $points = ProductPoint::where('type','product')->get();
-        $array = [];
+        $pointNew="0";
         foreach($products as $p){
 
                foreach($points as $point){
-
                    $idx = json_decode($point->type_id);
                    foreach($idx as $d){
-
                        if($p['id'] == $d){
-                           $p['points'] = $point->points;
-                        //   $p->save();
-                          $array[] = $p;
-
-
+                        $pointNew= $point->points;
                        }
                        else{
-                           $p['points'] = '0';
-                           $array[] = $p;
+                        $pointNew= "0";
                        }
                    }
                }
+
+               $p['points']= $pointNew;
             }
-        return $array;
+        return $products;
     }
 }

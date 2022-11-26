@@ -12,8 +12,10 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
  */
+header('Access-Control-Allow-Origin: *');
+header( 'Access-Control-Allow-Headers: Authorization, Content-Type' );
 
-Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_lang']], function () {
+Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_lang','cors']], function () {
 
 
     //Done
@@ -34,30 +36,29 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::any('social-login', 'SocialAuthController@social_login');
         Route::post('update-phone', 'SocialAuthController@update_phone');
     });
-     //End Done
+    //End Done
 
     Route::group(['prefix' => 'config'], function () {
         Route::get('/', 'ConfigController@configuration');
     });
 
-    Route::group(['prefix' => 'shipping-method','middleware'=>'auth:api'], function () {
+    Route::group(['prefix' => 'shipping-method', 'middleware' => 'auth:api'], function () {
         Route::get('detail/{id}', 'ShippingMethodController@get_shipping_method_info');
         Route::get('by-seller/{id}/{seller_is}', 'ShippingMethodController@shipping_methods_by_seller');
         Route::post('choose-for-order', 'ShippingMethodController@choose_for_order');
         Route::get('chosen', 'ShippingMethodController@chosen_shipping_methods');
 
-        Route::get('check-shipping-type','ShippingMethodController@check_shipping_type');
+        Route::get('check-shipping-type', 'ShippingMethodController@check_shipping_type');
     });
 
 
     //Done
-    Route::group(['prefix' => 'cart','middleware'=>'auth:api'], function () {
-        Route::get('/', 'CartController@cart');
+    Route::group(['prefix' => 'cart', 'middleware' => 'auth:api'], function () {
+        Route::get('/get', 'CartController@cart');
         Route::post('add', 'CartController@add_to_cart');
         Route::put('update', 'CartController@update_cart');
         Route::delete('remove', 'CartController@remove_from_cart');
-        Route::delete('remove-all','CartController@remove_all_from_cart');
-
+        Route::delete('remove-all', 'CartController@remove_all_from_cart');
     });
     //End Done
 
@@ -65,7 +66,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
     Route::get('faq', 'GeneralController@faq');
 
 
-    Route::group(['prefix' => 'bonuses','middleware'=>'auth:api'], function () {
+    Route::group(['prefix' => 'bonuses', 'middleware' => 'auth:api'], function () {
         Route::get('/', 'BonusesController@index');
         Route::get('/unlock_products', 'BonusesController@unlock_products');
         Route::get('/lock_products', 'BonusesController@lock');
@@ -86,7 +87,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('counter/{product_id}', 'ProductController@counter');
         Route::get('shipping-methods', 'ProductController@get_shipping_methods');
         Route::get('social-share-link/{product_id}', 'ProductController@social_share_link');
-        Route::post('reviews/submit', 'ProductController@submit_product_review')->middleware('auth:api');//Done
+        Route::post('reviews/submit', 'ProductController@submit_product_review')->middleware('auth:api'); //Done
         Route::get('best-sellings', 'ProductController@get_best_sellings');  //Done
         Route::get('home-categories', 'ProductController@get_home_categories');
         ROute::get('discounted-product', 'ProductController@get_discounted_product');
@@ -98,11 +99,11 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
 
     Route::group(['prefix' => 'pharmacy'], function () {
         Route::post('store', 'PharmacyController@store')->name('store');  //Done
-        Route::post('update', 'PharmacyController@edit')->name('update');//Done
+        Route::post('update', 'PharmacyController@edit')->name('update'); //Done
     });
 
-    Route::group(['prefix' => 'pharmacy','middleware'=>'auth:api'], function () {
-        Route::get('points', 'PharmacyController@pharmacy_points')->name('pharmacy_points');//was
+    Route::group(['prefix' => 'pharmacy', 'middleware' => 'auth:api'], function () {
+        Route::get('points', 'PharmacyController@pharmacy_points')->name('pharmacy_points'); //was
     });
 
     Route::group(['prefix' => 'pharmacy'], function () {
@@ -129,7 +130,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('products/{brand_id}', 'BrandController@get_products'); //Done
     });
 
-    Route::group(['prefix' => 'bags','middleware'=>'auth:api'], function () {
+    Route::group(['prefix' => 'bags', 'middleware' => 'auth:api'], function () {
         Route::get('list', 'BagController@get_bags'); //Done
         Route::get('products/list', 'BagController@get_bag_products'); //Done
 
@@ -156,9 +157,15 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
     });
 
 
+    Route::group(['prefix' => 'customer'], function () {
+        Route::post('verify-visit', 'CustomerController@visitors');
+    });
+
+
     // customer ( orders ,.....)
     Route::group(['prefix' => 'customer', 'middleware' => 'auth:api'], function () {
         Route::get('info', 'CustomerController@info');
+
         Route::put('update-profile', 'CustomerController@update_profile');
         Route::put('cm-firebase-token', 'CustomerController@update_cm_firebase_token');
 
@@ -217,7 +224,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
 
     Route::group(['prefix' => 'order'], function () {
         Route::get('track', 'OrderController@track_order');
-        Route::get('cancel-order','OrderController@order_cancel');
+        Route::get('cancel-order', 'OrderController@order_cancel');
     });
 
     //Done
@@ -232,7 +239,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::get('all', 'SellerController@get_all_sellers');
     });
 
-    Route::group(['prefix' => 'coupon','middleware' => 'auth:api'], function () {
+    Route::group(['prefix' => 'coupon', 'middleware' => 'auth:api'], function () {
         Route::get('apply', 'CouponController@apply');
         Route::get('list', 'CouponController@coupons');
     });

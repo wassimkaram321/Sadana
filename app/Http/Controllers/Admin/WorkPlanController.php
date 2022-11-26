@@ -8,6 +8,7 @@ use App\Model\PlanDetails;
 use App\Pharmacy;
 use App\User;
 use App\CPU\BackEndHelper;
+use App\Model\WorkPlanTask;
 use App\CPU\Helpers;
 use App\Http\Controllers\BaseController;
 use Brian2694\Toastr\Facades\Toastr;
@@ -19,6 +20,9 @@ use Illuminate\Support\Str;
 use function App\CPU\translate;
 use Illuminate\Support\Facades\Http;
 use App\Traits\distanceTrait;
+use Carbon\CarbonPeriod;
+use Carbon\Carbon;
+use DateTimeImmutable;
 
 class WorkPlanController extends Controller
 {
@@ -47,11 +51,11 @@ class WorkPlanController extends Controller
     {
 
         $salerSelected = WorkPlan::get(['saler_id']);
-        $salesman = User::where('user_type','=','salesman')->whereNotIn('id', $salerSelected)->get();
+        $salesman = User::where('user_type', '=', 'salesman')->whereNotIn('id', $salerSelected)->get();
         return view('admin-views.work-plan.add', compact('salesman'));
     }
 
-    
+
     public function work_plan_store(Request $request)
     {
 
@@ -96,7 +100,15 @@ class WorkPlanController extends Controller
     public function work_plan_delete($id)
     {
         $workPlan = WorkPlan::find($id);
-        $workPlan->delete();
+        $workPlanTasks = WorkPlanTask::where('task_plan_id','=',$id);
+        $planDetails=PlanDetails::where('work_plan_id','=',$id);
+
+        if(isset($workPlan) && isset($workPlanTasks))
+        {
+            $workPlanTasks->delete();
+            $$planDetails->delete();
+            $workPlan->delete();
+        }
         Toastr::success(translate('Work plan removed!'));
         return back();
     }
@@ -239,5 +251,81 @@ class WorkPlanController extends Controller
         else
             $result = 0;
         return $result;
+    }
+
+
+    public function work_plan_tasks(Request $request, $id)
+    {
+        $plan = WorkPlan::where(['id' => $id])->withoutGlobalScopes()->first();
+        $plan_id = $plan->id;
+
+        $pharmaciesSelected = json_decode($plan->pharmacies, true);
+        $pharmaciesSelectedTasks = WorkPlanTask::where([['task_plan_id', '=', $plan_id]])->get(['pharmacy_id']);
+        $pharmacies = Pharmacy::whereIn('id', $pharmaciesSelected)
+            ->whereNotIn('id', $pharmaciesSelectedTasks)
+            ->get();
+        $periods = CarbonPeriod::create($plan->begin_plan, $plan->end_plan);
+
+        $begin = $this->rev_date($plan->begin_plan);
+        $end =$this->rev_date($plan->end_plan);
+
+        return view('admin-views.work-plan.tasks', compact('pharmacies', 'periods', 'plan_id', 'begin', 'end'));
+    }
+
+    public function rev_date($date)
+    {
+        $array = explode("-", $date);
+        $rev = array_reverse($array);
+        $date = implode("-", $rev);
+        return $date;
+    }
+
+    public function work_plan_task_store(Request $request, $id)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'pharmacy_id' => 'required',
+            'task_date' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['Error' => 'Data is faild added']);
+        }
+
+        try {
+
+            $task = WorkPlanTask::where([
+                ['task_plan_id', '=', $id],
+                ['pharmacy_id', '=', $request->pharmacy_id]
+            ])->get()->first();
+
+            if (isset($task) && $request->task_date == "pharmacies") {
+                $task->delete();
+                return response()->json(['success' => 'Data is successfully added']);
+            }
+
+
+            if (!isset($task) && $request->task_date == "pharmacies") {
+                return response()->json(['success' => 'Data is successfully added']);
+            }
+
+
+            if (isset($task)) {
+                if ($task->task_date != $request->task_date) {
+                    $task->task_date = $request->task_date;
+                    $task->update();
+                }
+            } else {
+                $task = new WorkPlanTask;
+                $task->task_date = $request->task_date;
+                $task->task_plan_id = $id;
+                $task->pharmacy_id = $request->pharmacy_id;
+                $task->save();
+            }
+
+            return response()->json(['success' => 'Data is successfully added']);
+        } catch (Exception $e) {
+            return response()->json(['Error' => 'Data is faild added']);
+        }
     }
 }

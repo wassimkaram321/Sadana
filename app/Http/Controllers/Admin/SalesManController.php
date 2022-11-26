@@ -402,4 +402,35 @@ class SalesManController extends Controller
             'areas' => $areas
         ]);
     }
+
+    public function set_date(Request $request)
+    {
+
+        $from = $request['from'];
+        $to = $request['to'];
+        $team_char = $request['team_char'];
+
+        session()->put('from_date', $from);
+        session()->put('to_date', $to);
+        session()->put('team', $team_char);
+
+        $previousUrl = strtok(url()->previous(), '?');
+        return redirect()->to($previousUrl . '?' . http_build_query(['from_date' => $request['from'], 'to_date' => $request['to'],'team' => $request['team_char']]))->with(['from' => $from, 'to' => $to]);
+    }
+
+
+    public function orders_report_team(Request $request)
+    {
+        if (session()->has('from_date') == false) {
+            session()->put('from_date', date('Y-m-01'));
+            session()->put('to_date', date('Y-m-30'));
+        }
+        if(session()->has('team') == false)
+        {
+            session()->put('team','A');
+        }
+
+        return view('admin-views.sales-man.order-index');
+    }
+
 }

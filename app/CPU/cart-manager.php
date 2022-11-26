@@ -627,7 +627,7 @@ class CartManager
         $cart['name'] = $bag->bag_name;
         $cart['discount'] = 0;
         /*$data['shipping_cost'] = $shipping_cost;*/
-        $cart['thumbnail'] = "def.png";
+        $cart['thumbnail'] = $bag->bag_image;
         $cart['seller_id'] = 1;
         $cart['seller_is'] = 'admin';
         $cart['shipping_cost'] = 0;

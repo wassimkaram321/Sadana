@@ -819,25 +819,25 @@ class OrderManager
     }
 
 
-    public static  function products_points($pharmacy_id, $product,$order_id,$product_quantity)
+ public static  function products_points($pharmacy_id, $product,$order_id,$product_quantity)
     {
         # code...
         $points = 0;
         $productpoint = ProductPoint::wheretype('product')->get();
         foreach ($productpoint as $p) {
 
-            // foreach ($products as $product) {
+                $quantity = (int)($product_quantity / $p->quantity);
 
                 $idx = json_decode($p->type_id);
                 if (in_array($product->id, $idx)) {
                     $points = $points + $p->points;
                 }
-            // }
         }
 
         if ($points != 0) {
-                $points = $points*$product_quantity;
+                $points = $points*$quantity;
                 $pharmacy_points = new PharmaciesPoints();
+
                 $pharmacy_points->points = $pharmacy_points->points + $points;
 
                 $pharmacy_points->pharmacy_id = $pharmacy_id;

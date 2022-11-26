@@ -11,7 +11,7 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-2">
-            <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('scheduling_list')}} <span style="color: rgb(252, 59, 10);">({{ $orders->total() }})</span></h1>
+            <h1 class="h3 mb-0 text-black-50">{{\App\CPU\translate('scheduling_list : ')}}{{\App\CPU\translate('Orders (')}}{{\App\CPU\translate('Confirmed |')}}{{\App\CPU\translate('Processing )')}} <span style="color: rgb(252, 59, 10);">({{ $orders->total() }})</span></h1>
         </div>
 
         <div class="row" style="margin-top: 20px">
@@ -60,7 +60,8 @@
 
                                 @foreach($orders as $key=>$order)
                                     <tr>
-                                        <td class="text-center">{{$orders->firstItem()+$key}}</td>
+                                        <td class="text-center"> <a href="{{route('admin.orders.details',['id'=>$order['id']])}}">{{$order['id']}}</a></td>
+
                                         <td>
                                             @if($order->customer)
                                                 <a class="text-body text-capitalize"
@@ -93,8 +94,8 @@
 
                                         <td>
                                             @if($order->delivery_man)
-                                                <a class="text-body text-capitalize"
-                                                   href="{{route('admin.orders.details',['id'=>$order['id']])}}">{{$order->delivery_man['f_name'].' '.$order->delivery_man['l_name']}}</a>
+                                            <a class="text-body text-capitalize"
+                                            href="{{route('admin.orders.details',['id'=>$order['id']])}}">{{$order->delivery_man['f_name'].' '.$order->delivery_man['l_name']}}</a>
                                             @else
                                                 <label class="badge badge-danger">{{\App\CPU\translate('invalid_delivery_man_data')}}</label>
                                             @endif

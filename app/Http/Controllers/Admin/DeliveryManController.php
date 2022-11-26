@@ -211,7 +211,7 @@ class DeliveryManController extends Controller
 
             if ($status != 'all')
             {
-                $orders = Order::with(['customer','delivery_man'])->where(['order_status' => $status]);
+                $orders = Order::with(['customer','delivery_man'])->whereIn('order_status', ['processing', 'confirmed']);
             } else {
                 $orders = Order::with(['customer','delivery_man']);
             }

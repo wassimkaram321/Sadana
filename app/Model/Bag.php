@@ -24,10 +24,22 @@ class Bag extends Model
         'product_total_price',
         'is_gift',
     ];
-    
+
     protected $hidden=[
         'created_at',
         'updated_at'
     ];
+
+    public function bag_order_details()
+    {
+        return $this->hasMany(BagsOrdersDetails::class, 'bag_id');
+    }
+
+    public function bag_order_delivered()
+    {
+        return $this->hasMany(BagsOrdersDetails::class, 'bag_id')
+                        ->where('delivery_status','pending');
+    }
+
 
 }

@@ -6,15 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateBonusTable extends Migration
 {
-   
+
     public function up()
     {
         Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
-            $table->integer('master_product_id');
-            $table->integer('master_product_quatity');
-            $table->integer('salve_product_id');
-            $table->integer('salve_product_quatity');
+            $table->text('master_product_id');
+            $table->text('master_product_quatity');
+            $table->text('salve_product_id');
+            $table->text('salve_product_quatity');
             $table->integer('status');
             $table->timestamps();
         });

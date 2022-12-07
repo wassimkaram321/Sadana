@@ -63,12 +63,14 @@ class DashboardController extends Controller
             ->take(6)
             ->get();
 
+            
         $top_store_by_order_received = Order::where('seller_is', 'seller')
             ->select('seller_id', DB::raw('COUNT(id) as count'))
             ->groupBy('seller_id')
             ->orderBy("count", 'desc')
             ->take(6)
             ->get();
+
 
         $top_brand_by_order_received = OrderDetail::select('brand_id', DB::raw('COUNT(brand_id) as count'))
             ->groupBy('brand_id')
@@ -159,7 +161,7 @@ class DashboardController extends Controller
            "deliveries" => DeliveryMan::count(),
            "visitors" => Visitors::count()
         ];
-      
+
         return view('admin-views.system.dashboard', compact('data', 'inhouse_data', 'seller_data', 'commission_data','systems'));
     }
 

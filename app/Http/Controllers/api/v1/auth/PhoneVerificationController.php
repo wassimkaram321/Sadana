@@ -21,7 +21,7 @@ class PhoneVerificationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             //'temporary_token' => 'required',
-            'phone' => 'required|min:10|max:14|unique:users,phone'
+            'phone' => 'required|min:9|max:9|unique:users,phone'
         ]);
 
         if ($validator->fails()) {

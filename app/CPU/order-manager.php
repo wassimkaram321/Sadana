@@ -431,6 +431,7 @@ class OrderManager
                     $b = Brand::whereid($p->brand_id)->first();
                     $ccc['product_name'] = $p->name;
                     $ccc['brand_name'] = $b->name;
+                    $ccc['thumbnail'] = $p->thumbnail;
                 }
                 $bagId=$c->product_id;
                 $or_dd = [
@@ -819,7 +820,7 @@ class OrderManager
     }
 
 
- public static  function products_points($pharmacy_id, $product,$order_id,$product_quantity)
+    public static  function products_points($pharmacy_id, $product,$order_id,$product_quantity)
     {
         # code...
         $points = 0;

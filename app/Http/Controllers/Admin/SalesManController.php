@@ -11,19 +11,23 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\DB;
 use App\Model\City;
 use App\Model\SalerTeam;
+use App\Model\SalerReview;
+use App\Model\Admin;
 use App\Model\Area;
 use App\Model\Group;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use App\CPU\Helpers;
+use Exception;
 
 class SalesManController extends Controller
 {
 
     public function index()
     {
-        //
         return view('admin-views.sales-man.index');
     }
+
     public function list(Request $request)
     {
         $query_param = [];
@@ -419,6 +423,8 @@ class SalesManController extends Controller
     }
 
 
+
+
     public function orders_report_team(Request $request)
     {
         if (session()->has('from_date') == false) {
@@ -432,5 +438,66 @@ class SalesManController extends Controller
 
         return view('admin-views.sales-man.order-index');
     }
+
+
+    public function reviews(Request $request)
+    {
+        $query_param = [];
+        $search = $request['search'];
+        if ($request->has('search')) {
+            $key = explode(' ', $request['search']);
+            $lists = User::where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->orWhere('f_name', 'like', "%{$value}%")
+                    ->orWhere('l_name', 'like', "%{$value}%")
+                    ->orWhere('name', 'like', "%{$value}%");
+                }
+            });
+            $query_param = ['search' => $request['search']];
+        } else {
+            $lists =User::where('user_type','=','salesman');
+        }
+        $lists->Where('user_type', '=', "salesman");
+        $lists = $lists->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
+        return view('admin-views.sales-man.reviewList', compact('lists', 'search'));
+    }
+
+    public function store_review(Request $request)
+    {
+        $request->validate([
+            'rating' => 'required',
+            'comment' => 'required',
+            'saler_id'=> 'required',
+        ], [
+            'rating.required' => 'Rating is required!',
+            'comment.required' => 'Comment is required!',
+            'saler_id.required' => 'Saler ID is required!',
+        ]);
+
+        try {
+            $emp=Admin::where('id','=',auth('admin')->id())->get()->first();
+            $salerReview = new SalerReview;
+            $salerReview->saler_id = $request->saler_id;
+            $salerReview->saler_comment = $request->comment;
+            $salerReview->saler_rating = $request->rating;
+            $salerReview->emp_name = $emp->name;
+            $salerReview->save();
+            Toastr::success('Review added successfully!');
+            return back();
+        } catch (Exception $e) {
+            return back();
+            Toastr::success('Review added Failure!');
+        }
+    }
+
+
+    public function review($id)
+    {
+        $saler = User::with(['saler_reviews'])->where(['id' => $id])->first();
+        $reviews = SalerReview::where('saler_id','=',$id)->paginate(6);
+
+        return view('admin-views.sales-man.review', compact('saler', 'reviews'));
+    }
+
 
 }

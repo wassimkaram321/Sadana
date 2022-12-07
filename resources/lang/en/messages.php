@@ -2262,4 +2262,57 @@
   'Payment status updated' => 'Payment status updated',
   'Begin_Plan:' => 'Begin Plan:',
   'End_Plan:' => 'End Plan:',
+  'Plans_report' => 'Plans report',
+  'Plans Archive' => 'Plans Archive',
+  'Plan List Archive' => 'Plan List Archive',
+  'Begin_plan' => 'Begin plan',
+  'End_plan' => 'End plan',
+  'Selar_name' => 'Selar name',
+  'Visit_count' => 'Visit count',
+  'Orders_count' => 'Orders count',
+  '
+            Are_you_sure_delete_this_store ' => '
+            Are you sure delete this store ',
+  '
+            Yes ' => '
+            Yes ',
+  '
+            delete_it ' => '
+            delete it ',
+  '
+                            store_deleted_successfully ' => '
+                            store deleted successfully ',
+  'Order_Number' => 'Order Number',
+  'TOTAL_AMOUNT' => 'TOTAL AMOUNT',
+  'TOTAL_ORDERS' => 'TOTAL ORDERS',
+  'refresh' => 'Refresh',
+  '
+                        Status updated successfully ' => '
+                        Status updated successfully ',
+  '
+                        Status updated failed.Plan must be approved ' => '
+                        Status updated failed.Plan must be approved ',
+  'Marketing List' => 'Marketing List',
+  'marketing_list' => 'Marketing list',
+  '
+            Are_you_sure_delete_this_bag ' => '
+            Are you sure delete this bag ',
+  '
+                            Area_deleted_successfully ' => '
+                            Area deleted successfully ',
+  'deleted_successfully' => 'Deleted successfully',
+  'reviewer' => 'Reviewer',
+  'First_name' => 'First name',
+  'Last_name' => 'Last name',
+  'Personal_image' => 'Personal image',
+  'Evaluation' => 'Evaluation',
+  'Comment' => 'Comment',
+  'Delivery Preview' => 'Delivery Preview',
+  'Delivery reviews' => 'Delivery reviews',
+  'Salers_reviews' => 'Salers reviews',
+  'Saler Preview' => 'Saler Preview',
+  'Saler reviews' => 'Saler reviews',
+  'Main Products' => 'Main Products',
+  'Main Products Quantity' => 'Main Products Quantity',
+  'faild' => 'Faild',
 );

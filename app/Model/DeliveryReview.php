@@ -8,7 +8,6 @@ use App\CPU\Helpers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 
-
 class DeliveryReview extends Model
 {
 
@@ -28,6 +27,7 @@ class DeliveryReview extends Model
         'delivery_rating',
         'delivery_comment',
         'delivery_id',
+        'emp_name'
     ];
 
     public function translations()
@@ -62,5 +62,6 @@ class DeliveryReview extends Model
     {
         return $this->belongsTo(DeliveryMan::class, 'delivery_id');
     }
+
 
 }

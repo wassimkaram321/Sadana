@@ -44,14 +44,14 @@
                                     <!-- End Search -->
                                 </form>
                             </div>
-                            
+
                             <div class="col-12 col-md-8 text-right">
                                 <a href="{{route('admin.delivery-man.add')}}" class="btn btn-primary pull-right"><i
                                         class="tio-add-circle"></i> {{\App\CPU\translate('add')}} {{\App\CPU\translate('deliveryman')}}
                                 </a>
                             </div>
                         </div>
-                        
+
                     </div>
                     <!-- End Header -->
 
@@ -110,7 +110,14 @@
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 <a class="dropdown-item"
-                                                   href="{{route('admin.delivery-man.edit',[$dm['id']])}}">{{\App\CPU\translate('edit')}}</a>
+                                                href="{{route('admin.delivery-man.preview',[$dm['id']])}}">
+                                                {{\App\CPU\translate('view')}}
+                                                </a>
+
+                                                <a class="dropdown-item"
+                                                   href="{{route('admin.delivery-man.edit',[$dm['id']])}}">
+                                                   {{\App\CPU\translate('edit')}}
+                                                </a>
                                                 <a class="dropdown-item" href="javascript:"
                                                    onclick="form_alert('delivery-man-{{$dm['id']}}','Want to remove this information ?')">{{\App\CPU\translate('delete')}}</a>
                                                 <form action="{{route('admin.delivery-man.delete',[$dm['id']])}}"

@@ -334,7 +334,7 @@
   'employee_form' => 'فورم موظف',
   'Role' => 'دور',
   'employee_image' => 'صورة الموظف',
-  'submit' => 'Submit',
+  'submit' => 'تأكيد',
   'Employee' => 'الموظف',
   'employee_table' => 'جدول الموظفين',
   'Password' => 'كلمة السر',
@@ -2080,4 +2080,40 @@
   'Work plan removed!' => 'تم حذف الخطة!',
   'No plans to show' => 'No plans to show',
   'Sales Team ( Order Report )' => 'Sales Team ( Order Report )',
+  'Plans Archive' => 'أرشيف الخطط',
+  'Plan List Archive' => 'أرشيف تقارير الخطط',
+  'Plans_report' => 'تقارير الخطط',
+  'Begin_plan' => 'بداية الخطة',
+  'End_plan' => 'نهاية الخطة',
+  'Selar_name' => 'اسم المندوب',
+  'Visit_count' => 'عدد الزيارات',
+  'Orders_count' => 'عدد الطلبيات',
+  'Team' => 'الفريق',
+  '
+            Are_you_sure_delete_this_store ' => '
+            Are you sure delete this store ',
+  '
+            Yes ' => '
+            Yes ',
+  '
+            delete_it ' => '
+            delete it ',
+  '
+                            store_deleted_successfully ' => '
+                            store deleted successfully ',
+  'TOTAL_AMOUNT' => 'إجمالي السعر',
+  'TOTAL_ORDERS' => 'إجمالي الطلبيات',
+  'Order_Number' => 'رقم الطلبية',
+  'Marketing List' => 'قائمة التسويق',
+  'marketing_list' => 'قائمة تسويق المنتجات الأكثر طلباً',
+  'Num' => 'الرقم',
+  'deleted_successfully' => 'Deleted successfully',
+  'First_name' => 'الاسم',
+  'Last_name' => 'الكنية',
+  'Personal_image' => 'الصورة الشخصية',
+  'Evaluation' => 'تقييم',
+  'Comment' => 'الملاحظة',
+  'Delivery Preview' => 'تقييمات الموزع',
+  'Delivery reviews' => 'تقييمات الموزع',
+  'Salers_reviews' => 'Salers reviews',
 );

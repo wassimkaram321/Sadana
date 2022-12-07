@@ -1,6 +1,6 @@
 @extends('layouts.back-end.app')
 
-@section('title', \App\CPU\translate('Delivery Preview'))
+@section('title', \App\CPU\translate('Saler Preview'))
 
 @push('css_or_js')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -63,7 +63,7 @@
     <div class="page-header">
         <div class="flex-between row mx-1">
             <div>
-                <h1 class="page-header-title">{{$delivery['name']}}</h1>
+                <h1 class="page-header-title">{{$saler['name']}}</h1>
             </div>
             <div class="row">
                 <div class="col-12 flex-start">
@@ -81,7 +81,7 @@
         <ul class="nav nav-tabs page-header-tabs">
             <li class="nav-item">
                 <a class="nav-link active" href="javascript:">
-                    {{\App\CPU\translate('Delivery reviews')}}
+                    {{\App\CPU\translate('Saler reviews')}}
                 </a>
             </li>
         </ul>
@@ -97,13 +97,13 @@
                 <div class="col-md-auto mb-3 mb-md-0">
                     <div class="d-flex align-items-center">
                         <img class="avatar avatar-xxl avatar-4by3 {{Session::get('direction') === " rtl" ? 'ml-4'
-                            : 'mr-4' }}" onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'" src="{{asset('storage/app/public/delivery-man')}}/{{$delivery['image']}}" alt="Image Description">
+                            : 'mr-4' }}" onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'" src="{{asset('storage/app/public/delivery-man')}}/{{$saler['image']}}" alt="Image Description">
 
                         <div class="d-block">
                             <h4 class="display-2 text-dark mb-0">
-                                {{count($delivery->rating)>0?number_format($delivery->rating[0]->average, 2, '.', ' '):0}}
+                                {{count($saler->saler_rating)>0?number_format($saler->saler_rating[0]->average, 2, '.', ' '):0}}
                             </h4>
-                            <p> {{\App\CPU\translate('of')}} {{$delivery->reviews->count()}}
+                            <p> {{\App\CPU\translate('of')}} {{$saler->saler_reviews->count()}}
                                 {{\App\CPU\translate('reviews')}}
                                 <span class="badge badge-soft-dark badge-pill {{Session::get('direction') === " rtl"
                                     ? 'mr-1' : 'ml-1' }}"></span>
@@ -115,10 +115,10 @@
                 <div class="col-lg-6 col-md-6 col-sm-10">
                     <ul class="list-unstyled list-unstyled-py-2 mb-0">
 
-                        @php($total=$delivery->reviews->count())
+                        @php($total=$saler->saler_reviews->count())
                         <!-- Review Ratings -->
                         <li class="d-flex align-items-center font-size-sm">
-                            @php($five=\App\CPU\Helpers::delivery_rating_count($delivery['id'],5))
+                            @php($five=\App\CPU\Helpers::saler_rating_count($saler['id'],5))
                             <span class="{{Session::get('direction') === " rtl" ? 'ml-3' : 'mr-3'
                                 }}">{{\App\CPU\translate('5 star')}}</span>
                             <div class="progress flex-grow-1">
@@ -130,7 +130,7 @@
 
                         <!-- Review Ratings -->
                         <li class="d-flex align-items-center font-size-sm">
-                            @php($four=\App\CPU\Helpers::delivery_rating_count($delivery['id'],4))
+                            @php($four=\App\CPU\Helpers::saler_rating_count($saler['id'],4))
                             <span class="{{Session::get('direction') === " rtl" ? 'ml-3' : 'mr-3'
                                 }}">{{\App\CPU\translate('4 star')}}</span>
                             <div class="progress flex-grow-1">
@@ -142,7 +142,7 @@
 
                         <!-- Review Ratings -->
                         <li class="d-flex align-items-center font-size-sm">
-                            @php($three=\App\CPU\Helpers::delivery_rating_count($delivery['id'],3))
+                            @php($three=\App\CPU\Helpers::saler_rating_count($saler['id'],3))
                             <span class="{{Session::get('direction') === " rtl" ? 'ml-3' : 'mr-3'
                                 }}">{{\App\CPU\translate('3 star')}}</span>
                             <div class="progress flex-grow-1">
@@ -154,7 +154,7 @@
 
                         <!-- Review Ratings -->
                         <li class="d-flex align-items-center font-size-sm">
-                            @php($two=\App\CPU\Helpers::delivery_rating_count($delivery['id'],2))
+                            @php($two=\App\CPU\Helpers::saler_rating_count($saler['id'],2))
                             <span class="{{Session::get('direction') === " rtl" ? 'ml-3' : 'mr-3'
                                 }}">{{\App\CPU\translate('2 star')}}</span>
                             <div class="progress flex-grow-1">
@@ -166,7 +166,7 @@
 
                         <!-- Review Ratings -->
                         <li class="d-flex align-items-center font-size-sm">
-                            @php($one=\App\CPU\Helpers::delivery_rating_count($delivery['id'],1))
+                            @php($one=\App\CPU\Helpers::saler_rating_count($saler['id'],1))
                             <span class="{{Session::get('direction') === " rtl" ? 'ml-3' : 'mr-3'
                                 }}">{{\App\CPU\translate('1 star')}}</span>
                             <div class="progress flex-grow-1">
@@ -200,7 +200,7 @@
                         @foreach($reviews as $review)
                         <tr>
                             <td>
-                                <a class="d-flex align-items-center" href="{{route('admin.customer.view',[$review['delivery_id']])}}">
+                                <a class="d-flex align-items-center" href="{{route('admin.customer.view',[$review['saler_id']])}}">
 
                                     <div class="{{Session::get('direction') === " rtl" ? 'mr-3' : 'ml-3' }}">
                                         <span class="d-block h5 text-hover-primary mb-0">{{$review['emp_name'] }} <i class="tio-verified text-primary" data-toggle="tooltip" data-placement="top" title="Verified Customer"></i></span>
@@ -212,11 +212,11 @@
                                 <div class="text-wrap" style="width: 18rem;">
                                     <div class="d-flex mb-2">
                                         <label class="badge badge-soft-info">
-                                            {{$review->delivery_rating}} <i class="tio-star"></i>
+                                            {{$review->saler_rating}} <i class="tio-star"></i>
                                         </label>
                                         <label class="badge badge-soft-info">
                                             <span>
-                                                {{$review['delivery_comment']}}
+                                                {{$review['saler_comment']}}
                                             </span>
                                         </label>
                                     </div>

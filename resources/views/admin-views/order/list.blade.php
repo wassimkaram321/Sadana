@@ -147,16 +147,16 @@
                     @foreach($orders as $key=>$order)
 
                         <tr class="status-{{$order['order_status']}} class-all">
+                            
                             <td class="">
                                 {{$orders->firstItem()+$key}}
                             </td>
+
                             <td class="table-column-pl-0">
                                 <a href="{{route('admin.orders.details',['id'=>$order['id']])}}">{{$order['id']}}</a>
                             </td>
+
                             <td>{{date('d M Y',strtotime($order['created_at']))}}</td>
-
-
-
 
                             <td>
                                 @if($order->customer)

@@ -59,13 +59,14 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
         Route::put('update', 'CartController@update_cart');
         Route::delete('remove', 'CartController@remove_from_cart');
         Route::delete('remove-all', 'CartController@remove_all_from_cart');
+
+        Route::get('get/keys', 'CartController@get_product_keys');               //get product keys
+        Route::post('order/keys', 'CartController@order_product_keys');          //get product keys
     });
     //End Done
 
 
     Route::get('faq', 'GeneralController@faq');
-
-
     Route::group(['prefix' => 'bonuses', 'middleware' => 'auth:api'], function () {
         Route::get('/', 'BonusesController@index');
         Route::get('/unlock_products', 'BonusesController@unlock_products');
@@ -200,6 +201,7 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
             Route::post('refund-store', 'OrderController@store_refund');
             Route::get('refund-details', 'OrderController@refund_details');
         });
+
         // Chatting
         Route::group(['prefix' => 'chat'], function () {
             Route::get('/', 'ChatController@chat_with_seller');

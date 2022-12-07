@@ -4,12 +4,13 @@ namespace App;
 
 use App\Model\Order;
 use App\Model\Review;
+use App\Model\SalerReview;
 use App\Model\ShippingAddress;
 use App\Model\Wishlist;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -18,8 +19,6 @@ class User extends Authenticatable
     protected $fillable = [
         'f_name', 'l_name', 'name', 'email', 'password', 'phone', 'image', 'login_medium','is_active','social_id','is_phone_verified','temporary_token','city','country','area_id'
     ];
-
-
 
 
     protected $hidden=[
@@ -75,5 +74,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(WorkPlan::class,'id');
     }
+
+
+
+    //Sales Man Reviews
+    public function saler_reviews()
+    {
+        return $this->hasMany(SalerReview::class,'saler_id','id');
+    }
+
+
+    public function saler_rating()
+    {
+        return $this->hasMany(SalerReview::class,'saler_id','id')
+            ->select(DB::raw('avg(saler_rating) average, saler_id'))
+            ->groupBy('saler_id');
+    }
+   //End Sales Man Reviews
 
 }

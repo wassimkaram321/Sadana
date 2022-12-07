@@ -93,22 +93,19 @@ class OrderController extends Controller
         $order = Order::with('details', 'shipping', 'seller')->where(['id' => $id])->first();
         $bagsOrder = BagsOrdersDetails::where(['order_id' => $id])->get();
 
-        $count=0;
-      foreach($bagsOrder as $bagOrder)
-      {
-        $bag = Bag::where(['id' => $bagOrder->bag_id])->get()->first();
-        $bagProducts=BagProduct::where(['bag_id' => $bagOrder->bag_id])->get();
-        foreach($bagProducts as $bagProduct)
-        {
-            if($bagProduct->is_gift==1)
-            {
-                $count=$count+$bagProduct->product_count;
+        $count = 0;
+        foreach ($bagsOrder as $bagOrder) {
+            $bag = Bag::where(['id' => $bagOrder->bag_id])->get()->first();
+            $bagProducts = BagProduct::where(['bag_id' => $bagOrder->bag_id])->get();
+            foreach ($bagProducts as $bagProduct) {
+                if ($bagProduct->is_gift == 1) {
+                    $count = $count + $bagProduct->product_count;
+                }
             }
+            $bagOrder['bag_name'] = $bag->bag_name;
+            $bagOrder['total_qty'] = $count;
         }
-        $bagOrder['bag_name']=$bag->bag_name;
-        $bagOrder['total_qty']=$count;
-      }
-  //  dd($bagsOrder);
+
 
         $linked_orders = Order::where(['order_group_id' => $order['order_group_id']])
             ->whereNotIn('order_group_id', ['def-order-group'])
@@ -135,7 +132,7 @@ class OrderController extends Controller
 
             $status = true;
             if ($order->order_type == 'default_type') {
-                return view('admin-views.order.order-details', compact('bagsOrder','status', 'shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy', 'UserPharmacy'));
+                return view('admin-views.order.order-details', compact('bagsOrder', 'status', 'shipping_address', 'order', 'linked_orders', 'delivery_men', 'pharmacy', 'UserPharmacy'));
             } else {
                 return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address', 'pharmacy', 'UserPharmacy'));
             }
@@ -143,7 +140,7 @@ class OrderController extends Controller
 
         if ($order->order_type == 'default_type') {
             $status = false;
-            return view('admin-views.order.order-details', compact('bagsOrder','status', 'shipping_address', 'order', 'linked_orders', 'delivery_men'));
+            return view('admin-views.order.order-details', compact('bagsOrder', 'status', 'shipping_address', 'order', 'linked_orders', 'delivery_men'));
         } else {
             return view('admin-views.pos.order.order-details', compact('status', 'order', 'shipping_address'));
         }
@@ -290,6 +287,8 @@ class OrderController extends Controller
         }
         return back();
     }
+
+
     public function update_deliver_info(Request $request)
     {
         $order = Order::find($request->order_id);
@@ -313,13 +312,13 @@ class OrderController extends Controller
             $orderProduct = Product::where('id', $item->product_id)->get()->first();
             $product_details = json_decode($item->product_details);
 
-                $storage[] = [
-                    'اسم المادة' =>  $product_details->name,
-                    'كمية المادة' => $item->qty,
-                    'بونص المادة' => $item->total_qty,
-                    'سعر المادة' => $item->price,
-                    'تاريخ انتهاء الصلاحية' => $product_details->expiry_date,
-                ];
+            $storage[] = [
+                'اسم المادة' =>  $product_details->name,
+                'كمية المادة' => $item->qty,
+                'بونص المادة' => $item->total_qty,
+                'سعر المادة' => $item->price,
+                'تاريخ انتهاء الصلاحية' => $product_details->expiry_date,
+            ];
         }
 
         $orderBagsDetails = BagsOrdersDetails::where('order_id', $request->order_id)->get();
@@ -327,17 +326,15 @@ class OrderController extends Controller
             $bag_details = json_decode($itemBag->bag_details);
 
 
-            foreach($bag_details as $bag_detail)
-            {
+            foreach ($bag_details as $bag_detail) {
                 $storage[] = [
                     'اسم المادة' =>  $bag_detail->product_name,
-                    'كمية المادة' => ($itemBag->bag_qty)*($bag_detail->product_count),
+                    'كمية المادة' => ($itemBag->bag_qty) * ($bag_detail->product_count),
                     'بونص المادة' => 0,
                     'سعر المادة' => $bag_detail->product_price,
                     'تاريخ انتهاء الصلاحية' => "0000-00-00",
                 ];
             }
-
         }
         $userName = User::where('id', $product_details->user_id)->get()->first();
         $xlsx = ".xlsx";
@@ -374,25 +371,33 @@ class OrderController extends Controller
             if ($request->ajax()) {
                 $product = OrderDetail::where('order_id', '=', $request->order_id)
                     ->where('product_id', '=', $request->product_id)->get()->first();
-                OrderManager::stock_update_on_order_delete_change($product,$request->order_id);
+                OrderManager::stock_update_on_order_delete_change($product, $request->order_id);
                 $product->delete();
             }
 
+            $product_name = Product::where('id', '=', $request->product_id)->get()->first();
+            if (isset($product_name))
+                $productName = $product_name->name;
+            else
+                $productName = "غير معرف";
+
             //notification
-            // $value = Helpers::order_status_update_message($request->order_status);
-            //$fcm_token = $order->customer->cm_firebase_token;
-            // try {
-            //     if ($value) {
-            //         $data = [
-            //             'title' => translate('Order'),
-            //             'description' => $value,
-            //             'order_id' => $order['id'],
-            //             'image' => '',
-            //         ];
-            //         Helpers::send_push_notif_to_device($fcm_token, $data);
-            //     }
-            // } catch (\Exception $e) {
-            // }
+            $order = Order::find($request->order_id);
+            $fcm_token = $order->customer->cm_firebase_token;
+
+            $message = "تم إزالة المنتج (" . $productName . ") رقم الطلبية (" . $order['id'] . ")";
+            try {
+                if (true) {
+                    $data = [
+                        'title' => translate('Order'),
+                        'description' => $message,
+                        'order_id' => $order['id'],
+                        'image' => '',
+                    ];
+                    Helpers::send_push_notif_to_device($fcm_token, $data);
+                }
+            } catch (\Exception $e) {
+            }
 
             $data = 1;
             return response()->json($data);
@@ -403,13 +408,13 @@ class OrderController extends Controller
     }
 
 
-    public function product_edit_order(Request $request,$id)
+    public function product_edit_order(Request $request, $id)
     {
-        $orderDetail = OrderDetail::where('order_id','=',$id)
-        ->where('product_id','=',$request->product_id)->get()->first();
-	    return response()->json([
-	      'data' => $orderDetail
-	    ]);
+        $orderDetail = OrderDetail::where('order_id', '=', $id)
+            ->where('product_id', '=', $request->product_id)->get()->first();
+        return response()->json([
+            'data' => $orderDetail
+        ]);
     }
 
 
@@ -424,25 +429,33 @@ class OrderController extends Controller
                 Toastr::error('Faild updated!');
             }
 
-                $product = OrderDetail::where('order_id', '=', $request->order_id)
-                    ->where('product_id', '=', $request->product_id)->get()->first();
-                OrderManager::stock_update_on_order_edit_change($product,$request->order_id,$request->qty);
+            $product = OrderDetail::where('order_id', '=', $request->order_id)
+                ->where('product_id', '=', $request->product_id)->get()->first();
+            OrderManager::stock_update_on_order_edit_change($product, $request->order_id, $request->qty);
+
+            $product_name = Product::where('id', '=', $request->product_id)->get()->first();
+            if (isset($product_name))
+                $productName = $product_name->name;
+            else
+                $productName = "غير معرف";
 
             //notification
-            // $value = Helpers::order_status_update_message($request->order_status);
-            //$fcm_token = $order->customer->cm_firebase_token;
-            // try {
-            //     if ($value) {
-            //         $data = [
-            //             'title' => translate('Order'),
-            //             'description' => $value,
-            //             'order_id' => $order['id'],
-            //             'image' => '',
-            //         ];
-            //         Helpers::send_push_notif_to_device($fcm_token, $data);
-            //     }
-            // } catch (\Exception $e) {
-            // }
+            $order = Order::find($request->order_id);
+            $fcm_token = $order->customer->cm_firebase_token;
+
+            $message = "تم التعديل على كمية المنتج (" . $productName . ") رقم الطلبية (" . $order['id'] . ")";
+            try {
+                if (true) {
+                    $data = [
+                        'title' => translate('Order'),
+                        'description' => $message,
+                        'order_id' => $order['id'],
+                        'image' => '',
+                    ];
+                    Helpers::send_push_notif_to_device($fcm_token, $data);
+                }
+            } catch (\Exception $e) {
+            }
 
             Toastr::success('Quantity updated successfully!');
             return back();
@@ -462,39 +475,34 @@ class OrderController extends Controller
         $storage = [];
 
         foreach ($orderDetails as $item) {
-            if($item->customer_type=="pharmacist")
-            {
+            if ($item->customer_type == "pharmacist") {
                 $user = User::where('id', $item->customer_id)->get()->first();
                 $pharmacy = Pharmacy::where('user_id', $item->customer_id)->get()->first();
-            }
-            else
-            {
+            } else {
                 $pharmacy = Pharmacy::where('id', $item->orderBy_id)->get()->first();
                 $user = User::where('id', $pharmacy->user_id)->get()->first();
             }
-                $order_status=translate($item->order_status);
-                $order_paid=translate($item->payment_status);
-                $storage[] = [
-                    'رقم الطلبية' =>$item->id,
-                    'اسم الزبون' => $pharmacy->name,
-                    'السعر الاجمالي' => $item->order_amount,
-                    'المنطقة' => $pharmacy->region,
-                    'العنوان' => $pharmacy->Address,
-                    'رقم الهاتف' => $user->phone,
-                    'حالة الطلبية' => $order_status,
-                    'حالة الدفع' => $order_paid,
-                    'تاريخ الطلبية' => $item->created_at,
-                    'تاريخ التسليم' => $item->delivery_date,
-                    'رقم البطاقة' => $pharmacy->card_number,
-                    'رقم الحساب' => $user->pharmacy_id,
-                    'رقم الكشف' =>$item->Detection_number,
-                ];
+            $order_status = translate($item->order_status);
+            $order_paid = translate($item->payment_status);
+            $storage[] = [
+                'رقم الطلبية' => $item->id,
+                'اسم الزبون' => $pharmacy->name,
+                'السعر الاجمالي' => $item->order_amount,
+                'المنطقة' => $pharmacy->region,
+                'العنوان' => $pharmacy->Address,
+                'رقم الهاتف' => $user->phone,
+                'حالة الطلبية' => $order_status,
+                'حالة الدفع' => $order_paid,
+                'تاريخ الطلبية' => $item->created_at,
+                'تاريخ التسليم' => $item->delivery_date,
+                'رقم البطاقة' => $pharmacy->card_number,
+                'رقم الحساب' => $user->pharmacy_id,
+                'رقم الكشف' => $item->Detection_number,
+            ];
         }
 
         $xlsx = ".xlsx";
-        $result = 'الطلبيات'.now().''.$xlsx;
+        $result = 'الطلبيات' . now() . '' . $xlsx;
         return (new FastExcel($storage))->download($result);
-
     }
-
 }

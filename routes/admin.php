@@ -218,13 +218,18 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('store', 'AttributeController@store')->name('store');
             Route::get('edit/{id}', 'AttributeController@edit')->name('edit');
             Route::post('update/{id}', 'AttributeController@update')->name('update');
-            Route::post('delete', 'AttributeController@delete')->name('delete');
+            Route::delete('delete', 'AttributeController@delete')->name('delete');
         });
 
 
+        //marketing product
+        Route::group(['prefix' => 'marketing', 'as' => 'marketing.', 'middleware' => ['module:marketing_section']], function () {
+            Route::get('list', 'MarketingController@list')->name('list');
+            Route::post('store', 'MarketingController@store')->name('store');
+            Route::post('delete', 'MarketingController@delete')->name('delete');
+        });
 
 
-        //coupon
         Route::group(['prefix' => 'coupon', 'as' => 'coupon.', 'middleware' => ['module:marketing_section']], function () {
             Route::get('add-new', 'CouponController@add_new')->name('add-new')->middleware('actch');;
             Route::post('store-coupon', 'CouponController@store')->name('store-coupon');
@@ -767,7 +772,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('add', 'DeliveryManController@index')->name('add');
             Route::post('store', 'DeliveryManController@store')->name('store');
             Route::get('list', 'DeliveryManController@list')->name('list');
-           // Route::get('preview/{id}', 'DeliveryManController@preview')->name('preview');
+            Route::get('preview/{id}', 'DeliveryManController@preview')->name('preview');
             Route::get('edit/{id}', 'DeliveryManController@edit')->name('edit');
             Route::post('update/{id}', 'DeliveryManController@update')->name('update');
             Route::delete('delete/{id}', 'DeliveryManController@delete')->name('delete');
@@ -775,6 +780,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('status-update', 'DeliveryManController@status')->name('status-update');
 
             Route::get('reviews', 'DeliveryManController@reviewList')->name('delivery-reviews');
+            Route::post('store/review', 'DeliveryManController@store_review')->name('store-review');
 
         });
 
@@ -801,6 +807,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('update/{id}', 'SalesManController@update')->name('update');
             Route::get('preview/{id}', 'SalesManController@preview')->name('preview');
 
+            Route::get('reviews', 'SalesManController@reviews')->name('salers-reviews');
+            Route::post('store/review', 'SalesManController@store_review')->name('store-review');
+            Route::get('review/{saler_id}', 'SalesManController@review')->name('review');
+
 
             Route::get('orders/team', 'SalesManController@orders_report_team')->name('orders-report-teams');
             Route::any('team/set-date', 'SalesManController@set_date')->name('team-set-date');
@@ -816,7 +826,11 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('work-plan/get/details/{plan_id}', 'WorkPlanController@work_plan_details')->name('work-plan-details');
 
             Route::get('work-plan/tasks/{id}', 'WorkPlanController@work_plan_tasks')->name('work-plan-tasks');
+            Route::any('work-plan/refresh/{plan_id}', 'WorkPlanController@work_plan_refresh')->name('work-plan-refresh');
             Route::post('work-plan/task/store/{id}', 'WorkPlanController@work_plan_task_store')->name('work-plan-task-store');
+            Route::get('work-plan/report', 'WorkPlanController@work_plans_report')->name('work-plans-report');
+            Route::any('plan/set-date', 'WorkPlanController@plan_set_date')->name('plan-set-date');
+            Route::post('work-plan/plan/report/details/{id}', 'WorkPlanController@plan_details_report')->name('plan-details-report');
 
             Route::get('areas/{catId}', 'SalesManController@areas')->name('areas');
 

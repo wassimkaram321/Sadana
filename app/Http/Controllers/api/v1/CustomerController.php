@@ -12,6 +12,7 @@ use App\Model\OrderDetail;
 use App\Model\Visitors;
 use App\Model\ShippingAddress;
 use App\Model\BagsOrdersDetails;
+use App\Model\Bag;
 use App\Model\SupportTicket;
 use App\Model\SupportTicketConv;
 use App\Model\Wishlist;
@@ -72,18 +73,16 @@ class CustomerController extends Controller
 
     public function get_support_tickets(Request $request)
     {
-        $tickets=SupportTicket::where('customer_id', $request->user()->id)->get();
-        foreach($tickets as $ticket)
-        {
-            if($ticket['status']=='open')
-                $ticket['status']=1;   //open
-            elseif($ticket['status']=='close')
-                $ticket['status']=0;   //close
+        $tickets = SupportTicket::where('customer_id', $request->user()->id)->get();
+        foreach ($tickets as $ticket) {
+            if ($ticket['status'] == 'open')
+                $ticket['status'] = 1;   //open
+            elseif ($ticket['status'] == 'close')
+                $ticket['status'] = 0;   //close
             else
-                $ticket['status']=2;  //pending
+                $ticket['status'] = 2;  //pending
         }
         return response()->json($tickets, 200);
-
     }
 
     public function get_support_ticket_conv($ticket_id)
@@ -101,9 +100,8 @@ class CustomerController extends Controller
         }
 
 
-        $product=Product::find($request->product_id);
-        if(isset($product))
-        {
+        $product = Product::find($request->product_id);
+        if (isset($product)) {
             $wishlist = Wishlist::where('customer_id', $request->user()->id)->where('product_id', $request->product_id)->first();
 
             if (empty($wishlist)) {
@@ -115,13 +113,9 @@ class CustomerController extends Controller
             }
 
             return response()->json(['message' => translate('Already in your wishlist')], 409);
-        }
-        else
-        {
+        } else {
             return response()->json(['message' => translate('Product Id not found')], 409);
         }
-
-
     }
 
     public function remove_from_wishlist(Request $request)
@@ -139,7 +133,6 @@ class CustomerController extends Controller
         if (!empty($wishlist)) {
             Wishlist::where(['customer_id' => $request->user()->id, 'product_id' => $request->product_id])->delete();
             return response()->json(['message' => translate('successfully removed!')], 200);
-
         }
         return response()->json(['message' => translate('No such data found!')], 404);
     }
@@ -230,10 +223,15 @@ class CustomerController extends Controller
 
         $details = OrderDetail::where(['order_id' => $request['order_id']])->get();
         $bagDetails = BagsOrdersDetails::where(['order_id' => $request['order_id']])->get();
-        foreach($bagDetails as $bagDetail)
-        {
-             $bagDetail['order_id']=(int)$bagDetail['order_id'];
-             $bagDetail['bag_id']=(int)$bagDetail['bag_id'];
+        foreach ($bagDetails as $bagDetail) {
+            $bagDetail['order_id'] = (int)$bagDetail['order_id'];
+            $bagDetail['bag_id'] = (int)$bagDetail['bag_id'];
+
+            $bag = Bag::where('id', '=', (int)$bagDetail['bag_id'])->get()->first();
+            if (isset($bag)) {
+                $bagDetail['bag_name'] = $bag->bag_name;
+                $bagDetail['bag_image'] = $bag->bag_image;
+            }
         }
 
         $details->map(function ($query) {
@@ -243,14 +241,14 @@ class CustomerController extends Controller
         });
 
         $bagDetails->map(function ($query) {
-            $query['bag_details'] =json_decode($query['bag_details'], true);
+            $query['bag_details'] = json_decode($query['bag_details'], true);
             return $query;
         });
 
         // $merged = $details->merge($bagDetails);
         // $result = $merged->all();
 
-         return response()->json(['products'=>$details,'bags'=>$bagDetails], 200);
+        return response()->json(['products' => $details, 'bags' => $bagDetails], 200);
     }
 
     public function update_profile(Request $request)
@@ -322,13 +320,10 @@ class CustomerController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
-        $visitor=Visitors::where('serial_number','=',$request->serial_number)->get()->first();
-        if(isset($visitor))
-        {
+        $visitor = Visitors::where('serial_number', '=', $request->serial_number)->get()->first();
+        if (isset($visitor)) {
             return response()->json(['message' => 'The user is already visitor!!!'], 200);
-        }
-        else
-        {
+        } else {
             $visitorNew = new Visitors();
             $visitorNew->serial_number = $request->serial_number;
             $visitorNew->save();

@@ -6,20 +6,23 @@ use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\Controller;
 use App\Model\DeliveryMan;
+use App\Model\Admin;
 use App\Model\DeliveryReview;
-use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use function App\CPU\translate;
 use App\Model\Order;
-
+use Brian2694\Toastr\Facades\Toastr;
+use Exception;
 
 class DeliveryManController extends Controller
 {
+
     public function index()
     {
         return view('admin-views.delivery-man.index');
     }
+
 
     public function list(Request $request)
     {
@@ -60,11 +63,15 @@ class DeliveryManController extends Controller
         ]);
     }
 
+
     public function preview($id)
     {
-        $dm = DeliveryMan::with(['reviews'])->where(['id' => $id])->first();
-        return view('admin-views.delivery-man.view', compact('dm'));
+        $delivery = DeliveryMan::with(['reviews'])->where(['id' => $id])->first();
+        $reviews = DeliveryReview::where('delivery_id','=',$id)->paginate(6);
+
+        return view('admin-views.delivery-man.view', compact('delivery', 'reviews'));
     }
+
 
     public function store(Request $request)
     {
@@ -78,20 +85,6 @@ class DeliveryManController extends Controller
             'f_name.required' => 'First name is required!'
         ]);
 
-        // $delivery_man = DeliveryMan::where(['email' => $request['email'], 'seller_id' => 0])->first();
-        // $delivery_man_phone = DeliveryMan::where(['phone' => $request['phone'], 'seller_id' => 0])->first();
-
-        // if (isset($delivery_man)) {
-        //     $request->validate([
-        //         'email' => 'required|unique:delivery_men',
-        //     ]);
-        // }
-
-        // if (isset($delivery_man_phone)) {
-        //     $request->validate([
-        //         'phone' => 'required|unique:delivery_men',
-        //     ]);
-        // }
 
         $id_img_names = [];
         if (!empty($request->file('identity_image'))) {
@@ -138,8 +131,8 @@ class DeliveryManController extends Controller
     {
         $request->validate([
             'f_name' => 'required',
-            'email' => 'required|email|unique:delivery_men,email,'.$id,
-            'phone' => 'required|unique:delivery_men,phone,'.$id,
+            'email' => 'required|email|unique:delivery_men,email,' . $id,
+            'phone' => 'required|unique:delivery_men,phone,' . $id,
         ], [
             'f_name.required' => 'First name is required!'
         ]);
@@ -199,27 +192,21 @@ class DeliveryManController extends Controller
         return back();
     }
 
-
-
-
-
     public function scheduling_index(Request $request, $status)
     {
 
         $query_param = [];
         $search = $request['search'];
 
-            if ($status != 'all')
-            {
-                $orders = Order::with(['customer','delivery_man'])->whereIn('order_status', ['processing', 'confirmed']);
-            } else {
-                $orders = Order::with(['customer','delivery_man']);
-            }
+        if ($status != 'all') {
+            $orders = Order::with(['customer', 'delivery_man'])->whereIn('order_status', ['processing', 'confirmed']);
+        } else {
+            $orders = Order::with(['customer', 'delivery_man']);
+        }
 
         Order::where(['checked' => 0])->update(['checked' => 1]);
 
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $orders = $orders->where(function ($q) use ($key) {
                 foreach ($key as $value) {
@@ -234,12 +221,10 @@ class DeliveryManController extends Controller
 
         $orders = $orders->where('order_type', 'default_type')->orderBy('id', 'desc')->paginate(Helpers::pagination_limit())->appends($query_param);
 
-        return view('admin-views.delivery-trip.index',compact('orders', 'search'));
+        return view('admin-views.delivery-trip.index', compact('orders', 'search'));
     }
 
 
-
-    // عن طريق مشرف التوزيع جدولة الطلبات برقم كشف وتاريخ توصيل
     public function scheduling_edit($id)
     {
         $order = Order::find($id);
@@ -247,7 +232,7 @@ class DeliveryManController extends Controller
     }
 
 
-    public function scheduling_update(Request $request,$id)
+    public function scheduling_update(Request $request, $id)
     {
 
         $request->validate([
@@ -270,7 +255,6 @@ class DeliveryManController extends Controller
 
         Toastr::success('updated successfully!');
         return redirect()->back();
-
     }
 
     public function changeScheduling(Request $request)
@@ -278,10 +262,10 @@ class DeliveryManController extends Controller
 
         $order = order::find($request->id);
 
-          if($order->scheduling==true)
-            $order->scheduling=false;
-            else
-            $order->scheduling=true;
+        if ($order->scheduling == true)
+            $order->scheduling = false;
+        else
+            $order->scheduling = true;
         $order->save();
 
         Toastr::success('Scheduling status updated successfully!');
@@ -291,38 +275,54 @@ class DeliveryManController extends Controller
 
     public function reviewList(Request $request)
     {
-
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
-            $delivery_id = DeliveryMan::where(function ($q) use ($key) {
-                    foreach ($key as $value) {
-                        $q->orWhere('f_name', 'like', "%{$value}%")
-                        ->orWhere('l_name', 'like', "%{$value}%");
-                    }
-                })->pluck('id')->toArray();
-
-            $lists = DeliveryMan::with('dReviews')->where('id',$delivery_id);
-
+            $lists = DeliveryMan::where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->orWhere('f_name', 'like', "%{$value}%")
+                    ->orWhere('l_name', 'like', "%{$value}%");
+                }
+            });
             $query_param = ['search' => $request['search']];
-        }else{
-            $lists = DeliveryMan::with('dReviews');
+        } else {
+            $lists = new DeliveryMan();
         }
-
-        $lists = $lists->latest()->paginate(Helpers::pagination_limit());
-
-
-        return view('admin-views.delivery-man.reviewList', compact('lists','search'));
-
+        $lists = $lists->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
+        return view('admin-views.delivery-man.reviewList', compact('lists', 'search'));
     }
 
-    //عرض لوحة تقويم(تواريخ) للطلبات
-    public function scheduling_list()
-    {
 
+
+    public function store_review(Request $request)
+    {
+        $request->validate([
+            'rating' => 'required',
+            'comment' => 'required',
+            'delivery_id'=> 'required',
+        ], [
+            'rating.required' => 'Rating is required!',
+            'comment.required' => 'Comment is required!',
+            'delivery_id.required' => 'Delivery ID is required!',
+        ]);
+
+        try {
+            $emp=Admin::where('id','=',auth('admin')->id())->get()->first();
+            $deliveryReview = new DeliveryReview;
+            $deliveryReview->delivery_id = $request->delivery_id;
+            $deliveryReview->delivery_comment = $request->comment;
+            $deliveryReview->delivery_rating = $request->rating;
+            $deliveryReview->emp_name = $emp->name;
+            $deliveryReview->save();
+            Toastr::success('Review added successfully!');
+            return back();
+        } catch (Exception $e) {
+            return back();
+            Toastr::success('Review added Failure!');
+        }
     }
 
 
 }
+

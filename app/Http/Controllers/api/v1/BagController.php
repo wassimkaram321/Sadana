@@ -10,6 +10,7 @@ use App\Model\PlanDetails;
 use App\Model\BagsSetting;
 use App\Model\BagProduct;
 use App\Pharmacy;
+use App\Model\ProductPoint;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -85,6 +86,23 @@ class BagController extends Controller
                     }
                 }
             }
+        $points = ProductPoint::where('type','bag')->get();
+        foreach($details as $p){
+           foreach($points as $point){
+
+               $idx = json_decode($point->type_id);
+               foreach($idx as $d){
+
+                   if($p->id == $d){
+                       $p['points'] = $point->points;
+                   }
+                   else{
+                       $p['points'] = '0';
+                   }
+               }
+           }
+        }
+
         } catch (\Exception $e) {
         }
 
@@ -108,5 +126,5 @@ class BagController extends Controller
     }
 
 
-  
+
 }

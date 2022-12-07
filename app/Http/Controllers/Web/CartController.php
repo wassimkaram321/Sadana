@@ -116,4 +116,7 @@ class CartController extends Controller
 
         return response()->json(view('layouts.front-end.partials.cart_details')->render());
     }
+
+
+  
 }

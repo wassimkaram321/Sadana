@@ -9,6 +9,7 @@ use App\Model\DeliveryMan;
 use App\Model\BagsOrdersDetails;
 use App\Model\Order;
 use App\Pharmacy;
+use App\User;
 use App\Model\OrderDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,7 @@ class DeliveryManController extends Controller
     {
 
         $d_man = $request['delivery_man'];
-        $orders = Order::with(['shippingAddress'])->whereIn('order_status', ['processing', 'out_for_delivery', 'confirmed'])
+        $orders = Order::whereIn('order_status', ['processing', 'out_for_delivery', 'confirmed'])
             ->where(['delivery_man_id' => $d_man['id']])
             ->where('scheduling', '=', 1)
             ->get()
@@ -38,21 +39,29 @@ class DeliveryManController extends Controller
                     'transaction_ref', 'discount_amount', 'discount_type',
                     'coupon_code', 'shipping_method_id', 'shipping_cost', 'seller_id',
                     'seller_is', 'delivery_man_id', 'billing_address', 'billing_address_data',
-                    'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name','Detection_number','shipping_address_data',
-                    'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id','pharmacy_id','orderBy_id','customer_type'
+                    'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name', 'Detection_number', 'shipping_address_data',
+                    'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id', 'pharmacy_id', 'orderBy_id', 'customer_type'
                 ]
             );
         foreach ($orders as $order) {
-            if ($order->customer_type=="pharmacist") {
-                $pharmacy=Pharmacy::where('user_id','=',$order->customer_id)->get()->first();
-                $order['pharmacy_name']=$pharmacy->name;
-                $order['lat']=$pharmacy->lat;
-                $order['lan']=$pharmacy->lan;
+            if ($order->customer_type == "pharmacist") {
+                $pharmacy = Pharmacy::where('user_id', '=', $order->customer_id)->get()->first();
+
+                $user = User::where('id', '=', $pharmacy->user_id)->get()->first();
+
+                $order['pharmacy_name'] = $pharmacy->name;
+                $order['lat'] = $pharmacy->lat;
+                $order['lan'] = $pharmacy->lan;
+                $order['phone'] = $user->phone;
+                $order['address']=$pharmacy->city."/".$pharmacy->region."/".$pharmacy->Address;
             } else {
-                $pharmacy=Pharmacy::where('id','=',$order->orderBy_id)->get()->first();
-                $order['pharmacy_name']=$pharmacy->name;
-                $order['lat']=$pharmacy->lat;
-                $order['lan']=$pharmacy->lan;
+                $pharmacy = Pharmacy::where('id', '=', $order->orderBy_id)->get()->first();
+                $user = User::where('id', '=', $pharmacy->user_id)->get()->first();
+                $order['pharmacy_name'] = $pharmacy->name;
+                $order['lat'] = $pharmacy->lat;
+                $order['lan'] = $pharmacy->lan;
+                $order['phone'] = $user->phone;
+                $order['address']=$pharmacy->city."/".$pharmacy->region."/".$pharmacy->Address;
             }
         }
 
@@ -183,10 +192,9 @@ class DeliveryManController extends Controller
 
         $details = OrderDetail::where(['order_id' => $request['order_id']])->get();
         $bagDetails = BagsOrdersDetails::where(['order_id' => $request['order_id']])->get();
-        foreach($bagDetails as $bagDetail)
-        {
-             $bagDetail['order_id']=(int)$bagDetail['order_id'];
-             $bagDetail['bag_id']=(int)$bagDetail['bag_id'];
+        foreach ($bagDetails as $bagDetail) {
+            $bagDetail['order_id'] = (int)$bagDetail['order_id'];
+            $bagDetail['bag_id'] = (int)$bagDetail['bag_id'];
         }
 
         $details->map(function ($query) {
@@ -196,13 +204,13 @@ class DeliveryManController extends Controller
         });
 
         $bagDetails->map(function ($query) {
-            $query['bag_details'] =json_decode($query['bag_details'], true);
+            $query['bag_details'] = json_decode($query['bag_details'], true);
             return $query;
         });
 
 
-        return response()->json(['products'=>$details,'bags'=>$bagDetails], 200);
-       // return response()->json($details, 200);
+        return response()->json(['products' => $details, 'bags' => $bagDetails], 200);
+        // return response()->json($details, 200);
     }
 
 
@@ -212,57 +220,57 @@ class DeliveryManController extends Controller
         // $d_man = $request['delivery_man'];
         // $orders = Order::with(['shippingAddress', 'customer'])->where(['delivery_man_id' => $d_man['id']])->get();
         $d_man = $request['delivery_man'];
-        if(isset($request['from']) && isset($request['to']))
-        {
-            $orders = Order::with(['shippingAddress'])
-            ->where(['delivery_man_id' => $d_man['id']])
-            ->where('scheduling', '=', 1)
-            ->whereBetween('created_at', [$request['from'], $request['to']])
-            ->get()
-            ->makeHidden(
-                [
-                    'transaction_ref', 'discount_amount', 'discount_type',
-                    'coupon_code', 'shipping_method_id', 'shipping_cost', 'seller_id',
-                    'seller_is', 'delivery_man_id', 'billing_address', 'billing_address_data',
-                    'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name','Detection_number','shipping_address_data',
-                    'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id','pharmacy_id','orderBy_id','customer_type'
-                ]
-            );
-        }
-        else
-        {
-            $orders = Order::with(['shippingAddress'])
-            ->where(['delivery_man_id' => $d_man['id']])
-            ->where('scheduling', '=', 1)
-            ->get()
-            ->makeHidden(
-                [
-                    'transaction_ref', 'discount_amount', 'discount_type',
-                    'coupon_code', 'shipping_method_id', 'shipping_cost', 'seller_id',
-                    'seller_is', 'delivery_man_id', 'billing_address', 'billing_address_data',
-                    'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name','Detection_number','shipping_address_data',
-                    'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id','pharmacy_id','orderBy_id','customer_type'
-                ]
-            );
+        if (isset($request['from']) && isset($request['to'])) {
+            $orders = Order::where(['delivery_man_id' => $d_man['id']])
+                ->where('scheduling', '=', 1)
+                ->whereBetween('created_at', [$request['from'], $request['to']])
+                ->get()
+                ->makeHidden(
+                    [
+                        'transaction_ref', 'discount_amount', 'discount_type',
+                        'coupon_code', 'shipping_method_id', 'shipping_cost', 'seller_id',
+                        'seller_is', 'delivery_man_id', 'billing_address', 'billing_address_data',
+                        'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name', 'Detection_number', 'shipping_address_data',
+                        'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id', 'pharmacy_id', 'orderBy_id', 'customer_type'
+                    ]
+                );
+        } else {
+            $orders = Order::where(['delivery_man_id' => $d_man['id']])
+                ->where('scheduling', '=', 1)
+                ->get()
+                ->makeHidden(
+                    [
+                        'transaction_ref', 'discount_amount', 'discount_type',
+                        'coupon_code', 'shipping_method_id', 'shipping_cost', 'seller_id',
+                        'seller_is', 'delivery_man_id', 'billing_address', 'billing_address_data',
+                        'extra_discount', 'extra_discount_type', 'shipping_type', 'delivery_service_name', 'Detection_number', 'shipping_address_data',
+                        'delivery_type', 'status_export', 'scheduling', 'third_party_delivery_tracking_id', 'pharmacy_id', 'orderBy_id', 'customer_type'
+                    ]
+                );
         }
 
         foreach ($orders as $order) {
-            if ($order->customer_type=="pharmacist") {
-                $pharmacy=Pharmacy::where('user_id','=',$order->customer_id)->get()->first();
-                $order['pharmacy_name']=$pharmacy->name;
-                $order['lat']=$pharmacy->lat;
-                $order['lan']=$pharmacy->lan;
+            if ($order->customer_type == "pharmacist") {
+                $pharmacy = Pharmacy::where('user_id', '=', $order->customer_id)->get()->first();
+                $user = User::where('id', '=', $pharmacy->user_id)->get()->first();
+                $order['pharmacy_name'] = $pharmacy->name;
+                $order['lat'] = $pharmacy->lat;
+                $order['lan'] = $pharmacy->lan;
+                $order['phone'] = $user->phone;
+                $order['address']=$pharmacy->city."/".$pharmacy->region."/".$pharmacy->Address;
             } else {
-                $pharmacy=Pharmacy::where('id','=',$order->orderBy_id)->get()->first();
-                $order['pharmacy_name']=$pharmacy->name;
-                $order['lat']=$pharmacy->lat;
-                $order['lan']=$pharmacy->lan;
+                $pharmacy = Pharmacy::where('id', '=', $order->orderBy_id)->get()->first();
+                $user = User::where('id', '=', $pharmacy->user_id)->get()->first();
+                $order['pharmacy_name'] = $pharmacy->name;
+                $order['lat'] = $pharmacy->lat;
+                $order['lan'] = $pharmacy->lan;
+                $order['phone'] = $user->phone;
+                $order['address']=$pharmacy->city."/".$pharmacy->region."/".$pharmacy->Address;
             }
         }
 
         return response()->json($orders, 200);
     }
-
 
 
     public function get_last_location(Request $request)
@@ -325,8 +333,4 @@ class DeliveryManController extends Controller
 
         return response()->json(['message' => 'successfully updated!'], 200);
     }
-
-
-
-
 }

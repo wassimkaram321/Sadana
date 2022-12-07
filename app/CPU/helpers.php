@@ -6,8 +6,10 @@ use App\Model\Admin;
 use App\Model\BusinessSetting;
 use App\Model\Category;
 use App\Model\Color;
+use App\Model\SalerReview;
 use App\Model\Coupon;
 use App\Model\Currency;
+use App\Model\DeliveryReview;
 use App\Model\Order;
 use App\Model\Review;
 use App\Model\Seller;
@@ -134,10 +136,28 @@ class Helpers
         return $lang;
     }
 
+
+    
     public static function rating_count($product_id, $rating)
     {
         return Review::where(['product_id' => $product_id, 'rating' => $rating])->count();
     }
+
+
+
+    public static function delivery_rating_count($delivery_id, $rating)
+    {
+        return DeliveryReview::where(['delivery_id' => $delivery_id, 'delivery_rating' => $rating])->count();
+    }
+
+
+
+    public static function saler_rating_count($saler_id, $rating)
+    {
+        return SalerReview::where(['saler_id' => $saler_id, 'saler_rating' => $rating])->count();
+    }
+
+
 
     public static function get_business_settings($name)
     {

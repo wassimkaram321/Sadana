@@ -113,7 +113,7 @@ class SalesManController extends Controller
                     $plan->Wnote = $request->note;
                     $plan->Wlat = $request->lat;
                     $plan->Wlng = $request->lng;
-                    $plan->visit_time = now(); 
+                    $plan->visit_time = now();
                     $plan->save();
                 }
 

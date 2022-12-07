@@ -5,7 +5,9 @@ namespace App\CPU;
 use App\Model\OrderDetail;
 use App\Model\Product;
 use App\Model\ProductPoint;
+use App\Model\Bonus;
 use App\Model\Review;
+use App\Model\Marketing;
 use App\Model\ShippingMethod;
 use App\Model\Translation;
 use Illuminate\Support\Facades\DB;
@@ -17,196 +19,85 @@ class ProductManager
         return Product::active()->with(['rating'])->where('id', $id)->first();
     }
 
-    public static function get_latest_products($limit = 10, $offset = 1,$brand_id)
+    public static function get_latest_products($limit = 10, $offset = 1, $brand_id)
     {
-        if(isset($brand_id))
-        {
-            $paginator = Product::active()->where('brand_id','=',$brand_id)->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
-            $points = ProductPoint::where('type','product')->get();
-            foreach($paginator->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
-        }
-        else
-        {
+        if (isset($brand_id)) {
+            $paginator = Product::active()->where('brand_id', '=', $brand_id)->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
+            ProductManager::add_points($paginator,$paginator->items());
+            ProductManager::add_locks($paginator,$paginator->items());
+        } else {
             $paginator = Product::active()->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
-
-            $points = ProductPoint::where('type','product')->get();
-            foreach($paginator->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
+            ProductManager::add_points($paginator,$paginator->items());
+            ProductManager::add_locks($paginator,$paginator->items());
         }
-
-
         /*$paginator->count();*/
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
 
-    public static function get_featured_products($limit = 10, $offset = 1,$brand_id)
+    public static function get_featured_products($limit = 10, $offset = 1, $brand_id)
     {
         //change review to ratting
-        if(isset($brand_id))
-        {
+        if (isset($brand_id)) {
             $paginator = Product::with(['rating'])->active()
-            ->where('featured', 1)
-            ->where('brand_id','=', $brand_id)
-            ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
-            ->paginate($limit, ['*'], 'page', $offset);
+                ->where('featured', 1)
+                ->where('brand_id', '=', $brand_id)
+                ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
+                ->paginate($limit, ['*'], 'page', $offset);
 
-            $points = ProductPoint::where('type','product')->get();
-            foreach($paginator->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
-        }
-        else
-        {
+                ProductManager::add_points($paginator,$paginator->items());
+                ProductManager::add_locks($paginator,$paginator->items());
+        } else {
             $paginator = Product::with(['rating'])->active()
-            ->where('featured', 1)
-            ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
-            ->paginate($limit, ['*'], 'page', $offset);
-             $points = ProductPoint::where('type','product')->get();
-            foreach($paginator->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
+                ->where('featured', 1)
+                ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
+                ->paginate($limit, ['*'], 'page', $offset);
+                ProductManager::add_points($paginator,$paginator->items());
+                ProductManager::add_locks($paginator,$paginator->items());
         }
 
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
 
-    public static function get_top_rated_products($limit = 10, $offset = 1,$brand_id)
+    public static function get_top_rated_products($limit = 10, $offset = 1, $brand_id)
     {
-        // $reviews = Review::with('product')
-        //     ->whereHas('product', function ($query) {
-        //         $query->active();
-        //     })
-        //     ->select('product_id', DB::raw('AVG(rating) as count'))
-        //     ->groupBy('product_id')
-        //     ->orderBy("count", 'desc')
-        //     ->paginate($limit, ['*'], 'page', $offset);
 
-        // $data = [];
-        // foreach ($reviews as $review) {
-        //     array_push($data, $review->product);
-        // }
-        //change review to ratting
-        if(isset($brand_id))
-        {
+        if (isset($brand_id)) {
             $reviews = Product::with(['rating'])->active()
-            ->where('featured', 1)
-            ->where('brand_id','=', $brand_id)
-            ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
-            ->paginate($limit, ['*'], 'page', $offset);
+                ->where('featured', 1)
+                ->where('brand_id', '=', $brand_id)
+                ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
+                ->paginate($limit, ['*'], 'page', $offset);
 
-            $points = ProductPoint::where('type','product')->get();
-            foreach($reviews->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
-
-        }
-        else
-        {
+                ProductManager::add_points($reviews,$reviews->items());
+                ProductManager::add_locks($reviews,$reviews->items());
+        } else {
             $reviews = Product::with(['rating'])->active()
-            ->where('featured', 1)
-            ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
-            ->paginate($limit, ['*'], 'page', $offset);
-
-            $points = ProductPoint::where('type','product')->get();
-            foreach($reviews->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
+                ->where('featured', 1)
+                ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
+                ->paginate($limit, ['*'], 'page', $offset);
+                ProductManager::add_points($reviews,$reviews->items());
+                ProductManager::add_locks($reviews,$reviews->items());
         }
 
         return [
             'total_size' => $reviews->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $reviews
         ];
     }
 
-    public static function get_best_selling_products($limit = 10, $offset = 1,$brand_id)
+    public static function get_best_selling_products($limit = 10, $offset = 1, $brand_id)
     {
         //change reviews to rattings
         $paginator = OrderDetail::with('product.rating')
@@ -219,25 +110,50 @@ class ProductManager
             ->paginate($limit, ['*'], 'page', $offset);
 
         $data = [];
+        $data_id = [];
         foreach ($paginator as $order) {
 
-            if(isset($brand_id))
-            {
-                if($order->product->brand_id==$brand_id)
-                {
+            if (isset($brand_id)) {
+                if ($order->product->brand_id == $brand_id) {
                     array_push($data, $order->product);
+                    array_push($data_id, $order->product['id']);
                 }
-            }
-            else
-            {
+            } else {
                 array_push($data, $order->product);
+                array_push($data_id, $order->product['id']);
             }
         }
 
+        //Marketing
+        $marketing = Marketing::get();
+        foreach ($marketing as $market)
+        {
+            $found=true;
+            if ($market->item_type = "product")
+            {
+                $marketingProduct = Product::active()->with(['rating'])
+                    ->where('id', '=', $market->item_id)->get()->first();
+
+                    for($i=0;$i<count($data_id);$i++)
+                    {
+                         if($market->item_id ==$data_id[$i])
+                          $found=false;
+                    }
+
+                if (isset($marketingProduct) && $found)
+                {
+                    array_push($data, $marketingProduct);
+                }
+            }
+        }
+        //End Marketing
+        ProductManager::add_points($paginator,$data);
+        ProductManager::add_locks($paginator,$data);
+
         return [
             'total_size' => count($data),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $data
         ];
     }
@@ -254,35 +170,18 @@ class ProductManager
     public static function search_products($name, $limit = 10, $offset = 1)
     {
         $key = explode(' ', $name);
-       // $key = [base64_decode($name)];
-        $paginator = Product::active()->with(['rating'])->where('status','=',1)->where(function ($q) use ($key) {
+        $paginator = Product::active()->with(['rating'])->where('status', '=', 1)->where(function ($q) use ($key) {
             foreach ($key as $value) {
                 $q->orWhere('name', 'like', "%{$value}%");
             }
         })->paginate($limit, ['*'], 'page', $offset);
 
-        $points = ProductPoint::where('type','product')->get();
-            foreach($paginator->items() as $p){
-               foreach($points as $point){
-
-                   $idx = json_decode($point->type_id);
-                   foreach($idx as $d){
-
-                       if($p->id == $d){
-                           $p['points'] = $point->points;
-                       }
-                       else{
-                           $p['points'] = '0';
-                       }
-                   }
-               }
-            }
-
-
+       ProductManager::add_points($paginator,$paginator->items());
+       ProductManager::add_locks($paginator,$paginator->items());
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
@@ -299,8 +198,8 @@ class ProductManager
 
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
@@ -388,8 +287,8 @@ class ProductManager
         /*$paginator->count();*/
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
@@ -400,9 +299,60 @@ class ProductManager
         $paginator = Product::with(['rating'])->active()->where('discount', '!=', 0)->latest()->paginate($limit, ['*'], 'page', $offset);
         return [
             'total_size' => $paginator->total(),
-            'limit' => (integer)$limit,
-            'offset' => (integer)$offset,
+            'limit' => (int)$limit,
+            'offset' => (int)$offset,
             'products' => $paginator->items()
         ];
     }
+
+    public static function add_locks($paginator,$products)
+    {
+        # code...
+        $bonuses = Bonus::get();
+        $locks = [];
+        foreach($products as $p){
+            foreach($bonuses as $b){
+                $idx = json_decode($b->salve_product_id);
+                foreach($idx as $d){
+                    if($d == $p->id){
+                    $locks[] = $p->id;
+                    }
+                }
+            }
+        }
+
+        foreach($products as $p){
+                if(in_array($p->id,$locks)){
+                    $p['locks'] = "1";
+                }
+                else{
+                    $p['locks'] = "0";
+                }
+            }
+        return $paginator;
+    }
+
+    public static function add_points($paginator,$products)
+    {
+        # code...
+        $points = ProductPoint::where('type','product')->get();
+        foreach($products as $p){
+           foreach($points as $point){
+
+               $idx = json_decode($point->type_id);
+               foreach($idx as $d){
+
+                   if($p->id == $d){
+                       $p['points'] = $point->points;
+                   }
+                   else{
+                       $p['points'] = '0';
+                   }
+               }
+           }
+        }
+        return $paginator;
+    }
+
+
 }

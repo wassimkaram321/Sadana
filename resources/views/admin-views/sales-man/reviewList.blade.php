@@ -146,7 +146,7 @@
                             <i class="tio-search"></i>
                         </div>
                     </div>
-                    <input id="datatableSearch_" type="search" name="search" class="form-control"  aria-label="Search orders" value="{{ $search }}" required>
+                    <input id="datatableSearch_" type="search" name="search" class="form-control" aria-label="Search orders" value="{{ $search }}" required>
                     <button type="submit" class="btn btn-primary">{{ \App\CPU\translate('Search')}}</button>
                 </div>
             </form>
@@ -184,9 +184,9 @@
                                 <img style="width: 60px;height: 60px" onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'" src="{{asset('storage/app/public/delivery-man')}}/{{$list['image']}}">
                             </td>
                             <td>
-                                <button href="" id="editCompany" data-toggle="modal" data-target='#practice_modal' class="btn btn-primary btn-sm " data-delivery_id="{{$list['id']}}">
+                                <button href="" id="editCompany" data-toggle="modal" data-target='#practice_modal' class="btn btn-primary btn-sm " data-saler_id="{{$list['id']}}">
                                     <i class="tio-star"></i>&nbsp;&nbsp;{{\App\CPU\translate('Evaluation')}}</button>
-                                <a href="{{route('admin.delivery-man.preview',[$list['id']])}}" class="btn btn-success btn-sm">
+                                <a href="{{route('admin.sales-man.review',[$list['id']])}}" class="btn btn-success btn-sm">
                                     <i class="fa fa-eye"></i>&nbsp;&nbsp;{{ \App\CPU\translate('Reviews')}}
                                 </a>
                             </td>
@@ -217,12 +217,12 @@
         <div class="container">
             <div class="row">
                 <div class="col mt-4">
-                    <form action="{{route('admin.delivery-man.store-review')}}" class="py-2 px-4" method="POST" autocomplete="off">
+                    <form action="{{route('admin.sales-man.store-review')}}" class="py-2 px-4" method="POST" autocomplete="off">
                         @csrf
                         <div class="modal-content" style="min-height: 150px; padding: 20px">
                             <p class="font-weight-bold ">{{ \App\CPU\translate('Review')}}</p>
                             <div class="form-group row">
-                                <input type="hidden" name="delivery_id" id="delivery_id">
+                                <input type="hidden" name="saler_id" id="saler_id">
                                 <div class="col">
                                     <div class="rate">
                                         <input type="radio" id="star5" class="rate" name="rating" value="5" />
@@ -312,9 +312,9 @@
             $(document).ready(function() {
                 $('body').on('click', '#editCompany', function(event) {
                     event.preventDefault();
-                    var delivery_id = $(this).data('delivery_id');
-                    $('#delivery_id').val(delivery_id);
-                    console.log(delivery_id);
+                    var saler_id = $(this).data('saler_id');
+                    $('#saler_id').val(saler_id);
+                    console.log(saler_id);
                 });
             });
 

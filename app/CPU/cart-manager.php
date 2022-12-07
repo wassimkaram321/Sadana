@@ -7,9 +7,11 @@ use App\Model\CartShipping;
 use App\Model\Color;
 use App\Model\OrderDetail;
 use App\Model\Product;
+use App\Model\Bonus;
 use App\Model\Bag;
 use App\Model\BagProduct;
 use App\Model\Shop;
+use App\Model\ProductsKeys;
 use Barryvdh\Debugbar\Twig\Extension\Debug;
 use Cassandra\Collection;
 use Illuminate\Support\Str;
@@ -211,6 +213,42 @@ class CartManager
         $user = Helpers::get_customer($request);
         if ($request->type == "product") {
             $product = Product::find($request->id);
+
+            //Start
+            $bonuses = Bonus::get();
+            foreach ($bonuses as $bonus) {
+                $base_products = json_decode($bonus->salve_product_id, true);
+
+                $other_products = json_decode($bonus->master_product_id, true);
+                $other_products_qty = json_decode($bonus->master_product_quatity, true);
+
+                for ($i = 0; $i < count($base_products); $i++) {
+                    if ($base_products[$i] == $product->id) {
+                        if ($request->product_key) {
+                            $ProductKey = ProductsKeys::where([
+                                ['base_product_id', '=', $product->id],
+                                ['key_id', '=', $request->product_key],
+                                ['cus_id', '=', $user->id]
+                            ])->get()->first();
+                            if (!isset($ProductKey))
+                                return response()->json(['status' => false, 'message' => 'مفتاح المنتج غير صحيح']);
+                        } else
+                        {
+                            for ($i=0; $i <count($other_products) ; $i++) {
+
+                                $product_name = Product::whereid($other_products[$i])->first()->only('name', 'id');
+                                $product_name['quantity'] = $other_products_qty[$i];
+                                $data_f[] =  $product_name;
+                            }
+                            return response()->json(['status' => false, 'message' => '( مفتاح المنتج مطلوب ) المنتج مقفول','products'=>$data_f]);
+                        }
+
+                        break;
+                    }
+                }
+            }
+            //End
+
         } elseif ($request->type == "bag") {
             $bag = Bag::find($request->id);
             if ($bag) {
@@ -339,20 +377,17 @@ class CartManager
 
 
             //calculation pure price
-            if($request['pure_price']==1)
-            {
+            if ($request['pure_price'] == 1) {
                 if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
                     $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
-                    $cart['price'] = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $cart['price'] = CartManager::pure_price_calculation($price, $total_qty, $request['quantity']);
                     $cart['pure_price'] = 1;
                 }
-            }
-            else
-            {
+            } else {
                 $cart['price'] = $price;
                 $cart['pure_price'] = 0;
             }
-             //end calculation pure price
+            //end calculation pure price
 
             $cart['tax'] = $tax;
             $cart['slug'] = $product->slug;
@@ -414,6 +449,26 @@ class CartManager
         $cart = Cart::where(['id' => $request->key, 'customer_id' => $user->id])->first();
 
         $product = Product::find($cart['product_id']);
+
+        //Start
+        $bonuses = Bonus::get();
+        foreach ($bonuses as $bonus) {
+            $base_products = json_decode($bonus->salve_product_id, true);
+            $base_products_qty = json_decode($bonus->salve_product_quatity, true);
+            for ($i = 0; $i < count($base_products); $i++) {
+                if ($base_products[$i] == $product->id)
+                {
+                       if($base_products_qty[$i]>$request->quantity)
+                       {
+                        return response()->json(['status' => false, 'message' => 'لم يتم تعديل الكمية المطلوبة لانه يجب تحقيق الحد الادنى من الكمية لتحقيق العرض '], 200);
+                       }
+                    break;
+                }
+            }
+        }
+        //End
+
+
         $count = count(json_decode($product->variation));
         if ($count) {
             for ($i = 0; $i < $count; $i++) {
@@ -432,31 +487,25 @@ class CartManager
         if ($status) {
             $qty = $request->quantity;
             //Cal Pure Price
-            if($cart['pure_price']==1)
-            {
+            if ($cart['pure_price'] == 1) {
                 if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
                     $price = $product->unit_price;
                     $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
-                    $pure_price_new = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $pure_price_new = CartManager::pure_price_calculation($price, $total_qty, $request['quantity']);
                     $cart['price'] = $pure_price_new;
-                     if($total_qty==0)
-                    {
-                        $cart['pure_price']=0;
-                    }
-                    else
-                    {
-                        $cart['pure_price']=1;
+                    if ($total_qty == 0) {
+                        $cart['pure_price'] = 0;
+                    } else {
+                        $cart['pure_price'] = 1;
                     }
                 }
-            }
-            else
-            {
-                 if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
+            } else {
+                if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
                     $price = $product->unit_price;
                     $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
-                    $pure_price_new = CartManager::pure_price_calculation($price,$total_qty,$request['quantity']);
+                    $pure_price_new = CartManager::pure_price_calculation($price, $total_qty, $request['quantity']);
                     $cart['price'] = $pure_price_new;
-                    $cart['pure_price']=$request->pure_price;
+                    $cart['pure_price'] = $request->pure_price;
                 }
             }
 
@@ -586,10 +635,10 @@ class CartManager
         $bagProducts = BagProduct::where('bag_id', '=', $bag->id)->get();
         foreach ($bagProducts as $bagProduct) {
             $product = Product::where('id', '=', $bagProduct->product_id)->get()->first();
-            if ($product['current_stock'] < $bagProduct['product_count']*$request['quantity']) {
+            if ($product['current_stock'] < $bagProduct['product_count'] * $request['quantity']) {
                 return [
                     'status' => 0,
-                    'message' => translate($product->name.' : out_of_stock!')
+                    'message' => translate($product->name . ' : out_of_stock!')
                 ];
             }
         }
@@ -648,7 +697,6 @@ class CartManager
             'status' => 1,
             'message' => translate('successfully_added!')
         ];
-
     }
 
     public static function bag_update_cart_qty($request)
@@ -671,12 +719,12 @@ class CartManager
         $bagProducts = BagProduct::where('bag_id', '=', $bag->id)->get();
         foreach ($bagProducts as $bagProduct) {
             $product = Product::where('id', '=', $bagProduct->product_id)->get()->first();
-            if ($product['current_stock'] < $bagProduct['product_count']*$request['quantity']) {
+            if ($product['current_stock'] < $bagProduct['product_count'] * $request['quantity']) {
                 $status = 0;
                 $qty = $cart['quantity'];
                 return [
                     'status' => 0,
-                    'message' => translate($product->name.' : out_of_stock!')
+                    'message' => translate($product->name . ' : out_of_stock!')
                 ];
             }
         }
@@ -696,15 +744,14 @@ class CartManager
     }
 
 
-    public static function pure_price_calculation($price,$offer,$qty)
+    public static function pure_price_calculation($price, $offer, $qty)
     {
-        if($offer==0)
-            $pure_price=$price;
-        else
-        {
-            $pure_price=($price*$qty)/($qty+$offer);
-            $pure_price=round($pure_price,-1);
+        if ($offer == 0)
+            $pure_price = $price;
+        else {
+            $pure_price = ($price * $qty) / ($qty + $offer);
+            $pure_price = round($pure_price, -1);
         }
-         return $pure_price;
+        return $pure_price;
     }
 }

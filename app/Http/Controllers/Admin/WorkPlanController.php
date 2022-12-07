@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Model\WorkPlan;
 use App\Model\PlanDetails;
+use App\Model\PlanArchive;
+use App\Model\PlanDetailsArchive;
 use App\Pharmacy;
 use App\User;
 use App\CPU\BackEndHelper;
 use App\Model\WorkPlanTask;
 use App\CPU\Helpers;
 use App\Http\Controllers\BaseController;
+use App\Model\Order;
+use App\Model\SalerTeam;
 use Brian2694\Toastr\Facades\Toastr;
 use Exception;
 use Illuminate\Http\Request;
@@ -100,11 +104,10 @@ class WorkPlanController extends Controller
     public function work_plan_delete($id)
     {
         $workPlan = WorkPlan::find($id);
-        $workPlanTasks = WorkPlanTask::where('task_plan_id','=',$id);
-        $planDetails=PlanDetails::where('work_plan_id','=',$id);
+        $workPlanTasks = WorkPlanTask::where('task_plan_id', '=', $id);
+        $planDetails = PlanDetails::where('work_plan_id', '=', $id);
 
-        if(isset($workPlan) && isset($workPlanTasks))
-        {
+        if (isset($workPlan) && isset($workPlanTasks)) {
             $workPlanTasks->delete();
             $$planDetails->delete();
             $workPlan->delete();
@@ -267,7 +270,7 @@ class WorkPlanController extends Controller
         $periods = CarbonPeriod::create($plan->begin_plan, $plan->end_plan);
 
         $begin = $this->rev_date($plan->begin_plan);
-        $end =$this->rev_date($plan->end_plan);
+        $end = $this->rev_date($plan->end_plan);
 
         return view('admin-views.work-plan.tasks', compact('pharmacies', 'periods', 'plan_id', 'begin', 'end'));
     }
@@ -279,6 +282,7 @@ class WorkPlanController extends Controller
         $date = implode("-", $rev);
         return $date;
     }
+
 
     public function work_plan_task_store(Request $request, $id)
     {
@@ -328,4 +332,204 @@ class WorkPlanController extends Controller
             return response()->json(['Error' => 'Data is faild added']);
         }
     }
+
+
+
+
+    public function plan_set_date(Request $request)
+    {
+
+        $from = $request['plan_from_date'];
+        $to = $request['plan_to_date'];
+        $team_char = $request['plan_team_char'];
+
+        session()->put('plan_from_date', $from);
+        session()->put('plan_to_date', $to);
+        session()->put('plan_team_char', $team_char);
+
+        $previousUrl = strtok(url()->previous(), '?');
+        return redirect()->to($previousUrl . '?' . http_build_query(['from_date' => $request['plan_from_date'], 'to_date' => $request['plan_to_date'], 'team' => $request['plan_team_char']]))->with(['from' => $from, 'to' => $to]);
+    }
+
+
+
+    public function work_plans_report()
+    {
+
+        if (session()->has('plan_from_date') == false) {
+            session()->put('plan_from_date', date('Y-m-01'));
+            session()->put('plan_to_date', date('Y-m-30'));
+        }
+        if (session()->has('plan_team_char') == false) {
+            session()->put('plan_team_char', 'A');
+        }
+        $plan_from_date = session('plan_from_date');
+        $plan_to_date = session('plan_to_date');
+        $plan_team_char = session('plan_team_char');
+
+        $plansArchive = PlanArchive::whereBetween('begin_date', [$plan_from_date, $plan_to_date])
+            ->where('team_name', '=', $plan_team_char)
+            ->paginate(5, ['*'], 'page');
+
+        $selerIds = SalerTeam::where('team', $plan_team_char)->get(['saler_id']);
+
+        //Total orders
+        $total = Order::where('order_type', 'default_type')
+            ->where('customer_type', 'salesman')
+            ->whereIn('customer_id', $selerIds)
+            ->whereBetween('created_at', [$plan_from_date, $plan_to_date])
+            ->count();
+
+        //Total delivered
+        $delivered = $this->get_report_salesman($plan_from_date, $plan_to_date, "delivered", $selerIds);
+        //Total returned
+        $returned = $this->get_report_salesman($plan_from_date, $plan_to_date, "returned", $selerIds);
+        //Total failed
+        $failed = $this->get_report_salesman($plan_from_date, $plan_to_date, "failed", $selerIds);
+        //Total processing
+        $processing = $this->get_report_salesman($plan_from_date, $plan_to_date, "processing", $selerIds);
+        //Total canceled
+        $canceled = $this->get_report_salesman($plan_from_date, $plan_to_date, "canceled", $selerIds);
+
+        if ($total == 0) {
+            $totalRange = .01;
+        } else {
+            $totalRange = $total;
+        }
+
+        $data = [
+            'total' => $total,
+            'totalRange' => $totalRange,
+            'delivered' => $delivered,
+            'returned' => $returned,
+            'failed' => $failed,
+            'processing' => $processing,
+            'canceled' => $canceled
+        ];
+
+        return view('admin-views.work-plan.report', compact('plansArchive', 'data'));
+    }
+
+    public function get_report_salesman($plan_from_date, $plan_to_date, $status, $selerIds)
+    {
+        $data = Order::where('order_type', 'default_type')
+            ->where(['order_status' => $status, 'customer_type' => 'salesman'])
+            ->whereIn('customer_id', $selerIds)
+            ->whereBetween('created_at', [$plan_from_date, $plan_to_date])
+            ->count();
+        return $data;
+    }
+
+
+    public function plan_details_report(Request $request, $id)
+    {
+        $subLaws = '';
+        $total_price = 0;
+        $total_orders = 0;
+        $planArchive = PlanArchive::where('id','=',$id)->get()->first();
+
+        $orders = Order::where('order_type', 'default_type')
+        ->where('customer_id',$planArchive->saler_id)
+        ->where('order_type','=','default_type')
+        ->whereBetween('created_at', [$planArchive->begin_date,$planArchive->end_date])
+        ->get();
+
+        $total_price =$orders->sum('order_amount');
+        $total_orders =$orders->count();
+
+           foreach($orders as $order)
+           {
+            $subLaws .= '<tr class="odd">
+            <td>' . $order['id'] . '</td>
+            <td>' . $order['payment_status'] . '</td>
+            <td>' . $order['order_status'] . '</td>
+            <td>' . $order['order_amount'] . '</td>
+            <td>' . $order['created_at'] . '</td>
+            <tr>';
+           }
+
+        return response()->json([
+            'data' => $subLaws,
+            'total_price' => $total_price,
+            'total_orders' => $total_orders
+        ]);
+    }
+
+
+
+    public function work_plan_refresh(Request $request,$plan_id)
+    {
+        try {
+            $plan=WorkPlan::where('id','=',$plan_id)->get()->first();
+            //get details for archive
+            $num_visited=PlanDetails::where('work_plan_id','=',$plan_id)
+             ->where('visited','=',1)
+             ->count();
+            $num_orders = Order::where('order_type', 'default_type')
+             ->where('customer_id', $plan->saler_id)
+             ->where('order_type','=','default_type')
+             ->whereBetween('created_at', [$plan->begin_plan,$plan->end_plan])
+             ->get()->count();
+             $saler=User::where('id','=',$plan->saler_id)->get()->first();
+             $team=SalerTeam::where('saler_id','=',$plan->saler_id)->get()->first();
+
+
+
+
+             //Archive plan
+             $planArchive=new PlanArchive;
+             $planArchive->begin_date=$plan->begin_plan;
+             $planArchive->end_date=$plan->end_plan;
+             $planArchive->team_name=$team->team;
+             $planArchive->saler_id=$plan->saler_id;
+             $planArchive->saler_name=$saler->name;
+             $planArchive->pharmancies_visit_num=$num_visited;
+             $planArchive->orders_num=$num_orders;
+             $planArchive->save();
+
+
+             $plan_details=PlanDetails::where('work_plan_id','=',$plan_id)->get()->all();
+            //  $planDetailsArchive=new PlanDetailsArchive;
+            //  $planDetailsArchive->work_plan_archive_id =$planArchive->id;
+            //  $planDetailsArchive->pharmacy_id=$plan_details->Wpharmacy_id;
+
+            //  $planDetailsArchive->pharmacy_name=$plan_details->team;
+
+            //  $planDetailsArchive->note=$plan_details->Wnote;
+            //  $planDetailsArchive->visit_date=$plan_details->name;
+            //  $planDetailsArchive->site_match=$plan_details;
+            //  $planDetailsArchive->orders_num=$plan_details;
+            //  $planDetailsArchive->save();
+
+
+             //refresh date plan
+             $begin=date("Y-m-d", strtotime(Carbon::createFromFormat('Y-m-d', $plan->begin_plan)->addDays(7)));
+             $end=date("Y-m-d", strtotime(Carbon::createFromFormat('Y-m-d', $plan->end_plan)->addDays(7)));
+             $plan->begin_plan=$begin;
+             $plan->end_plan=$end;
+             $plan->save();
+
+             $workPlanTask=WorkPlanTask::where('task_plan_id','=',$plan_id)->get();
+             foreach($workPlanTask as $task)
+             {
+                $date=date("Y-m-d", strtotime(Carbon::createFromFormat('Y-m-d', $task->task_date)->addDays(7)));
+                $task->task_date=$date;
+                $task->save();
+             }
+
+             //delete plan details
+             $plan_details=PlanDetails::where('work_plan_id','=',$plan_id)->delete();
+             Toastr::success('Refresh successfully!');
+             return back();
+
+        } catch (\Throwable $th) {
+            Toastr::success('Refresh faild!');
+            return back();
+        }
+
+    }
+
+
+
+
 }

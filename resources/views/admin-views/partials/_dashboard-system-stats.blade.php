@@ -1,6 +1,6 @@
 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
     <!-- Card -->
-    <a class="card card-hover-shadow h-100" href="{{route('admin.orders.list',['pending'])}}" style="background: #FFFFFF">
+    <div class="card card-hover-shadow h-100" style="background: #FFFFFF">
         <div class="card-body">
             <div class="flex-between align-items-center mb-1">
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
@@ -15,13 +15,13 @@
             </div>
             <!-- End Row -->
         </div>
-    </a>
+    </div>
     <!-- End Card -->
 </div>
 
 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
     <!-- Card -->
-    <a class="card card-hover-shadow h-100" href="{{route('admin.orders.list',['confirmed'])}}" style="background: #FFFFFF;">
+    <div class="card card-hover-shadow h-100" style="background: #FFFFFF;">
         <div class="card-body">
             <div class="flex-between align-items-center mb-1">
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
@@ -37,13 +37,13 @@
             </div>
             <!-- End Row -->
         </div>
-    </a>
+    </div>
     <!-- End Card -->
 </div>
 
 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
     <!-- Card -->
-    <a class="card card-hover-shadow h-100" href="{{route('admin.orders.list',['processing'])}}" style="background: #FFFFFF">
+    <div class="card card-hover-shadow h-100"  style="background: #FFFFFF">
         <div class="card-body">
             <div class="flex-between align-items-center gx-2 mb-1">
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
@@ -59,13 +59,13 @@
             </div>
             <!-- End Row -->
         </div>
-    </a>
+    </div>
     <!-- End Card -->
 </div>
 
 <div class="col-sm-6 col-lg-3 mb-3 mb-lg-5">
     <!-- Card -->
-    <a class="card card-hover-shadow h-100" href="{{route('admin.orders.list',['out_for_delivery'])}}" style="background: #FFFFFFff">
+    <div class="card card-hover-shadow h-100"  style="background: #FFFFFFff">
         <div class="card-body">
             <div class="flex-between align-items-center gx-2 mb-1">
                 <div style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
@@ -81,7 +81,7 @@
             </div>
             <!-- End Row -->
         </div>
-    </a>
+    </div>
     <!-- End Card -->
 </div>
 

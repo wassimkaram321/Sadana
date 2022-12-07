@@ -198,9 +198,7 @@
 
 
 @section('content')
-@php
 
-@endphp
 
 <div>
     <div class="kanban-heading" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">

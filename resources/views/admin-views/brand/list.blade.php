@@ -1,7 +1,7 @@
 @extends('layouts.back-end.app')
 
 @section('title', \App\CPU\translate('Brand List'))
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @push('css_or_js')
 
 @endpush

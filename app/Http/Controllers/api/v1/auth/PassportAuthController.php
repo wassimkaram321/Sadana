@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Traits\GeneralTrait;
 use function App\CPU\translate;
+use Illuminate\Support\Facades\DB;
 
 class PassportAuthController extends Controller
 {
@@ -24,7 +25,6 @@ class PassportAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'f_name' => 'required',
             'l_name' => 'required',
-           // 'email' => 'required|unique:users',
             'phone' => 'required|unique:users',
             'password' => 'required',
             'pharmacy_name' => 'required',
@@ -47,10 +47,9 @@ class PassportAuthController extends Controller
         $group = Group::where('id',$area->group_id)->get()->first();
         $city=City::where('id',$group->city_id)->get()->first();
 
-        //$temporary_token = Str::random(40);
         $token = rand(100000, 999999);
         $email="Hiba_Store".$token."@hiba.sy";
-        //return response()->json(['token' => $area], 200);
+
         $user = User::create([
             'name'=> $request->f_name.' '.$request->l_name,
             'f_name' => $request->f_name,
@@ -63,7 +62,6 @@ class PassportAuthController extends Controller
             'is_phone_verified'=>1,
             'password' => bcrypt($request->password),
             'area_id' => $area->id,
-            //'temporary_token' => $temporary_token,
         ]);
         $user->user_type="pharmacist";
         $user->save();
@@ -90,27 +88,13 @@ class PassportAuthController extends Controller
         }
 
         $user->pharmacy()->save($pharmacy);
-
-
-        // $phone_verification = Helpers::get_business_settings('phone_verification');
-        // $email_verification = Helpers::get_business_settings('email_verification');
-        // if ($phone_verification && !$user->is_phone_verified) {
-        //     return response()->json(['temporary_token' => $temporary_token], 200);
-        // }
-        // if ($email_verification && !$user->is_email_verified) {
-        //     return response()->json(['temporary_token' => $temporary_token], 200);
-        // }
-
         $token = $user->createToken('LaravelAuthApp')->accessToken;
         return response()->json(['status'=>200 ,'user_type'=> $user->user_type,'token' => $token], 200);
     }
 
-
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            //'email' => 'required',
             'phone' => 'required|numeric',
             'password' => 'required|min:6'
         ]);
@@ -123,7 +107,6 @@ class PassportAuthController extends Controller
         if (filter_var($user_id, FILTER_VALIDATE_EMAIL)) {
             $medium = 'email';
         } else {
-           // $count = strlen(preg_replace("/[^\d]/", "", $user_id));
            $count = strlen($user_id);
             if ($count >= 9 && $count <= 15) {
                 $medium = 'phone';
@@ -150,19 +133,22 @@ class PassportAuthController extends Controller
             $user->save();
 
             $phone_verification = Helpers::get_business_settings('phone_verification');
-            //$email_verification = Helpers::get_business_settings('email_verification');
+
             if ($phone_verification && !$user->is_phone_verified) {
                 return response()->json(['status'=>200 ,'user_type'=> $user->user_type,'temporary_token' => $user->temporary_token], 200);
             }
-            // if ($email_verification && !$user->is_email_verified) {
-            //     return response()->json(['temporary_token' => $user->temporary_token], 200);
-            // }
+
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
 
             if($user->user_type=="salesman")
                 $details_user = User::where(['id' => $user->id])->get()->first();
             else
-                 $details_user = User::with(['pharmacy'])->where('id','=',$user->id)->get()->first();
+            {
+                $details_user = User::with(['pharmacy'])->where('id','=',$user->id)->get()->first();
+                 $points = DB::table('pharmacies_points')->where('pharmacy_id',$user->id)->sum('points');
+                 $details_user['points'] = $points;
+            }
+
 
 
             return response()->json(['status'=>200,'user_type'=> $user->user_type ,'token' => $token ,'details'=>$details_user], 200);

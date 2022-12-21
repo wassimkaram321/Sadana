@@ -94,12 +94,6 @@ class PharmacyController extends Controller
     }
 
 
-    public function create()
-    {
-        //
-    }
-
-
     public function store(Request $request)
     {
         //
@@ -120,11 +114,6 @@ class PharmacyController extends Controller
         }
     }
 
-    public function show(Pharmacy $pharmacy)
-    {
-        $pharmacy = Pharmacy::find($pharmacy->id);
-    }
-
     public function edit(Request $request)
     {
         //
@@ -137,9 +126,7 @@ class PharmacyController extends Controller
         $pharmacy->user_id = $request->user_id;
         $user_type = User::where('id', $pharmacy->user_id)->get();
         $pharmacy->user_type = $user_type->user_type;
-
         $pharmacy->save();
-
         Toastr::success('Pharmacy updated successfully.');
         return back();
     }
@@ -163,9 +150,7 @@ class PharmacyController extends Controller
 
         $query_param = [];
         $search = $request['search'];
-
         $pending = false;
-
         if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $pharmacies = UserImportExcel::where(function ($q) use ($key) {
@@ -178,8 +163,6 @@ class PharmacyController extends Controller
             $pharmacies = UserImportExcel::whereNotIn('id', [-2]);
         }
         $pharmacies = $pharmacies->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
-
-
         return view('admin-views.pharmacy.bulk-import', compact('pharmacies', 'search'));
     }
 
@@ -289,6 +272,8 @@ class PharmacyController extends Controller
             return $groupNew->id;
         }
     }
+
+
     public function  compare_area($area, $groupId)
     {
         $name1 = trim($area, " \t.");
@@ -317,33 +302,6 @@ class PharmacyController extends Controller
         } else {
             return 1;
         }
-    }
-
-
-    public function bulk_export_data()
-    {
-        // $products = Product::where(['added_by' => 'admin'])->get();
-        // $storage = [];
-        // foreach ($products as $item) {
-        //     $category_id = 0;
-        //     $sub_category_id = 0;
-        //     $sub_sub_category_id = 0;
-        //     foreach (json_decode($item->category_ids, true) as $category) {
-        //         if ($category['position'] == 1) {
-        //             $category_id = $category['id'];
-        //         } else if ($category['position'] == 2) {
-        //             $sub_category_id = $category['id'];
-        //         } else if ($category['position'] == 3) {
-        //             $sub_sub_category_id = $category['id'];
-        //         }
-        //     }
-        //     $brand = Brand::findOrFail($item->brand_id);
-        //     $storage[] = [
-
-        //     ];
-        // }
-        // return (new FastExcel($storage))->download('inhouse_products.xlsx');
-
     }
 
     public function  generate_excel(Request $request)
@@ -425,12 +383,7 @@ class PharmacyController extends Controller
         $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
         $cus_city = City::where('id', $cus_group->city_id)->get()->first();
         $email = "Hiba_Store" . $id . "@hiba.sy";
-
-        return view(
-            'admin-views.pharmacy-import.edit',
-            compact('email', 'pharmacy')
-        )
-            ->with('cus_area', $cus_area)->with('cus_group', $cus_group)->with('cus_city', $cus_city);
+        return view('admin-views.pharmacy-import.edit',compact('email', 'pharmacy'))->with('cus_area', $cus_area)->with('cus_group', $cus_group)->with('cus_city', $cus_city);
     }
 
 
@@ -439,18 +392,18 @@ class PharmacyController extends Controller
 
         $validator = Validator::make($request->all(), [
             'pharmacy_name' => 'required|string',
-            'f_name' => 'required|string',
-            'l_name' => 'required|string',
-            'lat' => 'between:-90,90',
-            'lng' => 'between:-90,90',
-            'to' => 'required|date_format:H:i',
-            'from' => 'required|date_format:H:i',
+            //'f_name' => 'string',
+            //'l_name' => 'string',
+            'lat' => 'required|between:-90,90',
+            'lng' => 'required|between:-90,90',
+            //'to' => 'date_format:H:i',
+            //'from' => 'date_format:H:i',
             'city_id' => 'required|numeric',
             'area_id' => 'required|numeric',
             'group_id' => 'required|numeric',
             'password' => 'required',
             'phone1' => 'required|unique:user_import_excel,phone1,' . $id,
-            'phone2' => 'required',
+            //'phone2' => 'required',
             'num_id' => 'required|numeric',
         ]);
 
@@ -459,19 +412,27 @@ class PharmacyController extends Controller
             return back();
         }
 
+
+        ($request->has('f_name') && $request->f_name!="") ?  $fname=$request->f_name : $fname=$request->pharmacy_name;
+        ($request->has('l_name') && $request->l_name!="") ?  $l_name=$request->l_name : $l_name=$request->pharmacy_name;
+        ($request->has('to') && $request->to!="00:00" && $request->to!="00:00:00") ?  $to=$request->to : $to="17:00:00";
+        ($request->has('from') && $request->from!="00:00" && $request->from!="00:00:00") ?  $from=$request->from : $from="09:00:00";
+        ($request->has('Land_number')) ?  $Land_number=$request->Land_number : $Land_number=0;
+
         $pharmacy = UserImportExcel::find($id);
         $pharmacy->pharmacy_name = $request->pharmacy_name;
         $pharmacy->password = $request->password;
-        $pharmacy->f_name = $request->f_name;
+        $pharmacy->f_name = $fname;
         $pharmacy->num_id = $request->num_id;
-        $pharmacy->l_name = $request->l_name;
+        $pharmacy->l_name = $l_name;
         $pharmacy->lat = $request->lat;
         $pharmacy->lng = $request->lng;
         $pharmacy->phone1 = $request->phone1;
         $pharmacy->phone2 = $request->phone2;
-        $pharmacy->to = $request->to;
-        $pharmacy->from = $request->from;
-        $pharmacy->land_number = $request->land_number;
+        $pharmacy->to = $to;
+        $pharmacy->card_number = 0;
+        $pharmacy->from = $from;
+        $pharmacy->land_number = $Land_number;
         $pharmacy->city_id = $request->city_id;
         $pharmacy->area_id = $request->area_id;
         $pharmacy->group_id = $request->group_id;
@@ -480,6 +441,7 @@ class PharmacyController extends Controller
         Toastr::success('Pharmacy updated successfully.');
         return back();
     }
+
 
     public function pharmacy_Import_destroy(Request $request, $id)
     {
@@ -493,6 +455,7 @@ class PharmacyController extends Controller
             return back();
         }
     }
+
 
     public function activation_export($id)
     {

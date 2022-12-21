@@ -23,7 +23,6 @@ class DeliveryManController extends Controller
         return view('admin-views.delivery-man.index');
     }
 
-
     public function list(Request $request)
     {
         $query_param = [];
@@ -186,7 +185,7 @@ class DeliveryManController extends Controller
                 Storage::disk('public')->delete('delivery-man/' . $img);
             }
         }
-
+        DeliveryReview::where('delivery_id','=',$delivery_man->id)->delete();
         $delivery_man->delete();
         Toastr::success(translate('Delivery-man removed!'));
         return back();
@@ -292,7 +291,6 @@ class DeliveryManController extends Controller
         $lists = $lists->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
         return view('admin-views.delivery-man.reviewList', compact('lists', 'search'));
     }
-
 
 
     public function store_review(Request $request)

@@ -81,7 +81,7 @@
 
                                 </div>
 
-                                <div class="col-md-6 col-sm-12">
+                                {{-- <div class="col-md-6 col-sm-12">
 
                                     <div class="form-group">
                                         <label class="input-label" for="exampleFormControlInput1">{{
@@ -90,7 +90,7 @@
                                             required>
                                     </div>
 
-                                </div>
+                                </div> --}}
 
                                 <div class="col-md-6 col-sm-12">
 

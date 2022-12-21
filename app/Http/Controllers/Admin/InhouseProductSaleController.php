@@ -25,7 +25,7 @@ class InhouseProductSaleController extends Controller
 
         $bags = Bag::with(['bag_order_details'])
         ->paginate(Helpers::pagination_limit(), ['*'], 'bag-page')
-        ->appends($query_param );
+        ->appends($query_param);
 
         return view('admin-views.report.inhouse-product-sale', compact('categories', 'category_id', 'products','bags'));
     }

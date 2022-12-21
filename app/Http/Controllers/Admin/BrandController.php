@@ -5,15 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\Controller;
-use App\Model\Admin;
+use App\Model\Marketing;
 use App\Model\Brand;
+use App\Model\bag;
+use App\Model\BagProduct;
+use App\Model\Product;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Model\Translation;
+use App\CPU\ProductManager;
+use App\Model\Wishlist;
 
 class BrandController extends Controller
 {
+
     public function add_new()
     {
         $br = Brand::latest()->paginate(Helpers::pagination_limit());
@@ -34,15 +40,15 @@ class BrandController extends Controller
         //  }
         $brand->save();
 
-        foreach($request->lang as $index=>$key)
-        {
-            if($request->name[$index] && $key != 'en')
-            {
+        foreach ($request->lang as $index => $key) {
+            if ($request->name[$index] && $key != 'en') {
                 Translation::updateOrInsert(
-                    ['translationable_type'  => 'App\Model\Brand',
+                    [
+                        'translationable_type'  => 'App\Model\Brand',
                         'translationable_id'    => $brand->id,
                         'locale'                => $key,
-                        'key'                   => 'name'],
+                        'key'                   => 'name'
+                    ],
                     ['value'                 => $request->name[$index]]
                 );
             }
@@ -55,8 +61,7 @@ class BrandController extends Controller
     {
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $br = Brand::where(function ($q) use ($key) {
                 foreach ($key as $value) {
@@ -64,11 +69,11 @@ class BrandController extends Controller
                 }
             });
             $query_param = ['search' => $request['search']];
-        }else{
+        } else {
             $br = new Brand();
         }
         $br = $br->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
-        return view('admin-views.brand.list', compact('br','search'));
+        return view('admin-views.brand.list', compact('br', 'search'));
     }
 
     public function edit($id)
@@ -84,22 +89,17 @@ class BrandController extends Controller
         $brand->name = $request->name[array_search('en', $request->lang)];
         if ($request->has('image')) {
             $brand->image = ImageManager::update('brand/', $brand['image'], 'png', $request->file('image'));
-         }
-        //  if($request->has('shipping')){
-        //     $brand->shipping = 1;
-        //  }
-        //  if(!$request->has('shipping')){
-        //     $brand->shipping = 0;
-        //  }
-
+        }
         $brand->save();
         foreach ($request->lang as $index => $key) {
             if ($request->name[$index] && $key != 'en') {
                 Translation::updateOrInsert(
-                    ['translationable_type' => 'App\Model\Brand',
+                    [
+                        'translationable_type' => 'App\Model\Brand',
                         'translationable_id' => $brand->id,
                         'locale' => $key,
-                        'key' => 'name'],
+                        'key' => 'name'
+                    ],
                     ['value' => $request->name[$index]]
                 );
             }
@@ -109,14 +109,35 @@ class BrandController extends Controller
         return back();
     }
 
+
     public function delete(Request $request)
     {
-        $translation = Translation::where('translationable_type','App\Model\Brand')
-                                    ->where('translationable_id',$request->id);
+        $translation = Translation::where('translationable_type', 'App\Model\Brand')
+            ->where('translationable_id', $request->id);
         $translation->delete();
         $brand = Brand::find($request->id);
         ImageManager::delete('/brand/' . $brand['image']);
         $brand->delete();
+
+        $productIds = Product::where('brand_id', '=', $request->id)->get();
+        foreach ($productIds as $productId) {
+            $bags=BagProduct::where('product_id', '=', $productId->id)->get();
+            ImageManager::delete('/product/thumbnail/' . $productId['thumbnail']);
+            foreach($bags as $bag)
+            {
+                $price = DB::table('products_bag')->where('bag_id', $bag->bag_id)->sum('product_total_price');
+                $bag = Bag::findOrFail($bag->bag_id);
+                $bag->total_price_offer = $price;
+                $bag->save();
+            }
+            BagProduct::where('product_id', '=', $productId->id)->delete();
+            $prodMark=Marketing::where('item_id','=',$productId->id)->get()->first();
+            if(isset($prodMark))$prodMark->delete();
+            ProductManager::remove_bounses($productId->id);
+            ProductManager::remove_points($productId->id);
+            Wishlist::where('product_id', $productId->id)->delete();
+        }
+        Product::where('brand_id','=',$request->id)->delete();
         return response()->json();
     }
 }

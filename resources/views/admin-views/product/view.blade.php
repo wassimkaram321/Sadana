@@ -70,12 +70,6 @@
                             <i class="tio-back-ui"></i> {{\App\CPU\translate('Back')}}
                         </a>
                     </div>
-                    {{-- <div>
-                        <a href="{{route('product',$product['slug'])}}" class="btn btn-primary " target="_blank"><i
-                                class="tio-globe"></i> {{ \App\CPU\translate('View') }} {{ \App\CPU\translate('from') }}
-                            {{ \App\CPU\translate('Website') }}
-                        </a>
-                    </div> --}}
                 </div>
             </div>
         </div>
@@ -294,8 +288,14 @@
                         </div>
                         <div class="col-md-4 d-flex align-items-center my-2">
                             <i class="fa-solid fa-store"></i>
+                            @if(isset($store))
                             <h6 class="mr-3 ml-3">{{\App\CPU\translate('Store Name')}} :</h6>
                             <span>{{ $store->store_name }}</span>
+                            @else
+                            <label class="badge badge-danger mr-3 ml-3">{{\App\CPU\translate('invalid_store_data')}}</label>
+
+                            @endif
+
                         </div>
                         <div class="col-md-4 d-flex align-items-center my-2">
                             <i class="fa-solid fa-hand"></i>

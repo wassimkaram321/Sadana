@@ -112,15 +112,15 @@
                                              <i class="tio-refresh"></i>
                                         </a>
                                         @else
-                                        <a class="btn btn-success btn-sm">
+                                        <a class="btn btn-success btn-sm" href="{{route('admin.sales-man.work-plan-refresh',[$p['id']])}}">
                                             {{-- <i class="fa-regular fa-rotate"></i> --}}
                                             <i class="tio-refresh"></i>
                                         </a>
                                         @endif
 
-                                        <a class="btn btn-primary btn-sm" href="{{route('admin.sales-man.work-plan-edit',[$p['id']])}}">
-                                            <i class="tio-edit"></i> {{-- {{\App\CPU\translate('Edit')}} --}}
-                                        </a>
+                                        {{-- <a class="btn btn-primary btn-sm" href="{{route('admin.sales-man.work-plan-edit',[$p['id']])}}">
+                                            <i class="tio-edit"></i> 
+                                        </a> --}}
                                         <a class="btn btn-danger btn-sm" href="javascript:" onclick="form_alert('plan-{{$p['id']}}','Want to delete this item ?')">
                                             <i class="tio-add-to-trash"></i>{{--{{\App\CPU\translate('Delete')}}--}}
                                         </a>

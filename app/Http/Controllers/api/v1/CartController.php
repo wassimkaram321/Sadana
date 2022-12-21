@@ -126,7 +126,7 @@ class CartController extends Controller
         $user = Helpers::get_customer($request);
 
 
-        
+
         //Start
         $cart = Cart::where(['id' => $request->key, 'customer_id' => $user->id])->get()->first();
         $ProductKey = ProductsKeys::where([
@@ -134,17 +134,16 @@ class CartController extends Controller
             ['cus_id', '=', $user->id]
         ])->get()->first();
 
-        if(isset($ProductKey))
-        {
+        if (isset($ProductKey)) {
             $found = ProductsKeys::where('key_id', '=', $ProductKey->key_id)->get(['base_product_id']);
-            $objects=Cart::whereIn('product_id',$found)->get();
+            $objects = Cart::whereIn('product_id', $found)->get();
             if (count($objects) <= 1) {
                 $other_products = json_decode($ProductKey->other_product_id, true);
                 for ($i = 0; $i < count($other_products); $i++) {
                     $cart = Cart::where(['product_id' => $other_products[$i], 'customer_id' => $user->id])
-                    ->update(['update_delete'=>1]);
+                        ->update(['update_delete' => 1]);
                 }
-                ProductsKeys::where([['cus_id', '=', $user->id],['key_id','=',$ProductKey->key_id]])->delete();
+                ProductsKeys::where([['cus_id', '=', $user->id], ['key_id', '=', $ProductKey->key_id]])->delete();
             }
         }
         //End
@@ -177,37 +176,6 @@ class CartController extends Controller
         return response()->json(translate('successfully_removed'));
     }
 
-
-
-    // public function add_to_cart_website(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'carts.*.id' => 'required|numeric',
-    //         'carts.*.quantity' => 'required|numeric',
-    //         'carts.*.type' => 'required|string',
-    //         'carts.*.pure_price' => 'required|numeric',
-    //         'note' => 'required|string',
-    //         'delivery_date' => 'required|date',
-    //     ]);
-
-    //     if ($validator->errors()->count() > 0) {
-    //         return response()->json(['errors' => Helpers::error_processor($validator->errors())]);
-    //     }
-
-    //     foreach ($request->carts as $cart)
-    //     {
-    //         //$cart = CartManager::add_to_cart($cart);
-    //         //$user = Helpers::get_customer($request);
-    //         //place order
-    //     }
-
-    //     $cart = CartManager::add_to_cart($request);
-    //     return response()->json($cart, 200);
-    // }
-
-
-
-
     public function get_product_keys(Request $request)
     {
         $user = Helpers::get_customer($request);
@@ -236,28 +204,40 @@ class CartController extends Controller
         $other_products = [];
         $other_products_qty = [];
         $base_key = 0;
+        $base_products = [];
 
 
 
         //check if bonus found and get other products your link ;
         $bonuses = Bonus::get();
         foreach ($bonuses as $bonus) {
-            $base_products = json_decode($bonus->salve_product_id, true);
-            for ($i = 0; $i < count($base_products); $i++) {
-                if ($base_products[$i] == $product_id) {
+            $base_productsF = json_decode($bonus->salve_product_id, true);
+
+            for ($i = 0; $i < count($base_productsF); $i++) {
+                if ((int)$base_productsF[$i] == $product_id) {
                     $bonusObject = $bonus;
                     $bonus_found = true;
                     $other_products = json_decode($bonusObject->master_product_id, true);
                     $other_products_qty = json_decode($bonusObject->master_product_quatity, true);
-                    break;
+                    $base_products = json_decode($bonus->salve_product_id, true);
                 }
             }
         }
+
+
         if ($bonus_found == false) {
             return response()->json(['status' => false, 'message' => 'لا يوجد عرض'], 200);
         }
         //End check ;
 
+
+
+        for ($i = 0; $i < count($other_products); $i++) {
+
+            $product_name = Product::whereid($other_products[$i])->first()->only('name', 'id');
+            $product_name['quantity'] = $other_products_qty[$i];
+            $data_f[] =  $product_name;
+        }
 
         //check if products your link founds in cart ;
         $user = Helpers::get_customer($request);
@@ -267,51 +247,54 @@ class CartController extends Controller
             ])->first();
 
             if (!isset($cart)) {
-                return response()->json(['status' => false, 'message' => 'لم يتم ادخال كامل المنتجات الى السلة'], 200);
+
+                return response()->json(['status' => false, 'details' => ['message' => 'لم يتم ادخال كامل المنتجات الى السلة', 'products' => $data_f]], 200);
             }
             if ($other_products_qty[$i] > $cart->quantity) {
-                return response()->json(['status' => false, 'message' => 'يرجى ادخال الحد الادنى للمنتجات من اجل امكانية الشراء'], 200);
+                return response()->json(['status' => false, 'details' => ['message' => 'يرجى ادخال الحد الادنى للمنتجات من اجل امكانية الشراء', 'products' => $data_f]], 200);
             }
         }
         //End check ;
 
 
-        //lock update and delete
-        for ($i = 0; $i < count($other_products); $i++) {
-            $cart = Cart::where([
-                ['customer_id', '=', $user->id], ['product_id', '=', $other_products[$i]]
-            ])->first();
-            $cart->update_delete = 0;
-            $cart->save();
-        }
-        //End lock
 
-
-        //Grant key ;
-        $base_key = $this->generateNumber();
-
-        for ($i = 0; $i < count($base_products); $i++) {
-
-            $ProductKey = ProductsKeys::where([['base_product_id', '=', (int)$base_products[$i]], ['cus_id', '=', $user->id]])
-                ->get()->first();
-
-            // $ProductKey = ProductsKeys::whereIn([['base_product_id', '=', (int)$base_products[$i]], ['cus_id', '=', $user->id]])
-            //     ->get()->first();
-
-            if (isset($ProductKey)) {
-                $base_key = $ProductKey->key_id;
-            } else {
-                $product_key = new ProductsKeys;
-                $product_key->key_id = $base_key;
-                $product_key->cus_id = $user->id;
-                $product_key->base_product_id = (int)$base_products[$i];
-                $product_key->other_product_id = json_encode($other_products);
-                $product_key->save();
+        if ($request->check == 1)
+            return response()->json(['status' => true, 'details' => ['products' => $data_f]], 200);
+        else {
+            //lock update and delete
+            for ($i = 0; $i < count($other_products); $i++) {
+                $cart = Cart::where([
+                    ['customer_id', '=', $user->id], ['product_id', '=', $other_products[$i]]
+                ])->first();
+                $cart->update_delete = 0;
+                $cart->save();
             }
-        }
+            //End lock
 
-        return response()->json(['status' => true, 'message' => ['key' => $base_key]], 200);
-        //End Grant;
+
+            //Grant key ;
+            $base_key = rand(100000, 999999);
+
+
+            for ($i = 0; $i < count($base_products); $i++) {
+
+                $ProductKey = ProductsKeys::where([['base_product_id', '=', (int)$base_products[$i]], ['cus_id', '=', $user->id]])
+                    ->get()->first();
+                if (isset($ProductKey)) {
+                    $base_key = $ProductKey->key_id;
+                } else {
+                    $product_key = new ProductsKeys;
+                    $product_key->key_id = $base_key;
+                    $product_key->cus_id = $user->id;
+                    $product_key->base_product_id = (int)$base_products[$i];
+                    $product_key->other_product_id = json_encode($other_products);
+                    $product_key->save();
+                }
+            }
+
+            return response()->json(['status' => true, 'details' => ['key' => $base_key, 'products' => $data_f]], 200);
+            //End Grant;
+        }
     }
 
     function generateNumber()
@@ -325,6 +308,6 @@ class CartController extends Controller
 
     function NumberExists($number)
     {
-        return ProductsKeys::whereKey_id($number)->exists();
+        return ProductsKeys::where('key_id', '=', $number)->exists();
     }
 }

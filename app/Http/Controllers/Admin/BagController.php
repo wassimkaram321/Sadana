@@ -11,8 +11,6 @@ use App\Model\Group;
 use App\Model\BagsSetting;
 use App\Model\BagsOrdersDetails;
 use App\Model\BagProduct;
-use App\Model\City;
-use App\Pharamcy;
 use App\Model\Product;
 use App\Pharmacy;
 use Brian2694\Toastr\Facades\Toastr;
@@ -26,7 +24,6 @@ class BagController extends BaseController
 {
 
 
-    //Done
     public function bag_list(Request $request)
     {
         $query_param = [];
@@ -46,14 +43,14 @@ class BagController extends BaseController
         return view('admin-views.bag.list', compact('br', 'search'));
     }
 
-    //Done
+
     public function bag_add_new()
     {
         $br = Bag::latest()->paginate(Helpers::pagination_limit());
         return view('admin-views.bag.add-new', compact('br'));
     }
 
-    //Done
+
     public function bag_store(Request $request)
     {
 
@@ -87,15 +84,13 @@ class BagController extends BaseController
         Toastr::success('bag added successfully!');
         return back();
     }
-    //Done
+
     public function bag_edit($id)
     {
         $b = Bag::where(['id' => $id])->withoutGlobalScopes()->first();
         return view('admin-views.bag.edit', compact('b'));
     }
 
-
-    //Done
     public function bag_update(Request $request, $id)
     {
 
@@ -130,8 +125,6 @@ class BagController extends BaseController
         }
     }
 
-
-    //Done
     public function bag_delete(Request $request)
     {
         $translation = Translation::where('translationable_type', 'App\Model\Bag')
@@ -144,12 +137,13 @@ class BagController extends BaseController
             $bagDelete->delete();
         }
         ImageManager::delete('brand/' . $bag['bag_image']);
+        $bagSet=BagsSetting::where('bag_id','=',$bag->id)->get()->first();
+        if(isset($bagSet)) $bagSet->delete();
         $bag->delete();
         return response()->json();
     }
 
-    //Bag produts fun
-    //Done
+
     public function bag_products_list(Request $request, $id)
     {
         $bag_products = BagProduct::join("products", "products.id", "=", "products_bag.product_id")
@@ -176,7 +170,6 @@ class BagController extends BaseController
         //dd($bag_products);
         return view('admin-views.bag.bag-product-view', compact('bag_products', 'br', 'bag_id'));
     }
-
 
 
     public function bag_products_store(Request $request, $bag_id)
@@ -335,8 +328,6 @@ class BagController extends BaseController
         $pharmacies=Pharmacy::get();
         return view('admin-views.bag.setting', compact('bag', 'b', 'city_id', 'array', 'groups','pharmacies','array2'));
     }
-
-
 
     public function bag_product_price(Request $request, $id)
     {

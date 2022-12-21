@@ -31,7 +31,7 @@
                                     name="area_name" class="w-100 js-example-basic-multiple form-control"
                                     style="width: 100%;" required>
                             </div>
-                            
+
                             <div class="col-md-4 d-flex align-items-center w-100">
                                 <input type="number"
                                     placeholder="Number"
@@ -84,7 +84,7 @@
                                     </td>
                                     <td>{{$b['area_num']}}</td>
                                     <td>
-                                        <a class="btn btn-danger btn-sm delete" id="{{$b['id']}}">
+                                        <a class="btn btn-danger btn-sm delete" id="{{$b['area_id']}}">
                                             <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete')}}
                                         </a>
                                     </td>
@@ -113,8 +113,8 @@
     $(document).on('click', '.delete', function () {
             var id = $(this).attr("id");
             Swal.fire({
-                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_bag')}}?',
-                text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this')}}!",
+                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_area')}}?',
+                text: '{{ \App\CPU\translate('All_users_belonging_to_this_area_will_be_removed')}}!!',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',

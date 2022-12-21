@@ -118,8 +118,8 @@
     $(document).on('click', '.delete', function () {
             var id = $(this).attr("id");
             Swal.fire({
-                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_bag')}}?',
-                text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this')}}!",
+                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_group')}}?',
+                text: '{{ \App\CPU\translate('All_users_belonging_to_this_area_will_be_removed')}}!!',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',

@@ -176,9 +176,11 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3 mb-md-0 product-name">
 
-                                    <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
-                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,65)}}{{strlen($detail->product['name'])>45?'':''}}</a>
+                                    {{-- <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
+                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,65)}}{{strlen($detail->product['name'])>45?'':''}}</a> --}}
 
+                                        <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
+                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,100)}}</a>
                                 </div>
 
                                 <div class="col-md-1 align-self-center p-0 ">

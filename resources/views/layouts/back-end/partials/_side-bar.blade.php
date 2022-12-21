@@ -1008,42 +1008,41 @@
                     <!--business settings ends here-->
 
 
-
-
-                    {{-- @if (\App\CPU\Helpers::module_permission_check('web_&_app_settings'))
-                        <li
+                    @if (\App\CPU\Helpers::module_permission_check('web_&_app_settings'))
+                    {{-- <li
                             class="nav-item {{ Request::is('admin/business-settings/social-media') || Request::is('admin/business-settings/terms-condition') || Request::is('admin/business-settings/web-config/refund-index') || Request::is('admin/business-settings/privacy-policy') || Request::is('admin/business-settings/about-us') || Request::is('admin/helpTopic/list') || Request::is('admin/business-settings/fcm-index') || Request::is('admin/business-settings/mail') || Request::is('admin/business-settings/web-config/db-index') || Request::is('admin/business-settings/web-config/environment-setup') || Request::is('admin/business-settings/web-config') ? 'scroll-here' : '' }}">
                     <small class="nav-subtitle" title="">{{ \App\CPU\translate('web_&_app_settings') }}</small>
                     <small class="tio-more-horizontal nav-subtitle-replacer"></small>
                     </li> --}}
 
-                    {{-- <li
-                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config') ? 'active' : '' }}">
-                    <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.index') }}">
-                        <i class="tio-globe nav-icon"></i>
-                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                            {{ \App\CPU\translate('web_config') }}
-                        </span>
-                    </a>
+                    {{-- <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config') ? 'active' : '' }}">
+                        <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.index') }}">
+                            <i class="tio-globe nav-icon"></i>
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                {{ \App\CPU\translate('web_config') }}
+                            </span>
+                        </a>
                     </li> --}}
-                    {{-- <li
-                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config/db-index') ? 'active' : '' }}">
-                    <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.db-index') }}">
-                        <i class="tio-cloud nav-icon"></i>
-                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                            {{ \App\CPU\translate('clean_database') }}
-                        </span>
-                    </a>
+
+                    <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config/db-index') ? 'active' : '' }}">
+                        <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.db-index') }}">
+                            <i class="tio-cloud nav-icon"></i>
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                {{ \App\CPU\translate('clean_database') }}
+                            </span>
+                        </a>
+                    </li>
+
+                    {{-- <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config/environment-setup') ? 'active' : '' }}">
+                        <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.environment-setup') }}">
+                            <i class="tio-labels nav-icon"></i>
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                                {{ \App\CPU\translate('environment_setup') }}
+                            </span>
+                        </a>
                     </li> --}}
-                    {{-- <li
-                            class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config/environment-setup') ? 'active' : '' }}">
-                    <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.environment-setup') }}">
-                        <i class="tio-labels nav-icon"></i>
-                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
-                            {{ \App\CPU\translate('environment_setup') }}
-                        </span>
-                    </a>
-                    </li> --}}
+
+
                     {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/web-config/refund-index') ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.web-config.refund-index') }}">
@@ -1053,6 +1052,8 @@
                         </span>
                     </a>
                     </li> --}}
+
+
                     {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/captcha') ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.captcha') }}">
@@ -1062,6 +1063,8 @@
                         </span>
                     </a>
                     </li> --}}
+
+
                     {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/analytics-index') ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.analytics-index') }}">
@@ -1071,6 +1074,8 @@
                         </span>
                     </a>
                     </li> --}}
+
+
                     {{-- <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/mail') ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.mail.index') }}">
@@ -1080,6 +1085,8 @@
                         </span>
                     </a>
                     </li> --}}
+
+
                     <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/business-settings/fcm-index') ? 'active' : '' }}">
                         <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.business-settings.fcm-index') }}">
                             <i class="tio-notifications-alert nav-icon"></i>
@@ -1166,7 +1173,7 @@
                             </span>
                         </a>
                     </li>
-                    {{-- @endif --}}
+                    @endif
 
 
 

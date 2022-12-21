@@ -7,8 +7,11 @@ use App\CPU\Helpers;
 use App\CPU\ImageManager;
 use App\Http\Controllers\BaseController;
 use App\Model\Brand;
+use App\Model\Bag;
+use App\Model\Marketing;
 use App\Model\Category;
 use App\Model\Color;
+use App\Model\BagProduct;
 use App\Model\DealOfTheDay;
 use App\Model\FlashDealProduct;
 use App\Model\Product;
@@ -24,6 +27,7 @@ use Illuminate\Support\Str;
 use Rap2hpoutre\FastExcel\FastExcel;
 use function App\CPU\translate;
 use App\Model\Cart;
+use App\CPU\ProductManager;
 
 class ProductController extends BaseController
 {
@@ -821,30 +825,33 @@ class ProductController extends BaseController
     public function delete($id)
     {
         $product = Product::find($id);
-
         $translation = Translation::where('translationable_type', 'App\Model\Product')
             ->where('translationable_id', $id);
         $translation->delete();
 
         Cart::where('product_id', $product->id)->delete();
         Wishlist::where('product_id', $product->id)->delete();
-
-
-        /*
-        $countImages=count(json_decode($product['images']));
-        if($countImages!=0)
-        {
-            foreach (json_decode($product['images'], true) as $image) {
-                ImageManager::delete('/product/' . $image);
-            }
-        }
-        */
-
         ImageManager::delete('/product/thumbnail/' . $product['thumbnail']);
         $product->delete();
 
         FlashDealProduct::where(['product_id' => $id])->delete();
         DealOfTheDay::where(['product_id' => $id])->delete();
+
+
+            $bags=BagProduct::where('product_id', '=', $id)->get();
+            foreach($bags as $bag)
+            {
+                $price = DB::table('products_bag')->where('bag_id', $bag->bag_id)->sum('product_total_price');
+                $bag = Bag::findOrFail($bag->bag_id);
+                $bag->total_price_offer = $price;
+                $bag->save();
+            }
+            BagProduct::where('product_id', '=', $id)->delete();
+
+        $prodMark=Marketing::where('item_id','=',$id)->get()->first();
+        if(isset($prodMark))$prodMark->delete();
+        ProductManager::remove_bounses($id);
+        ProductManager::remove_points($id);
 
         Toastr::success('Product removed successfully!');
         return back();
@@ -920,9 +927,11 @@ class ProductController extends BaseController
                 $brand_id = $NewBrand->id;
             }
 
+
+
+            $dateNew = $this->rev_date($collection['تاريخ الصلاحية']);
             $product = Product::where('num_id', '=', $collection['رمز المادة '])->get()->first();
             if (isset($product)) {
-                $product->num_id = $collection['رمز المادة '];
                 $product->unit_price = $collection['السعر'];
                 $product->current_stock = $collection['الكمية'];
                 $product->details = $collection['الملاحظات'];
@@ -932,7 +941,7 @@ class ProductController extends BaseController
                 $product->q_normal_offer = $collection['العرض لل'];
                 $product->q_featured_offer = $collection['العرض مميز لل'];
                 $product->featured_offer = $collection['العرض المميز'];
-                $product->expiry_date = $collection['تاريخ الصلاحية'];
+                $product->expiry_date = $dateNew;
                 $product->demand_limit = $collection['حد الطلب'];
                 $product->store_id = $store_id;
                 $product->featured = 0;
@@ -953,7 +962,7 @@ class ProductController extends BaseController
                     'normal_offer' => $collection['العرض'],
                     'featured_offer' => $collection['العرض المميز'],
                     'demand_limit' => $collection['حد الطلب'],
-                    'expiry_date' => $collection['تاريخ الصلاحية'],
+                    'expiry_date' => $dateNew,
 
                     //By defult
                     'store_id' => $store_id,
@@ -977,11 +986,20 @@ class ProductController extends BaseController
                 ]);
             }
         }
+
         if (count($data) > 0) {
             DB::table('products')->insert($data);
         }
         Toastr::success(count($data) . ' - Products imported successfully! and (' . $countUpdate . ') Products updated successfully!');
         return back();
+    }
+
+    public function rev_date($date)
+    {
+        $array=explode("-",$date);
+                  $rev=array_reverse($array);
+                  $date=implode("-",$rev);
+                  return $date;
     }
 
     public function bulk_export_data()
@@ -1002,30 +1020,16 @@ class ProductController extends BaseController
                     $sub_sub_category_id = $category['id'];
                 }
             }
-            // $storage[] = [
-            //     'name' => $item->name,
-            //     'category_id' => $category_id,
-            //     'sub_category_id' => $sub_category_id,
-            //     'sub_sub_category_id' => $sub_sub_category_id,
-            //     'brand_id' => $item->brand_id,
-            //     'unit' => $item->unit,
-            //     'min_qty' => $item->min_qty,
-            //     'refundable' => $item->refundable,
-            //     'youtube_video_url' => $item->video_url,
-            //     'unit_price' => $item->unit_price,
-            //     'purchase_price' => $item->purchase_price,
-            //     'tax' => $item->tax,
-            //     'discount' => $item->discount,
-            //     'discount_type' => $item->discount_type,
-            //     'current_stock' => $item->current_stock,
-            //     'details' => $item->details,
-            //     'thumbnail' => 'thumbnail/' . $item->thumbnail,
-            // ];
 
-            $brand = Brand::findOrFail($item->brand_id);
+            $brand = Brand::where('id','=',$item->brand_id)->get()->first();
+            if(!isset($brand))
+               $brand_name="غير معرف";
+            else
+                $brand_name=$brand->name;
+
             $storage[] = [
                 'رمز المادة' => $item->num_id,
-                'المجموعة' => $brand->name,
+                'المجموعة' => $brand_name,
                 'اسم المادة' => $item->name,
                 'الكمية' => $item->current_stock,
                 'السعر' => $item->unit_price,

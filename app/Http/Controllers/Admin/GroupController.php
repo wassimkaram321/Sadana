@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Model\Group;
 use Illuminate\Http\Request;
 use App\CPU\Helpers;
+use App\CPU\SalerManager;
 use Brian2694\Toastr\Facades\Toastr;
 use Exception;
 
@@ -39,9 +40,11 @@ class GroupController extends Controller
     public function group_delete(Request $request)
     {
         $group = Group::findOrFail($request->id);
-        
+        SalerManager::remove_users_details_group($request->id);
+        $group->areas()->delete();
         $group->delete();
         Toastr::success('Group deleted successfully!');
+        return response()->json();
     }
 
 }

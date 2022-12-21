@@ -12,7 +12,7 @@
         <div class="page-header mb-1">
             <div class="flex-between align-items-center">
                 <div>
-                    <h1 class="page-header-title">{{\App\CPU\translate('Plan Pharmacies')}} <span
+                    <h1 class="page-header-title">{{\App\CPU\translate('Plan Pharmacies')}}<span
                             class="badge badge-soft-dark mx-2">{{$PharmaciesPlan->count()}}</span></h1>
                 </div>
                 <div>
@@ -125,7 +125,7 @@
                                 {{$pharmacyPlan->id}}
                             </td>
                             <td>
-                                <a href="{{route('admin.customer.view',[$pharmacyPlan['id']])}}">{{$pharmacyPlan['pharmacy_name']}}</a>
+                                <a href="#">{{$pharmacyPlan['pharmacy_name']}}</a>
                             </td>
 
                             <td>

@@ -9,10 +9,16 @@
 @section('content')
 <div class="content container-fluid">
     <!-- Page Header -->
-    <div class="page-header">
+    <div class="page-header" style="margin-bottom: 0px !important;padding-bottom: 0px !important;">
         <div class="row align-items-center">
-            <div class="col-sm mb-2 mb-sm-0">
+            <div class="col-sm mb-2 mb-sm-0" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
                 <h1 class="page-header-title">{{\App\CPU\translate('Clean')}} {{\App\CPU\translate('database')}}</h1>
+
+                <div class="jumbotron"  style="background: white;margin: 0px !important;padding: 0px !important;">
+                    <h1 class="display-4">{{\App\CPU\translate('Instructions')}} : </h1>
+                    <p> 1. {{\App\CPU\translate('Removing brands deletes associated products')}}.</p>
+                </div>
+
             </div>
         </div>
     </div>
@@ -35,7 +41,9 @@
                                            id="business_section_{{$key}}">
                                     <label class="form-check-label text-dark"
                                            style="{{Session::get('direction') === "rtl" ? 'margin-right: 1.25rem;' : ''}};"
-                                           for="business_section_{{$key}}">{{ Str::limit($table, 20) }}</label>
+                                           for="business_section_{{$key}}">
+                                           {{\App\CPU\translate(Str::limit($table, 20))}}
+                                           {{-- {{ Str::limit($table, 20) }}--}}</label>
                                     <span class="badge-pill badge-secondary mx-2">{{$rows[$key]}}</span>
                                 </div>
                             </div>

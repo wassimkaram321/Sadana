@@ -12,7 +12,7 @@ class CreatePointsSettingTable extends Migration
         Schema::create('products_points', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->text('type_id');//ghghgh
+            $table->text('type_id');
             $table->string('name');
             $table->bigInteger('quantity');
             $table->bigInteger('points');

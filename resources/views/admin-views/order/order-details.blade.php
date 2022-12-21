@@ -342,9 +342,11 @@
                         <div class="media-body">
                             <div class="row">
                                 <div class="col-md-3 mb-3 mb-md-0 product-name">
-
                                     <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
-                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,55)}}{{strlen($detail->product['name'])>35?'':''}}</a>
+                                    rel="noopener noreferrer">{{substr($detail->product['name'],0,100)}}</a>
+
+                                    {{-- <a href="{{route('admin.product.view',[$detail['product_id']])}}" target="_blank"
+                                        rel="noopener noreferrer">{{substr($detail->product['name'],0,55)}}{{strlen($detail->product['name'])>35?'':''}}</a> --}}
 
                                 </div>
 

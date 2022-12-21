@@ -95,9 +95,11 @@ class SalesManController extends Controller
         if ($validator->fails()) {
             return response()->json(['status'=>403 ,'errors' => Helpers::error_processor($validator)], 403);
         }
+
         try {
             $plan = PlanDetails::where('work_plan_id', '=', $request->work_plan_id)
                 ->where('Wpharmacy_id', '=', $request->pharmacy_id)->get()->first();
+
                 if(isset($plan))
                 {
                     $plan->visited = $request->visited;
@@ -108,13 +110,15 @@ class SalesManController extends Controller
                     $plan->update();
                 }
                 else{
-                    $plan =new PlanDetails;
-                    $plan->visited = $request->visited;
-                    $plan->Wnote = $request->note;
-                    $plan->Wlat = $request->lat;
-                    $plan->Wlng = $request->lng;
-                    $plan->visit_time = now();
-                    $plan->save();
+                   $plan =new PlanDetails;
+                   $plan->work_plan_id = $request->work_plan_id;
+                   $plan->Wpharmacy_id = $request->pharmacy_id;
+                   $plan->visited = $request->visited;
+                   $plan->Wnote = $request->note;
+                   $plan->Wlat = $request->lat;
+                   $plan->Wlng = $request->lng;
+                   $plan->visit_time = now();
+                   $plan->save();
                 }
 
             return response()->json(['status'=>200 ,'message' => translate('The visit has been registered successfully')], 200);

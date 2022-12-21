@@ -76,7 +76,6 @@ class CustomerController extends Controller
     public function edit($id){
 
         $user = User::with(['pharmacy'])->where(['id' => $id])->withoutGlobalScopes()->get()->first();
-
         $cus_area = Area::where('id',$user->area_id)->get()->first();
         $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
         $cus_city = City::where('id',$cus_group->city_id)->get()->first();
@@ -183,8 +182,6 @@ class CustomerController extends Controller
         Toastr::success('pharmacy updated successfully!');
         return back();
     }
-
-
 
     public function delete($id)
     {

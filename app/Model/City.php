@@ -15,4 +15,9 @@ class City extends Model
         'id' => 'integer',
         'city_status' => 'integer',
     ];
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
+    }
 }

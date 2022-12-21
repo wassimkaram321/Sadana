@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Model\Area;
 use Illuminate\Http\Request;
 use App\CPU\Helpers;
+use App\CPU\SalerManager;
 use Brian2694\Toastr\Facades\Toastr;
 use Exception;
 
@@ -15,7 +16,9 @@ class AreaController extends Controller
     {
         $group_areas = Area::join("group_area", "group_area.id", "=", "areas.group_id")
             ->where("areas.group_id", $id)
-            ->get();
+            ->get([
+                'areas.area_name','areas.id as area_id','areas.area_num'
+            ]);
         $group_id=$id;
         return view('admin-views.area.list', compact('group_areas','group_id'));
     }
@@ -40,7 +43,8 @@ class AreaController extends Controller
 
     public function area_delete(Request $request)
     {
-        $area = Area::findOrFail($request->id);
+        $area = Area::find($request->id);
+        SalerManager::remove_users_details($request->id);
         $area->delete();
         Toastr::success('Area deleted successfully!');
     }

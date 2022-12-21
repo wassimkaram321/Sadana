@@ -31,7 +31,6 @@ class BrandManager
 
 
 
-
         $points = ProductPoint::where('type', 'product')->get();
         $pointNew = "0";
         foreach ($products as $p) {
@@ -46,7 +45,6 @@ class BrandManager
                     }
                 }
             }
-
             $p['points'] = $pointNew;
         }
         $bonuses = Bonus::get();
@@ -54,7 +52,7 @@ class BrandManager
         foreach ($products as $p) {
             foreach ($bonuses as $b) {
                 $idx = json_decode($b->salve_product_id);
-           
+
                 foreach ($idx as $d) {
                     if ($d == $p->id) {
                         $locks[] = $p->id;

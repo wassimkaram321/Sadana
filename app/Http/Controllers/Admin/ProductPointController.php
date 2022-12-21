@@ -12,90 +12,62 @@ use App\CPU\Helpers;
 use App\Model\Bag;
 use App\Model\PharmaciesPoints;
 use App\Model\Product;
-use App\Pharmacy;
-use PDO;
 
 class ProductPointController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index(Request $request)
     {
-        //
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
-            $productpoint = ProductPoint::where('type','product')->where(function ($q) use ($key) {
+            $productpoint = ProductPoint::where('type', 'product')->where(function ($q) use ($key) {
                 foreach ($key as $value) {
                     $q->Where('name', 'like', "%{$value}%");
                 }
             });
             $query_param = ['search' => $request['search']];
-        }else{
+        } else {
             $productpoint = new ProductPoint();
         }
-        $productpoint = ProductPoint::where('type','product')->latest()->paginate(Helpers::pagination_limit());
-        return view('admin-views.points.list',compact('productpoint','search'));
+        $productpoint = ProductPoint::where('type', 'product')->latest()->paginate(Helpers::pagination_limit());
+        return view('admin-views.points.list', compact('productpoint', 'search'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
         $idx = array();
         $indecies = [];
         $productpoint = ProductPoint::wheretype('product')->latest()->paginate(Helpers::pagination_limit());
-        foreach($productpoint as $p){
-            array_push($idx,json_decode($p->type_id));
+        foreach ($productpoint as $p) {
+            array_push($idx, json_decode($p->type_id));
         }
-        if(count($idx) > 0){
-        foreach($idx as $id){
-           foreach($id as $i){
-            $indecies[] = $i;
-           }
-
+        if (count($idx) > 0) {
+            foreach ($idx as $id) {
+                foreach ($id as $i) {
+                    $indecies[] = $i;
+                }
+            }
         }
-    }
-        $products = Product::whereNotIN('id',$indecies)->get();
-        return view('admin-views.points.create',compact('productpoint','products'));
-
+        $products = Product::whereNotIN('id', $indecies)->get();
+        return view('admin-views.points.create', compact('productpoint', 'products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
         $request->validate([
-            // 'type' => 'required',
-            // 'type_id' => 'required',
             'quantity' => 'required',
             'points' => 'required',
         ], [
-            // 'type.required' => ' Type is required!',
-            // 'type_id.required' => 'Product/Bag is required!',
             'quantity.required' => 'Quantity is required!',
             'points.required' => 'Points amount is required!',
         ]);
-        $idx = json_encode($request->products);
 
         $productpoint = new ProductPoint();
         $productpoint->type = 'product';
-        // $productpoint->type = $request->type;
-        $productpoint->type_id = $idx;
+        $productpoint->type_id =  json_encode($request->products);
         $productpoint->quantity = $request->quantity;
         $productpoint->points = $request->points;
         $productpoint->save();
@@ -103,56 +75,32 @@ class ProductPointController extends Controller
         return back();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ProductPoint $productPoint)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id,Request $request)
+    public function edit($id, Request $request)
     {
         //
         $productpoint = ProductPoint::whereId($id)->first();
 
         $idx = json_decode($productpoint->type_id);
-        $old_products = Product::whereIn('id',$idx)->get();
+        $old_products = Product::whereIn('id', $idx)->get();
         // $products = Product::all();
         $idx = array();
         $indecies = [];
         $productpoint1 = ProductPoint::wheretype('product')->latest()->paginate(Helpers::pagination_limit());
-        foreach($productpoint1 as $p){
-            array_push($idx,json_decode($p->type_id));
+        foreach ($productpoint1 as $p) {
+            array_push($idx, json_decode($p->type_id));
         }
-        foreach($idx as $id){
-           foreach($id as $i){
-            $indecies[] = $i;
-           }
-
+        foreach ($idx as $id) {
+            foreach ($id as $i) {
+                $indecies[] = $i;
+            }
         }
-        $products = Product::whereNotIN('id',$indecies)->get();
-        return view('admin-views.points.edit',compact('productpoint','old_products','products'));
-
+        $products = Product::whereNotIN('id', $indecies)->get();
+        return view('admin-views.points.edit', compact('productpoint', 'old_products', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function update($id,Request $request)
+
+    public function update($id, Request $request)
     {
         //
 
@@ -175,12 +123,7 @@ class ProductPointController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Request $request)
     {
         //
@@ -197,60 +140,44 @@ class ProductPointController extends Controller
         //
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
-            $productpoint = ProductPoint::where('type','bag')->where(function ($q) use ($key) {
+            $productpoint = ProductPoint::where('type', 'bag')->where(function ($q) use ($key) {
                 foreach ($key as $value) {
                     $q->Where('name', 'like', "%{$value}%");
                 }
             });
             $query_param = ['search' => $request['search']];
-        }else{
+        } else {
             $productpoint = new ProductPoint();
         }
-        $productpoint = ProductPoint::where('type','bag')->latest()->paginate(Helpers::pagination_limit());
-        return view('admin-views.points.bag_point_list',compact('productpoint','search'));
+        $productpoint = ProductPoint::where('type', 'bag')->latest()->paginate(Helpers::pagination_limit());
+        return view('admin-views.points.bag_point_list', compact('productpoint', 'search'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function bag_point_create()
     {
         //
-        $productpoint = ProductPoint::where('type','bag')->latest()->paginate(Helpers::pagination_limit());
+        $productpoint = ProductPoint::where('type', 'bag')->latest()->paginate(Helpers::pagination_limit());
         // $products = Bag::all();
         $idx = array();
         $indecies = [];
         $productpoint1 = ProductPoint::wheretype('bag')->latest()->paginate(Helpers::pagination_limit());
-        foreach($productpoint1 as $p){
-            array_push($idx,json_decode($p->type_id));
+        foreach ($productpoint1 as $p) {
+            array_push($idx, json_decode($p->type_id));
         }
-        foreach($idx as $id){
-           foreach($id as $i){
-            $indecies[] = $i;
-           }
-
+        foreach ($idx as $id) {
+            foreach ($id as $i) {
+                $indecies[] = $i;
+            }
         }
-        $products = Bag::whereNotIN('id',$indecies)->get();
-        return view('admin-views.points.bag_point_create',compact('productpoint','products'));
-
+        $products = Bag::whereNotIN('id', $indecies)->get();
+        return view('admin-views.points.bag_point_create', compact('productpoint', 'products'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function bag_point_store(Request $request)
     {
-        //
-
-
         $request->validate([
             // 'type' => 'required',
             // 'type_id' => 'required',
@@ -275,66 +202,33 @@ class ProductPointController extends Controller
         return back();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function bag_point_show(ProductPoint $productPoint)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function bag_point_edit($id,Request $request)
+    public function bag_point_edit($id, Request $request)
     {
-        //
         $productpoint = ProductPoint::whereId($id)->first();
-
         $idx = json_decode($productpoint->type_id);
-        $old_products = Bag::whereIn('id',$idx)->get();
-        // $products = Bag::all();
+        $old_products = Bag::whereIn('id', $idx)->get();
         $idx = array();
         $indecies = [];
         $productpoint1 = ProductPoint::wheretype('bag')->latest()->paginate(Helpers::pagination_limit());
-        foreach($productpoint1 as $p){
-            array_push($idx,json_decode($p->type_id));
+        foreach ($productpoint1 as $p) {
+            array_push($idx, json_decode($p->type_id));
         }
-        foreach($idx as $id){
-           foreach($id as $i){
-            $indecies[] = $i;
-           }
-
+        foreach ($idx as $id) {
+            foreach ($id as $i) {
+                $indecies[] = $i;
+            }
         }
-        $products = Bag::whereNotIN('id',$indecies)->get();
-        return view('admin-views.points.bag_point_edit',compact('productpoint','old_products','products'));
-
+        $products = Bag::whereNotIN('id', $indecies)->get();
+        return view('admin-views.points.bag_point_edit', compact('productpoint', 'old_products', 'products'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
-    public function bag_point_update($id,Request $request)
+    public function bag_point_update($id, Request $request)
     {
-        //
-
         try {
             $productpoint = ProductPoint::findOrFail($id);
             $idx = json_encode($request->products);
-
-            // $productpoint = ProductPoint::whereId();
             $productpoint->type = 'bag';
-            // $productpoint->type = $request->type;
             $productpoint->type_id = $idx;
             $productpoint->quantity = $request->quantity;
             $productpoint->points = $request->points;
@@ -347,16 +241,8 @@ class ProductPointController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\ProductPoint  $productPoint
-     * @return \Illuminate\Http\Response
-     */
     public function bag_point_destroy(Request $request)
     {
-        //
-
         $translation = Translation::where('translationable_type', 'App\Model\ProductPoint')
             ->where('translationable_id', $request->id);
         $translation->delete();
@@ -364,13 +250,12 @@ class ProductPointController extends Controller
         $productpoint->delete();
         return response()->json();
     }
+
     public function order_points(Request $request)
     {
-        //
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $productpoint = OrdersPoints::where(function ($q) use ($key) {
                 foreach ($key as $value) {
@@ -378,15 +263,15 @@ class ProductPointController extends Controller
                 }
             });
             $query_param = ['search' => $request['search']];
-        }else{
+        } else {
             $productpoint = new OrdersPoints();
         }
         $productpoint = OrdersPoints::latest()->paginate(Helpers::pagination_limit());
-        return view('admin-views.points.order_points.list',compact('productpoint','search'));
+        return view('admin-views.points.order_points.list', compact('productpoint', 'search'));
     }
+
     public function order_points_store(Request $request)
     {
-        //
         $request->validate([
             // 'type' => 'required',
             // 'type_id' => 'required',
@@ -407,13 +292,8 @@ class ProductPointController extends Controller
         return back();
     }
 
-
-
-
     public function order_points_destroy(Request $request)
     {
-        //
-
         $translation = Translation::where('translationable_type', 'App\Model\OrdersPoints')
             ->where('translationable_id', $request->id);
         $translation->delete();
@@ -423,16 +303,12 @@ class ProductPointController extends Controller
     }
 
 
-
-
     public function pharmacies_points(Request $request)
     {
-        # code...
 
         $query_param = [];
         $search = $request['search'];
-        if ($request->has('search'))
-        {
+        if ($request->has('search')) {
             $key = explode(' ', $request['search']);
 
             $pharmacies = PharmaciesPoints::where(function ($q) use ($key) {
@@ -442,17 +318,11 @@ class ProductPointController extends Controller
             });
 
             $query_param = ['search' => $request['search']];
-        }else{
+        } else {
             $pharmacies = new PharmaciesPoints();
         }
         $pharmacies = PharmaciesPoints::groupBy('pharmacy_id')->with('pharmacy')->selectRaw('sum(points) as sum, pharmacy_id')->latest()->paginate(Helpers::pagination_limit());
 
-        return view('admin-views.points.pharmacies_points',compact('pharmacies','search'));
-
-    }
-    public function test()
-    {
-        # code...
-
+        return view('admin-views.points.pharmacies_points', compact('pharmacies', 'search'));
     }
 }

@@ -2315,4 +2315,48 @@
   'Main Products' => 'Main Products',
   'Main Products Quantity' => 'Main Products Quantity',
   'faild' => 'Faild',
+  '
+                    Invalid date range ' => '
+                    Invalid date range ',
+  'successfully' => 'Successfully',
+  'bags_orders_details' => 'Bags orders details',
+  'cities' => 'Cities',
+  'delivery_men' => 'Delivery men',
+  'group_area' => 'Group area',
+  'notifications' => 'Notifications',
+  'orders_points' => 'Orders points',
+  'product_stocks' => 'Product stocks',
+  'salers_reviews' => 'Salers reviews',
+  'stores' => 'Stores',
+  'support_ticket_convs' => 'Support ticket convs',
+  'support_tickets' => 'Support tickets',
+  'user_import_excel' => 'User import excel',
+  'wishlists' => 'Wishlists',
+  'work_plan_archive' => 'Work plan archive',
+  '
+                        plan_deleted_successfully ' => '
+                        plan deleted successfully ',
+  '
+                Are_you_sure_delete_this_store ' => '
+                Are you sure delete this store ',
+  '
+                Yes ' => '
+                Yes ',
+  '
+                delete_it ' => '
+                delete it ',
+  '
+                                plan_deleted_successfully ' => '
+                                plan deleted successfully ',
+  'plan removed!' => 'Plan removed!',
+  'Are_you_sure_delete_this_area' => 'Are you sure delete this area',
+  'All_users_belonging_to_this_area_will_be_removed' => 'All users belonging to this area will be removed',
+  'All_users_belonging_to_this_area_will_be_removed\\nYou_will_not_be_able_to_revert_this' => 'All users belonging to this area will be removed\\nYou will not be able to revert this',
+  'All_users_belonging_to_this_area_will_be_removed <br>' => 'All users belonging to this area will be removed  br ',
+  'All_users_belonging_to_this_area_will_be_removed </br>' => 'All users belonging to this area will be removed  /br ',
+  'Are_you_sure_delete_this_city' => 'Are you sure delete this city',
+  'Are_you_sure_delete_this_group' => 'Are you sure delete this group',
+  'invalid_store_data' => 'Invalid store data',
+  'Removing trademarks deletes associated products' => 'Removing trademarks deletes associated products',
+  'Removing brands deletes associated products' => 'Removing brands deletes associated products',
 );

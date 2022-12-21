@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Model\City;
+use App\Model\Area;
+
 use Illuminate\Http\Request;
 use App\CPU\Helpers;
+use App\CPU\SalerManager;
 use Brian2694\Toastr\Facades\Toastr;
 
 class CityController extends Controller
@@ -41,10 +44,16 @@ class CityController extends Controller
         return back();
     }
 
+
     //Done
     public function city_delete(Request $request)
     {
         $city = City::find($request->id);
+        SalerManager::remove_users_details_city($request->id);
+        for ($i = 0; $i < count($city->groups); $i++) {
+            Area::where('group_id', '=', $city->groups[$i]->id)->delete();
+        }
+        $city->groups()->delete();
         $city->delete();
         return response()->json();
     }

@@ -234,13 +234,7 @@ class CartManager
                                 return response()->json(['status' => false, 'message' => 'مفتاح المنتج غير صحيح']);
                         } else
                         {
-                            for ($i=0; $i <count($other_products) ; $i++) {
-
-                                $product_name = Product::whereid($other_products[$i])->first()->only('name', 'id');
-                                $product_name['quantity'] = $other_products_qty[$i];
-                                $data_f[] =  $product_name;
-                            }
-                            return response()->json(['status' => false, 'message' => '( مفتاح المنتج مطلوب ) المنتج مقفول','products'=>$data_f]);
+                            return response()->json(['status' => false, 'message' => '( مفتاح المنتج مطلوب ) المنتج مقفول']);
                         }
 
                         break;

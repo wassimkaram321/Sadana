@@ -355,4 +355,79 @@ class ProductManager
     }
 
 
+    //Remove bounses when remove product
+    public static function remove_bounses($productId)
+    {
+        $masterProdNew=[];
+        $salveProdNew=[];
+
+        $bonuses=Bonus::get();
+        foreach($bonuses as $bonus)
+        {
+            $masterProd=json_decode($bonus->master_product_id);
+            $salveProd=json_decode($bonus->salve_product_id	);
+
+            for($i=0;$i<count($masterProd);$i++)
+            {
+                if($masterProd[$i]!=$productId)
+                {
+                    array_push($masterProdNew,$masterProd[$i]);
+                }
+            }
+
+            for($i=0;$i<count($salveProd);$i++)
+            {
+                if($salveProd[$i]!=$productId)
+                {
+                    array_push($salveProdNew,$salveProd[$i]);
+                }
+            }
+
+            if(count($masterProdNew)!=0 && count($salveProdNew)!=0)
+            {
+                $bonus->master_product_id=json_encode($masterProdNew);
+                $bonus->salve_product_id=json_encode($salveProdNew);
+                $bonus->save();
+            }
+            else
+            {
+                Bonus::where('id','=',$bonus->id)->delete();
+            }
+
+        }
+
+    }
+
+    //Remove points when remove product
+    public static function remove_points($productId)
+    {
+        $pointProdNew=[];
+        $ponits=ProductPoint::get();
+        foreach($ponits as $ponit)
+        {
+            $pointProd=json_decode($ponit->type_id);
+
+            for($i=0;$i<count($pointProd);$i++)
+            {
+                if($pointProd[$i]!=$productId)
+                {
+                    array_push($pointProdNew,$pointProd[$i]);
+                }
+            }
+
+            if(count($pointProdNew)!=0)
+            {
+                $ponit->type_id=json_encode($pointProdNew);
+                $ponit->save();
+            }
+            else
+            {
+                ProductPoint::where('id','=',$ponit->id)->delete();
+            }
+
+        }
+
+    }
+
+
 }

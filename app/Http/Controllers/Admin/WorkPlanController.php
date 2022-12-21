@@ -65,7 +65,7 @@ class WorkPlanController extends Controller
 
         $validator = Validator::make($request->all(), [
             'begin_date' => 'required',
-            'end_date' => 'required',
+            //'end_date' => 'required',
             'note' => 'required',
             'saler_id' => 'required',
             'pharamcies_ids' => 'required',
@@ -84,10 +84,11 @@ class WorkPlanController extends Controller
             $pharmacies = json_encode($request->pharamcies_ids);
         }
 
+        $endDate=date('Y-m-d', strtotime($request->begin_date. ' + 6 days'));
         $saler = User::where('id', '=', $request->saler_id)->get()->first();
         DB::table('salers_work_plans')->insert([
             'begin_plan' => $request->begin_date,
-            'end_plan' => $request->end_date,
+            'end_plan' => $endDate,
             'saler_id' => $request->saler_id,
             'note' => $request->note,
             'saler_name' => $saler->name,
@@ -109,7 +110,7 @@ class WorkPlanController extends Controller
 
         if (isset($workPlan) && isset($workPlanTasks)) {
             $workPlanTasks->delete();
-            $$planDetails->delete();
+            $planDetails->delete();
             $workPlan->delete();
         }
         Toastr::success(translate('Work plan removed!'));
@@ -195,7 +196,7 @@ class WorkPlanController extends Controller
                 $site_match = 0;
                 $street_address = " ";
                 $pharmacy = Pharmacy::where('id', '=', $c->Wpharmacy_id)->get()->first();
-                $res = $this->get_location($c->lat, $c->lng);
+                $res = $this->get_location($c->Wlat, $c->Wlng);
                 $c['pharmacy_name'] = $pharmacy->name;
                 $c['area'] = $res["area"];
                 $c['street_address'] = $res["street"];
@@ -212,7 +213,7 @@ class WorkPlanController extends Controller
 
         $res = array();
         try {
-            $apikey = "AIzaSyCPsxZeXKcSYK1XXw0O0RbrZiI_Ekou5DY";
+            $apikey = 'AIzaSyCPsxZeXKcSYK1XXw0O0RbrZiI_Ekou5DY';
             $url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$apikey";
             $header = array(
                 "authorization: key=" . $apikey . "",
@@ -223,7 +224,7 @@ class WorkPlanController extends Controller
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
             // Get URL content
             $result = curl_exec($ch);
@@ -334,8 +335,6 @@ class WorkPlanController extends Controller
     }
 
 
-
-
     public function plan_set_date(Request $request)
     {
 
@@ -350,6 +349,7 @@ class WorkPlanController extends Controller
         $previousUrl = strtok(url()->previous(), '?');
         return redirect()->to($previousUrl . '?' . http_build_query(['from_date' => $request['plan_from_date'], 'to_date' => $request['plan_to_date'], 'team' => $request['plan_team_char']]))->with(['from' => $from, 'to' => $to]);
     }
+
 
 
 
@@ -410,6 +410,9 @@ class WorkPlanController extends Controller
         return view('admin-views.work-plan.report', compact('plansArchive', 'data'));
     }
 
+
+
+
     public function get_report_salesman($plan_from_date, $plan_to_date, $status, $selerIds)
     {
         $data = Order::where('order_type', 'default_type')
@@ -419,6 +422,8 @@ class WorkPlanController extends Controller
             ->count();
         return $data;
     }
+
+
 
 
     public function plan_details_report(Request $request, $id)
@@ -454,6 +459,7 @@ class WorkPlanController extends Controller
             'total_orders' => $total_orders
         ]);
     }
+
 
 
 
@@ -527,6 +533,16 @@ class WorkPlanController extends Controller
             return back();
         }
 
+    }
+
+
+
+    public function plan_archive_remove($id)
+    {
+        $planArchive = PlanArchive::where('id','=',$id)->get()->first();
+        $planArchive->delete();
+        Toastr::success(translate('plan removed!'));
+        return back();
     }
 
 

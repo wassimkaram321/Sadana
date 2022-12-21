@@ -208,6 +208,7 @@
         <div class="col-lg-8 mb-3 mb-lg-0">
 
 
+
             <h5 class="card-header-title">{{ \App\CPU\translate('Groups') }}</h5>
             <div class="card">
                 <div class="card-header">
@@ -269,23 +270,19 @@
                         </table>
                         <hr>
 
-                        <div class="page-area">
+                        {{-- <div class="page-area">
                             <table>
                                 <tfoot>
                                     {!! $pharmacies->links() !!}
                                 </tfoot>
                             </table>
-                        </div>
+                        </div> --}}
 
                     </div>
 
                 </div>
 
             </div>
-
-
-
-
 
             <h5 class="card-header-title">{{ \App\CPU\translate('Regions') }}</h5>
             <div class="card">
@@ -348,13 +345,13 @@
                         </table>
                         <hr>
 
-                        <div class="page-area">
+                        {{-- <div class="page-area">
                             <table>
                                 <tfoot>
                                     {!! $pharmacies->links() !!}
                                 </tfoot>
                             </table>
-                        </div>
+                        </div> --}}
 
                     </div>
 
@@ -431,13 +428,13 @@
                         </table>
                         <hr>
 
-                        <div class="page-area">
+                        {{-- <div class="page-area">
                             <table>
                                 <tfoot>
                                     {!! $pharmacies->links() !!}
                                 </tfoot>
                             </table>
-                        </div>
+                        </div> --}}
 
                     </div>
 
@@ -445,7 +442,12 @@
 
             </div>
 
+
+
         </div>
+
+
+
 
         <div class="col-lg-4">
             <!-- Card -->
@@ -534,10 +536,15 @@
             </div>
             <!-- End Card -->
         </div>
+
     </div>
     <!-- End Row -->
 </div>
 @endsection
+
+
+
+
 
 @push('script_2')
 <script>
@@ -569,8 +576,6 @@
             });
         });
 </script>
-
-
 
 <script>
     var content = [

@@ -11,17 +11,17 @@
     }
 
     h3 {
-          margin-right: 20px;
-         background:#f8fafd;
-         padding: 10px 20px;
-         border:.0625rem solid rgba(231, 234, 243, .7);
+        margin-right: 20px;
+        background: #f8fafd;
+        padding: 10px 20px;
+        border: .0625rem solid rgba(231, 234, 243, .7);
     }
 
-    i{
-            font-size: 25px;
-            width: 30px;
-            height: 30px;
-        }
+    i {
+        font-size: 25px;
+        width: 30px;
+        height: 30px;
+    }
 
 </style>
 @endpush
@@ -481,18 +481,22 @@ $chars=['A','B','C','D','E','F','G','H'];
                         </td>
 
                         <td>
-                            <a class="btn btn-success btn-sm"
-                                        id="editCompany" data-toggle="modal" data-target='#practice_modal'
-                                        data-end_date="{{$planArchive['end_date']}}"
-                                        data-begin_date="{{$planArchive['begin_date']}}"
-                                        data-id="{{ $planArchive['id'] }}">
-                                        <i class="tio-visible"></i>
-                                        {{\App\CPU\translate('Details')}}
+                            <a class="btn btn-success btn-sm" id="editCompany" data-toggle="modal" data-target='#practice_modal' data-end_date="{{$planArchive['end_date']}}" data-begin_date="{{$planArchive['begin_date']}}" data-id="{{ $planArchive['id'] }}">
+                                <i class="tio-visible"></i>
+                                {{\App\CPU\translate('Details')}}
                             </a>
 
-                            <a class="btn btn-danger btn-sm delete" id="{{$planArchive['id']}}">
-                                <i class="tio-add-to-trash"></i> {{ \App\CPU\translate('Delete')}}
+                            <a class="btn btn-danger  btn-sm" href="javascript:"
+                            onclick="form_alert('plan-{{$planArchive['id']}}','Want to delete this plan ?')">
+                                <i class="tio-add-to-trash"></i> {{\App\CPU\translate('delete')}}
                             </a>
+                            <form action="{{route('admin.sales-man.plan-archive-remove',[$planArchive['id']])}}"
+                                  method="get" id="plan-{{$planArchive['id']}}">
+                                @csrf @method('delete')
+                            </form>
+
+
+
                         </td>
 
                     </tr>
@@ -524,15 +528,17 @@ $chars=['A','B','C','D','E','F','G','H'];
 
 
 {{-- Table Modal archive details --}}
-<div class="modal fade" id="practice_modal" >
+<div class="modal fade" id="practice_modal">
     <div class="modal-dialog" style="max-width: 800px;">
 
         <div class="modal-content" style="height: 500px; padding: 20px; overflow-y: scroll;">
             <div class="card-body" style="padding: 0">
                 {{-- <div class="d-flex justify-content-between" style="margin-bottom: 20px;"> --}}
                 <div class="d-flex align-items-center" style="margin-bottom: 20px;">
-                    <i class="fa-solid fa-money-bill-1-wave"></i><h3 >{{\App\CPU\translate('TOTAL_AMOUNT')}}:&nbsp;<span id="total_amount">***</span>&nbsp;SYP</h3>
-                    <i class="fa-solid fa-cubes-stacked"></i><h3 >{{\App\CPU\translate('TOTAL_ORDERS')}}:&nbsp;<span id="total_orders">***</span></h3>
+                    <i class="fa-solid fa-money-bill-1-wave"></i>
+                    <h3>{{\App\CPU\translate('TOTAL_AMOUNT')}}:&nbsp;<span id="total_amount">***</span>&nbsp;SYP</h3>
+                    <i class="fa-solid fa-cubes-stacked"></i>
+                    <h3>{{\App\CPU\translate('TOTAL_ORDERS')}}:&nbsp;<span id="total_orders">***</span></h3>
                 </div>
                 <div class="table-responsive">
                     <table id="sublawmasterdata" style="text-align: {{ Session::get('direction') === 'rtl' ? 'right' : 'left' }};  width: 100%;" class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
@@ -563,90 +569,45 @@ $chars=['A','B','C','D','E','F','G','H'];
 </div>
 
 
-
-
 @endsection
-@push('script')
-
-
-<script src="{{asset('public/assets/back-end')}}/vendor/chart.js/dist/Chart.min.js"></script>
-<script src="{{asset('public/assets/back-end')}}/vendor/chartjs-chart-matrix/dist/chartjs-chart-matrix.min.js"></script>
-<script src="{{asset('public/assets/back-end')}}/js/hs.chartjs-matrix.js"></script>
-
+@push('script1')
 
 <script>
-    $(document).on('click', '.delete', function() {
-        var id = $(this).attr("id");
-        Swal.fire({
-            title: '{{ \App\CPU\translate('
-            Are_you_sure_delete_this_store ')}}?'
-            , text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this')}}!"
-            , showCancelButton: true
-            , confirmButtonColor: '#3085d6'
-            , cancelButtonColor: '#d33'
-            , confirmButtonText: '{{ \App\CPU\translate('
-            Yes ')}}, {{ \App\CPU\translate('
-            delete_it ')}}!'
-        }).then((result) => {
-            if (result.value) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: "{{route('admin.store.delete')}}"
-                    , method: 'POST'
-                    , data: {
-                        id: id
-                    }
-                    , success: function() {
-                        toastr.success('{{ \App\CPU\translate('
-                            store_deleted_successfully ')}}');
-                        location.reload();
-                    }
-                });
-            }
-        })
-    });
+    $(document).ready(function() {
 
-</script>
-
-<script>
-    $(document).ready(function () {
-
-    $.ajaxSetup({
-        headers: {
+        $.ajaxSetup({
+            headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+
+        $('body').on('click', '#editCompany', function(event) {
+            event.preventDefault();
+            var archive_id = $(this).data('id');
+            var begin_date = $(this).data('begin_date');
+            var end_date = $(this).data('end_date');
+
+
+            $.ajax({
+                url: 'plan/report/details/' + archive_id
+                , type: "POST"
+                , data: {
+                    begin_date: begin_date
+                    , end_date: end_date
+                , }
+                , success: function(data) {
+                    $("#sublawmasterdata tbody").empty();
+                    $("#exampleid").append(data.data);
+                    document.getElementById("total_amount").innerHTML = data.total_price;
+                    document.getElementById("total_orders").innerHTML = data.total_orders;
+
+                }
+            });
+
+        });
+
     });
 
-    $('body').on('click', '#editCompany', function (event) {
-        event.preventDefault();
-        var archive_id = $(this).data('id');
-        var begin_date = $(this).data('begin_date');
-        var end_date = $(this).data('end_date');
-
-
-        $.ajax({
-          url: 'plan/report/details/'+archive_id,
-          type: "POST",
-          data: {
-            begin_date: begin_date,
-            end_date: end_date,
-          },
-          success: function (data) {
-            $("#sublawmasterdata tbody").empty();
-            $("#exampleid").append(data.data);
-            document.getElementById("total_amount").innerHTML = data.total_price;
-            document.getElementById("total_orders").innerHTML = data.total_orders;
-
-          }
-      });
-
-    });
-
-   });
 </script>
 
 @endpush

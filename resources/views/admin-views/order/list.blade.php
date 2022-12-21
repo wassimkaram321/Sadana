@@ -90,33 +90,6 @@
 
                             </div>
                         </form>
-
-                        {{-- <form style="width: 100%;" action="{{ url()->current() }}">
-                            <div class="row text-{{ Session::get('direction') === 'rtl' ? 'right' : 'left' }}">
-                                <div class="input-group input-group-merge input-group-flush">
-                                        <select class="js-select2-custom form-control" name="customer_type">
-                                            <option value="all" selected>{{ \App\CPU\translate('All') }}</option>
-                                            <option value="salesman">{{ \App\CPU\translate('Sales-Man') }}
-                                            </option>
-                                            <option value="pharmacist">{{ \App\CPU\translate('Pharmacist') }}
-                                            </option>
-                                        </select>
-                                 </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        {{ \App\CPU\translate('Filter') }}
-                                    </button>
-                            </div>
-                        </form> --}}
-
-                        {{-- <div class="float-right">
-                            <label> {{\App\CPU\translate('inhouse_orders_only')}} : </label>
-                            <label class="switch ml-3">
-                                <input type="checkbox" class="status"
-                                       onclick="filter_order()" {{session()->has('show_inhouse_orders') && session('show_inhouse_orders')==1?'checked':''}}>
-                                <span class="slider round"></span>
-                            </label>
-                        </div> --}}
-
                     </div>
                 </div>
                 <!-- End Row -->
@@ -147,7 +120,7 @@
                     @foreach($orders as $key=>$order)
 
                         <tr class="status-{{$order['order_status']}} class-all">
-                            
+
                             <td class="">
                                 {{$orders->firstItem()+$key}}
                             </td>

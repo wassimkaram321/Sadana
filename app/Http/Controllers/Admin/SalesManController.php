@@ -18,6 +18,7 @@ use App\Model\Group;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use App\CPU\Helpers;
+use App\CPU\SalerManager;
 use Exception;
 
 class SalesManController extends Controller
@@ -100,9 +101,9 @@ class SalesManController extends Controller
             array_push($arrGroup, $idg->group_id);
         }
 
-        $pharmacies = Pharmacy::whereIn('id', $arr)->paginate(12);
-        $areas = Area::whereIn('id', $arrArea)->paginate(12);
-        $groups = Group::whereIn('id', $arrGroup)->paginate(12);
+        $pharmacies = Pharmacy::whereIn('id', $arr)->get();
+        $areas = Area::whereIn('id', $arrArea)->get();
+        $groups = Group::whereIn('id', $arrGroup)->get();
 
         if (count($arr) > 0) {
             $all_pharmacies = Pharmacy::whereNotIn('id', $arr)->get();
@@ -114,7 +115,7 @@ class SalesManController extends Controller
             $all_areas = Area::whereNotIn('id', $arrArea)->get();
 
             $all_areas_assign = Area::join("group_area", "group_area.id", "=", "areas.group_id")
-                ->where("areas.id", $arrArea)
+                ->whereIn("areas.id", $arrArea)
                 ->get([
                     'group_area.group_name as group_name', 'areas.id as area_id',
                     'areas.area_name as area_name',
@@ -127,7 +128,7 @@ class SalesManController extends Controller
             $all_groups = Group::whereNotIn('id', $arrGroup)->get();
 
             $all_groups_assign = Group::join("cities", "cities.id", "=", "group_area.city_id")
-                ->where("group_area.id", $arrGroup)
+                ->whereIn("group_area.id", $arrGroup)
                 ->get([
                     'cities.city_name as city_name', 'group_area.id as group_id',
                     'group_area.group_name as group_name',
@@ -135,7 +136,7 @@ class SalesManController extends Controller
         } else {
             $all_groups = Group::all();
         }
-        // dd($all_groups_assign);
+
         return view('admin-views.sales-man.view', compact('sm', 'pharmacies', 'all_groups', 'all_groups_assign', 'all_pharmacies', 'all_areas', 'all_areas_assign'));
     }
 
@@ -171,9 +172,6 @@ class SalesManController extends Controller
         return redirect()->back();
     }
 
-
-
-
     //Area
     public function unassign_area(Request $request, $id)
     {
@@ -198,7 +196,6 @@ class SalesManController extends Controller
         return redirect()->back();
     }
 
-
     public function assign_area(Request $request, $id)
     {
         $areas_id = $request->assigned_areas;
@@ -219,7 +216,6 @@ class SalesManController extends Controller
         }
         return redirect()->back();
     }
-
 
     //Group
     public function unassign_group(Request $request, $id)
@@ -337,7 +333,6 @@ class SalesManController extends Controller
 
     public function edit($id)
     {
-        //
         $sales_man = User::find($id);
         return view('admin-views.sales-man.edit', compact('sales_man'));
     }
@@ -387,6 +382,7 @@ class SalesManController extends Controller
 
     public function destroy(Request $request)
     {
+        SalerManager::remove_salesman_details($request->id);
         $sales_man = User::find($request->id);
         $sales_man->delete();
         Toastr::success(translate('Sales-man removed!'));

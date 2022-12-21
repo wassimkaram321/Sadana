@@ -130,8 +130,8 @@
         $(document).on('click', '.delete', function () {
             var id = $(this).attr("id");
             Swal.fire({
-                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_bag')}}?',
-                text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this')}}!",
+                title: '{{ \App\CPU\translate('Are_you_sure_delete_this_city')}}?',
+                text: '{{ \App\CPU\translate('All_users_belonging_to_this_area_will_be_removed')}}!!',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
@@ -147,7 +147,8 @@
                         url: "{{route('admin.city.delete')}}",
                         method: 'POST',
                         data: {id: id},
-                        success: function () {
+                        success: function (data) {
+                            console.log(data.groups);
                             toastr.success('{{ \App\CPU\translate('city_deleted_successfully')}}');
                             location.reload();
                         }

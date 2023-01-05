@@ -166,7 +166,7 @@ class ProductController extends BaseController
         $p->num_id = $request->num_id;
         $p->demand_limit = $request->demand_limit;
         $p->expiry_date = $request->expiry_date;
-        $p->production_date = 2022-11-02;
+        $p->production_date = 2022 - 11 - 02;
         $p->q_featured_offer = $request->q_featured_offer;
         $p->featured_offer = $request->featured_offer;
         $p->normal_offer = $request->normal_offer;
@@ -579,7 +579,7 @@ class ProductController extends BaseController
 
             'demand_limit' => 'required|gt:-1|numeric',
             'expiry_date' => 'required|date',
-           // 'production_date' => 'required|date',
+            // 'production_date' => 'required|date',
             'q_featured_offer' => 'required|numeric',
             'featured_offer' => 'required|numeric',
             'q_normal_offer' => 'required|numeric',
@@ -838,18 +838,17 @@ class ProductController extends BaseController
         DealOfTheDay::where(['product_id' => $id])->delete();
 
 
-            $bags=BagProduct::where('product_id', '=', $id)->get();
-            foreach($bags as $bag)
-            {
-                $price = DB::table('products_bag')->where('bag_id', $bag->bag_id)->sum('product_total_price');
-                $bag = Bag::findOrFail($bag->bag_id);
-                $bag->total_price_offer = $price;
-                $bag->save();
-            }
-            BagProduct::where('product_id', '=', $id)->delete();
+        $bags = BagProduct::where('product_id', '=', $id)->get();
+        foreach ($bags as $bag) {
+            $price = DB::table('products_bag')->where('bag_id', $bag->bag_id)->sum('product_total_price');
+            $bag = Bag::findOrFail($bag->bag_id);
+            $bag->total_price_offer = $price;
+            $bag->save();
+        }
+        BagProduct::where('product_id', '=', $id)->delete();
 
-        $prodMark=Marketing::where('item_id','=',$id)->get()->first();
-        if(isset($prodMark))$prodMark->delete();
+        $prodMark = Marketing::where('item_id', '=', $id)->get()->first();
+        if (isset($prodMark)) $prodMark->delete();
         ProductManager::remove_bounses($id);
         ProductManager::remove_points($id);
 
@@ -996,10 +995,10 @@ class ProductController extends BaseController
 
     public function rev_date($date)
     {
-        $array=explode("-",$date);
-                  $rev=array_reverse($array);
-                  $date=implode("-",$rev);
-                  return $date;
+        $array = explode("-", $date);
+        $rev = array_reverse($array);
+        $date = implode("-", $rev);
+        return $date;
     }
 
     public function bulk_export_data()
@@ -1021,11 +1020,11 @@ class ProductController extends BaseController
                 }
             }
 
-            $brand = Brand::where('id','=',$item->brand_id)->get()->first();
-            if(!isset($brand))
-               $brand_name="غير معرف";
+            $brand = Brand::where('id', '=', $item->brand_id)->get()->first();
+            if (!isset($brand))
+                $brand_name = "غير معرف";
             else
-                $brand_name=$brand->name;
+                $brand_name = $brand->name;
 
             $storage[] = [
                 'رمز المادة' => $item->num_id,
@@ -1058,29 +1057,24 @@ class ProductController extends BaseController
             return back();
         }
 
+        try {
+            $data = [];
+            $statusUpdate = 0;
+            $skip = ['youtube_video_url', 'details', 'thumbnail'];
 
-        $data = [];
-        $statusUpdate = 0;
-        $skip = ['youtube_video_url', 'details', 'thumbnail'];
-
-        foreach ($collections as $collection) {
-
-            // foreach ($collection as $key => $value) {
-            //     if ($key!="" && $value === "" && !in_array($key, $skip)) {
-            //         Toastr::error('Please fill ' . $key . ' fields');
-            //         return back();
-            //     }
-            // }
-            $product = Product::where('num_id', '=', $collection['رمز المادة'])->get()->first();
-            //$product = Product::where('name', 'LIKE', '%' . $collection['اسم المادة'] . '%')->get()->first();
-            if (isset($product)) {
-                $product->purchase_price = $collection['السعر'];
-                $product->save();
-                $statusUpdate++;
+            foreach ($collections as $collection) {
+                $product = Product::where('num_id', '=', $collection['رمز المادة'])->get()->first();
+                if (isset($product)) {
+                    $product->purchase_price = $collection['السعر'];
+                    $product->save();
+                    $statusUpdate++;
+                }
             }
+            Toastr::success('(' . $statusUpdate . ') Products purchase price updated successfully!');
+            return back();
+        } catch (\Exception $exception) {
+            Toastr::success('حدث خطأ ما يرجى التأكد من حقول الملف المدخل');
+            return back();
         }
-
-        Toastr::success('(' . $statusUpdate . ') Products purchase price updated successfully!');
-        return back();
     }
 }

@@ -700,13 +700,6 @@ class OrderManager
 
             }
 
-            //Mail::to($user->email)->send(new \App\Mail\OrderPlaced($order_id));
-            // if ($order['seller_is'] == 'seller') {
-            //     $seller = Seller::where(['id' => $seller_data->seller_id])->first();
-            // } else {
-            //     $seller = Admin::where(['admin_role_id' => 1])->first();
-            // }
-            //Mail::to($seller->email)->send(new \App\Mail\OrderReceivedNotifySeller($order_id));
         } catch (\Exception $exception) {
         }
 

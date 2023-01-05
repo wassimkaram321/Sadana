@@ -29,45 +29,22 @@ class BrandManager
                 ]
             );
 
-
-
-        $points = ProductPoint::where('type', 'product')->get();
+        //$points = ProductPoint::where('type', 'product')->get();
         $pointNew = "0";
         foreach ($products as $p) {
 
-            foreach ($points as $point) {
-                $idx = json_decode($point->type_id);
-                foreach ($idx as $d) {
-                    if ($p['id'] == $d) {
-                        $pointNew = $point->points;
-                    } else {
-                        $pointNew = "0";
-                    }
-                }
-            }
+            // foreach ($points as $point) {
+            //     $idx = json_decode($point->type_id);
+            //     foreach ($idx as $d) {
+            //         if ($p['id'] == $d) {
+            //             $pointNew = $point->points;
+            //         } else {
+            //             $pointNew = "0";
+            //         }
+            //     }
+            // }
             $p['points'] = $pointNew;
         }
-        $bonuses = Bonus::get();
-        $locks = [];
-        foreach ($products as $p) {
-            foreach ($bonuses as $b) {
-                $idx = json_decode($b->salve_product_id);
-
-                foreach ($idx as $d) {
-                    if ($d == $p->id) {
-                        $locks[] = $p->id;
-                    }
-                }
-            }
-        }
-        foreach ($products as $p) {
-            if (in_array($p->id, $locks)) {
-                $p['locks'] = "1";
-            } else {
-                $p['locks'] = "0";
-            }
-        }
-
         return $products;
     }
 }

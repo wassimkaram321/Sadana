@@ -13,13 +13,11 @@ class GroupController extends Controller
 {
     public function city_groups_list(Request $request, $id)
     {
-        // $city_groups = Group::join("cities", "cities.id", "=", "group_area.city_id")
-        //     ->where("group_area.city_id", $id)
-        //     ->get();
         $city_groups=Group::where('city_id',$id)->get();
         $city_id=$id;
         return view('admin-views.group.list', compact('city_groups','city_id'));
     }
+
 
     public function group_store(Request $request, $city_id)
     {
@@ -34,6 +32,33 @@ class GroupController extends Controller
             return back();
         } catch (Exception $e) {
             Toastr::success('Group area added Failure!');
+        }
+    }
+
+
+    public function edit($id)
+    {
+        $group = Group::where('id', '=', $id)->get()->first();
+        return response()->json([
+            'data' => $group
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $request->validate([
+                'group_id'=>'required',
+                'group_name'=>'required',
+            ]);
+            $group = Group::find($request->group_id);
+            $group->group_name =  $request->get('group_name');
+            $group->save();
+            Toastr::success('Name updated successfully!');
+            return back();
+        } catch (\Exception $e) {
+            Toastr::error('Faild updated!');
+            return back();
         }
     }
 

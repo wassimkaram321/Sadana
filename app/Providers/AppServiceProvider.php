@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
+use App\Repository\Pharmacy\PharmacyInterface;
+use App\Repository\Pharmacy\PharmacyRepository;
+use App\Repository\User\UserInterface;
+use App\Repository\User\UserRepository;
+
 ini_set('memory_limit',-1);
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isLocal()) {
             $this->app->register(\Amirami\Localizator\ServiceProvider::class);
         }
+
+        $this->app->bind(UserInterface::class,UserRepository::class);
+        $this->app->bind(PharmacyInterface::class,PharmacyRepository::class);
+
     }
 
     /**

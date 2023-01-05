@@ -2131,4 +2131,5 @@
   'wishlists' => 'الرغبات',
   'work_plan_archive' => 'أرشيف خطط العمل',
   'Removing brands deletes associated products' => 'إزالة العلامات التجارية (الشركات) يؤدي إلى حذف المنتجات المرتبطة بها',
+  'Pharmacy_Deatils' => 'تفاصيل الصيدلية',
 );

@@ -58,6 +58,32 @@ class CityController extends Controller
         return response()->json();
     }
 
+    public function edit($id)
+    {
+        $city = City::where('id', '=', $id)->get()->first();
+        return response()->json([
+            'data' => $city
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $request->validate([
+                'city_id'=>'required',
+                'city_name'=>'required',
+            ]);
+            $city = City::find($request->city_id);
+            $city->city_name =  $request->get('city_name');
+            $city->save();
+            Toastr::success('Name updated successfully!');
+            return back();
+        } catch (\Exception $e) {
+            Toastr::error('Faild updated!');
+            return back();
+        }
+    }
+
     //Done
     public function city_status_update(Request $request)
     {

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\api\v1;
-
 use App\CPU\CartManager;
 use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
@@ -16,11 +15,12 @@ use function App\CPU\translate;
 
 class CartController extends Controller
 {
+
     public function cart(Request $request)
     {
-
         $user = Helpers::get_customer($request);
         $cart = Cart::where(['customer_id' => $user->id])->get();
+        $i=0;
         foreach ($cart as $c) {
 
             if ($c->order_type != "bag") {
@@ -30,6 +30,9 @@ class CartController extends Controller
                 $c['normal_offer'] = $p->normal_offer;
                 $c['featured_offer'] = $p->featured_offer;
                 $c['demand_limit'] = (int)$p->demand_limit;
+                $c['locks'] = $p->locks;
+                $c['qty_locks'] = $p->qty_locks;
+
             }
             if ($c->order_type == "bag") {
                 $p = Bag::whereid($c->product_id)->first();
@@ -48,7 +51,6 @@ class CartController extends Controller
 
         return response()->json($cart, 200);
     }
-
 
 
 
@@ -109,8 +111,6 @@ class CartController extends Controller
 
 
 
-
-
     public function remove_from_cart(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -157,7 +157,6 @@ class CartController extends Controller
 
 
 
-
     public function remove_all_from_cart(Request $request)
     {
         // $validator = Validator::make($request->all(), [
@@ -176,6 +175,8 @@ class CartController extends Controller
         return response()->json(translate('successfully_removed'));
     }
 
+
+
     public function get_product_keys(Request $request)
     {
         $user = Helpers::get_customer($request);
@@ -184,6 +185,7 @@ class CartController extends Controller
         ]);
         return response()->json(['status' => true, 'message' => $ProductKey], 200);
     }
+
 
 
     public function order_product_keys(Request $request)
@@ -297,6 +299,7 @@ class CartController extends Controller
         }
     }
 
+
     function generateNumber()
     {
         $number = mt_rand(1000000000, 9999999999);
@@ -305,6 +308,8 @@ class CartController extends Controller
         }
         return $number;
     }
+
+
 
     function NumberExists($number)
     {

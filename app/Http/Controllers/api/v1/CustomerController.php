@@ -18,11 +18,8 @@ use App\Model\SupportTicketConv;
 use App\Model\Wishlist;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 use function App\CPU\translate;
 
 class CustomerController extends Controller

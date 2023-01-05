@@ -79,7 +79,6 @@ class CustomerController extends Controller
         $cus_area = Area::where('id',$user->area_id)->get()->first();
         $cus_group = Group::where('id', $cus_area->group_id)->get()->first();
         $cus_city = City::where('id',$cus_group->city_id)->get()->first();
-
         return view('admin-views.pharmacy.edit', compact('user','cus_area','cus_group','cus_city'));
     }
 
@@ -137,7 +136,7 @@ class CustomerController extends Controller
             'group_id' => 'required|numeric',
             'phone' => 'required|unique:users,phone,'.$id,
             'num_id' => 'required|unique:users,pharmacy_id,'.$id,
-            'card_number' => 'required|unique:pharmacies,card_number,'.$pharmacy->id,
+            //'card_number' => 'required|unique:pharmacies,card_number,'.$pharmacy->id,
        ]);
 
        if ($validator->fails()) {
@@ -161,9 +160,8 @@ class CustomerController extends Controller
         $user->zip=30303;
         $user->pharmacy_id=$request->num_id;
         $user->area_id=$request->area_id;
-
-
-
+        if($request->has('password'))
+            $user->password=bcrypt($request->password);
 
         $pharmacy->lat=$request->lat;
         $pharmacy->lan=$request->lan;
@@ -174,11 +172,9 @@ class CustomerController extends Controller
         $pharmacy->from=$request->from;
         $pharmacy->to=$request->to;
         $pharmacy->land_number=$request->land_number;
-        $pharmacy->card_number=$request->card_number;
-
+        $pharmacy->card_number=0;
         $user->save();
         $pharmacy->save();
-
         Toastr::success('pharmacy updated successfully!');
         return back();
     }

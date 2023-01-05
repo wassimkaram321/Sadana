@@ -17,10 +17,10 @@ class AreaController extends Controller
         $group_areas = Area::join("group_area", "group_area.id", "=", "areas.group_id")
             ->where("areas.group_id", $id)
             ->get([
-                'areas.area_name','areas.id as area_id','areas.area_num'
+                'areas.area_name', 'areas.id as area_id', 'areas.area_num'
             ]);
-        $group_id=$id;
-        return view('admin-views.area.list', compact('group_areas','group_id'));
+        $group_id = $id;
+        return view('admin-views.area.list', compact('group_areas', 'group_id'));
     }
 
     public function area_store(Request $request, $group_id)
@@ -41,6 +41,33 @@ class AreaController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        $area = Area::where('id', '=', $id)->get()->first();
+        return response()->json([
+            'data' => $area
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        try {
+            $request->validate([
+                'area_id' => 'required',
+                'area_name' => 'required',
+            ]);
+            $area = Area::find($request->area_id);
+            $area->area_name =  $request->get('area_name');
+            $area->save();
+            Toastr::success('Name updated successfully!');
+            return back();
+        } catch (\Exception $e) {
+            Toastr::error('Faild updated!');
+            return back();
+        }
+    }
+
+
     public function area_delete(Request $request)
     {
         $area = Area::find($request->id);
@@ -48,6 +75,4 @@ class AreaController extends Controller
         $area->delete();
         Toastr::success('Area deleted successfully!');
     }
-
-
 }

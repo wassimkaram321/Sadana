@@ -113,7 +113,7 @@ use App\Model\Product;
                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                         aria-hidden="true">
                         <div class="modal-dialog centered" id ="eee" style="justify-content: center">
-                            <div class="modal-content" style="width: 800px !important;height: 800px;">
+                            <div class="modal-content" style="height: 400px;width:600px">
                                 <div class="modal-header">
 
                                     <div class="table-responsive">

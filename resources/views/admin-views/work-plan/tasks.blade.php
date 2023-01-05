@@ -13,13 +13,14 @@
     }
 
 
+
     .kanban-board {
         padding: 10px;
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
         gap: 15px;
-        justify-content: space-between;
+        /* justify-content: space-between; */
         font-family: sans-serif;
         border-color: #041562
     }
@@ -42,7 +43,8 @@
         background-color: white;
         box-shadow: 0px 0px 25px -2px rgba(189, 189, 189, 0.5);
         padding: 0.6rem;
-        min-width: 250px;
+        min-width: 32%;
+        /* min-width: 250px; */
         /* min-width: 14rem; */
         height: 300px;
         /* max-height: 100%; */
@@ -107,7 +109,7 @@
         box-shadow: 0px 0px 25px -5px #e9e9fc;
         FONT-WEIGHT: bold;
         font-family: sans-serif;
-        padding: 0.3rem 0.2rem 0.3rem 2rem;
+        padding: 8px 5px;
         transition: all 0.3s ease-in-out;
         cursor: pointer;
         position: relative;

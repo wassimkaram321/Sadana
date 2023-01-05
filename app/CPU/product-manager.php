@@ -23,12 +23,12 @@ class ProductManager
     {
         if (isset($brand_id)) {
             $paginator = Product::active()->where('brand_id', '=', $brand_id)->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
-            ProductManager::add_points($paginator,$paginator->items());
-            ProductManager::add_locks($paginator,$paginator->items());
+            //ProductManager::add_points($paginator,$paginator->items());
+           // ProductManager::add_locks($paginator,$paginator->items());
         } else {
             $paginator = Product::active()->with(['rating'])->latest()->paginate($limit, ['*'], 'page', $offset);
-            ProductManager::add_points($paginator,$paginator->items());
-            ProductManager::add_locks($paginator,$paginator->items());
+            // ProductManager::add_points($paginator,$paginator->items());
+           // ProductManager::add_locks($paginator,$paginator->items());
         }
         /*$paginator->count();*/
         return [
@@ -49,15 +49,15 @@ class ProductManager
                 ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
                 ->paginate($limit, ['*'], 'page', $offset);
 
-                ProductManager::add_points($paginator,$paginator->items());
-                ProductManager::add_locks($paginator,$paginator->items());
+               // ProductManager::add_points($paginator,$paginator->items());
+               // ProductManager::add_locks($paginator,$paginator->items());
         } else {
             $paginator = Product::with(['rating'])->active()
                 ->where('featured', 1)
                 ->withCount(['order_details'])->orderBy('order_details_count', 'DESC')
                 ->paginate($limit, ['*'], 'page', $offset);
-                ProductManager::add_points($paginator,$paginator->items());
-                ProductManager::add_locks($paginator,$paginator->items());
+                //ProductManager::add_points($paginator,$paginator->items());
+               // ProductManager::add_locks($paginator,$paginator->items());
         }
 
         return [
@@ -78,15 +78,15 @@ class ProductManager
                 ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
                 ->paginate($limit, ['*'], 'page', $offset);
 
-                ProductManager::add_points($reviews,$reviews->items());
-                ProductManager::add_locks($reviews,$reviews->items());
+               // ProductManager::add_points($reviews,$reviews->items());
+               // ProductManager::add_locks($reviews,$reviews->items());
         } else {
             $reviews = Product::with(['rating'])->active()
                 ->where('featured', 1)
                 ->withCount(['reviews'])->orderBy('reviews_count', 'DESC')
                 ->paginate($limit, ['*'], 'page', $offset);
-                ProductManager::add_points($reviews,$reviews->items());
-                ProductManager::add_locks($reviews,$reviews->items());
+                //ProductManager::add_points($reviews,$reviews->items());
+               // ProductManager::add_locks($reviews,$reviews->items());
         }
 
         return [
@@ -147,8 +147,8 @@ class ProductManager
             }
         }
         //End Marketing
-        ProductManager::add_points($paginator,$data);
-        ProductManager::add_locks($paginator,$data);
+       // ProductManager::add_points($paginator,$data);
+        //ProductManager::add_locks($paginator,$data);
 
         return [
             'total_size' => count($data),
@@ -176,8 +176,8 @@ class ProductManager
             }
         })->paginate($limit, ['*'], 'page', $offset);
 
-       ProductManager::add_points($paginator,$paginator->items());
-       ProductManager::add_locks($paginator,$paginator->items());
+      // ProductManager::add_points($paginator,$paginator->items());
+      // ProductManager::add_locks($paginator,$paginator->items());
         return [
             'total_size' => $paginator->total(),
             'limit' => (int)$limit,
@@ -305,37 +305,47 @@ class ProductManager
         ];
     }
 
-    public static function add_locks($paginator,$products)
-    {
-        # code...
-        $bonuses = Bonus::get();
-        $locks = [];
-        foreach($products as $p){
-            foreach($bonuses as $b){
-                $idx = json_decode($b->salve_product_id);
-                foreach($idx as $d){
-                    if($d == $p->id){
-                    $locks[] = $p->id;
-                    }
-                }
-            }
-        }
 
-        foreach($products as $p){
-                if(in_array($p->id,$locks)){
-                    $p['locks'] = "1";
-                }
-                else{
-                    $p['locks'] = "0";
-                }
-            }
-        return $paginator;
-    }
+    // public static function add_locks($paginator,$products)
+    // {
+    //     # code...
+    //     $bonuses = Bonus::get();
+    //     $locks = [];
+    //     $locks_qty = [];
+    //     $i=0;
+    //     foreach($products as $p){
+    //         foreach($bonuses as $b){
+    //             $idx = json_decode($b->salve_product_id);
+    //             $idxq = json_decode($b->salve_product_quatity);
+    //             foreach($idx as $d){
+    //                 if($d == $p->id){
+    //                 $locks[] = $p->id;
+    //                 $locks_qty[] = $idxq[$i] ;
+    //                 }
+    //                 $i++;
+    //             }
+    //         }
+    //     }
+
+    //     foreach($products as $p){
+    //             if(in_array($p->id,$locks)){
+    //                 $p['locks'] = "1";
+    //                 $p['qty_locks'] =  $locks_qty[array_keys($locks,$p->id)];
+    //             }
+    //             else{
+    //                 $p['locks'] = "0";
+    //                 $p['qty_locks'] = "0";
+    //             }
+
+    //         }
+    //     return $paginator;
+    // }
 
     public static function add_points($paginator,$products)
     {
         # code...
         $points = ProductPoint::where('type','product')->get();
+
         foreach($products as $p){
            foreach($points as $point){
 
@@ -353,7 +363,6 @@ class ProductManager
         }
         return $paginator;
     }
-
 
     //Remove bounses when remove product
     public static function remove_bounses($productId)

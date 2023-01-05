@@ -452,7 +452,7 @@ class CartManager
             for ($i = 0; $i < count($base_products); $i++) {
                 if ($base_products[$i] == $product->id)
                 {
-                       if($base_products_qty[$i]>$request->quantity)
+                       if($base_products_qty[$i]<$request->quantity)
                        {
                         return response()->json(['status' => false, 'message' => 'لم يتم تعديل الكمية المطلوبة لانه يجب تحقيق الحد الادنى من الكمية لتحقيق العرض '], 200);
                        }

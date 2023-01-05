@@ -215,8 +215,8 @@ Route::group(['namespace' => 'api\v1', 'prefix' => 'v1', 'middleware' => ['api_l
     //sales Man
     Route::group(['prefix' => 'sales-man', 'middleware' => 'auth:api'], function () {
 
-        Route::get('/pharmacies', 'SalesManController@get_pharmacies'); //Done
-        Route::get('/work-plans', 'SalesManController@get_work_plans'); //Done
+        Route::get('/pharmacies', 'SalesManController@get_pharmacies');
+        Route::get('/work-plans', 'SalesManController@get_work_plans');
         Route::get('/plan-details', 'SalesManController@get_plan_details');
         Route::post('/visiter-register', 'SalesManController@register_visiter');
     });

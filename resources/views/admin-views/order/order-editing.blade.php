@@ -327,7 +327,7 @@
           },
           dataType: 'json',
           success: function (data) {
-            $('#userCrudModal').html("Edit Product");
+             $('#userCrudModal').html("Edit Product");
              $('#submit').val("Edit Product");
              $('#order_id').val(data.data.order_id);
              $('#product_id').val(data.data.product_id);

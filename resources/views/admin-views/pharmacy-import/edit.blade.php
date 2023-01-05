@@ -80,6 +80,7 @@
                                         placeholder="Email">
                                 </div>
                             </div>
+
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
@@ -100,8 +101,8 @@
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('latitude')}}<span
                                         style="color: red;">*</span></label>
-                                    <input type="number" placeholder="33.51289470802381" value="{{$pharmacy['lat']}}"
-                                        name="lat" class="form-control" placeholder="Latitude" required>
+                                    <input type="text" placeholder="33.51289470802381" value="{{$pharmacy['lat']}}"
+                                        name="lat" class="form-control" required>
 
                                 </div>
                             </div>
@@ -110,8 +111,8 @@
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('longitude')}}<span
                                         style="color: red;">*</span></label>
-                                    <input type="number" placeholder="36.282898280422735" value="{{$pharmacy['lng']}}"
-                                        name="lng" class="form-control" placeholder="Longitude" required>
+                                    <input type="text" placeholder="36.282898280422735" value="{{$pharmacy['lng']}}"
+                                        name="lng" class="form-control" required>
                                 </div>
                             </div>
 

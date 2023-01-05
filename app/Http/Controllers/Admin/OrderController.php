@@ -6,7 +6,6 @@ use App\CPU\Helpers;
 use App\CPU\OrderManager;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\App;
 use App\Model\Bag;
 use App\User;
 use App\Model\DeliveryMan;
@@ -24,7 +23,7 @@ use function App\CPU\translate;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Pharmacy;
 use Exception;
-use Illuminate\Support\Facades\Session;
+
 
 class OrderController extends Controller
 {
@@ -56,7 +55,6 @@ class OrderController extends Controller
         }
 
         Order::where(['checked' => 0])->update(['checked' => 1]);
-
         if ($request->has('search')) {
             $key = explode(' ', $request['search']);
             $orders = $orders->where(function ($q) use ($key) {
@@ -72,7 +70,6 @@ class OrderController extends Controller
         if ($request->has('customer_type')) {
             if ($request['customer_type'] != 'all') {
                 $key = explode(' ', $request['customer_type']);
-                //dd($key);
                 $orders = $orders->where(function ($q) use ($key) {
                     foreach ($key as $value) {
                         $q->orWhere('customer_type', 'like', "%{$value}%");
@@ -84,9 +81,9 @@ class OrderController extends Controller
 
 
         $orders = $orders->where('order_type', 'default_type')->orderBy('id', 'desc')->paginate(Helpers::pagination_limit())->appends($query_param);
-
         return view('admin-views.order.list', compact('orders', 'search'));
     }
+
 
     public function details($id)
     {
@@ -308,6 +305,7 @@ class OrderController extends Controller
 
         $orderDetails = OrderDetail::where('order_id', $request->order_id)->get();
         $storage = [];
+        $user_id = 0;
         foreach ($orderDetails as $item) {
             $orderProduct = Product::where('id', $item->product_id)->get()->first();
             $product_details = json_decode($item->product_details);
@@ -319,6 +317,7 @@ class OrderController extends Controller
                 'سعر المادة' => $item->price,
                 'تاريخ انتهاء الصلاحية' => $product_details->expiry_date,
             ];
+            $user_id = $product_details->user_id;
         }
 
         $orderBagsDetails = BagsOrdersDetails::where('order_id', $request->order_id)->get();
@@ -336,17 +335,19 @@ class OrderController extends Controller
                 ];
             }
         }
-        $userName = User::where('id', $product_details->user_id)->get()->first();
-        $xlsx = ".xlsx";
-        if (isset($userName->name)) {
-            $result = $userName->name . '' . now() . '' . $xlsx;
-        } elseif (isset($orderProduct->name)) {
-            $result = $orderProduct->name . '-' . now() . '' . $xlsx;
+        $order = Order::where('id', $request->order_id)->get()->first();
+        $user = User::where('id', '=', $order->customer_id)->get()->first();
+        if ($user->user_type == "pharmacist") {
+            $pharmacy = Pharmacy::where('user_id', '=', $user->id)->get()->first();
+            $xlsx = ".xlsx";
+            $result =  $pharmacy->name . '' . $xlsx;
+            return (new FastExcel($storage))->withoutHeaders()->download($result);
         } else {
-            $result = now() . '' . $xlsx;
+            $pharmacy = Pharmacy::where('id', '=', $order->orderBy_id)->get()->first();
+            $xlsx = ".xlsx";
+            $result =  $pharmacy->name . '' . $xlsx;
+            return (new FastExcel($storage))->withoutHeaders()->download($result);
         }
-
-        return (new FastExcel($storage))->download($result);
     }
 
 
@@ -504,5 +505,25 @@ class OrderController extends Controller
         $xlsx = ".xlsx";
         $result = 'الطلبيات' . now() . '' . $xlsx;
         return (new FastExcel($storage))->download($result);
+    }
+
+
+    public function show_order_details($order_id)
+    {
+        $order = Order::where('id', '=', $order_id)->get()->first();
+        if($order->orderBy_id!=0)
+        {
+            $cus_id=$order->orderBy_id;         //pharamcy
+            $details = Pharmacy::where('id', '=', $cus_id)->get()->first();
+        }
+        else
+        {
+            $cus_id=$order->customer_id;       //user
+            $details = Pharmacy::where('user_id', '=', $cus_id)->get()->first();
+        }
+
+        return response()->json([
+            'data' => $details
+        ]);
     }
 }

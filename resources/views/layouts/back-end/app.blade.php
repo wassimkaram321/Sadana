@@ -373,7 +373,8 @@
 
 
 <!--check_order_pop_up_notification-->
-<audio id="myAudio">
+{{-- hi fofo --}}
+{{-- <audio id="myAudio">
     <source src="{{asset('public/assets/back-end/sound/notification.mp3')}}" type="audio/mpeg">
 </audio>
 <script>
@@ -388,7 +389,7 @@
     }
 </script>
 <script>
-    /*
+
     setInterval(function () {
         $.get({
             url: '{{route('admin.get-order-data')}}',
@@ -401,19 +402,13 @@
                 }
             },
         });
-    }, 1000);
+    }, 5000);
 
     function check_order() {
         location.href = '{{route('admin.orders.list',['status'=>'all'])}}';
     }
-    */
-</script>
 
-
-
-
-
-
+</script> --}}
 
 
 <script>
@@ -485,25 +480,25 @@
 
 <!-- ck editor -->
 
-{{--<script src="{{ asset('public/ckeditor/ckeditor.js')}}"></script>--}}
-{{--<script>CKEDITOR.replace('editor');</script>--}}
+{{-- <script src="{{ asset('public/ckeditor/ckeditor.js')}}"></script>
+<script>CKEDITOR.replace('editor');</script> --}}
 
 <!-- ck editor -->
 
-<script>
+{{-- <script>
     initSample();
-</script>
-
+</script> --}}
+{{--
 <script>
-    // $(document).ready(function () {
-    //     $('.navbar-vertical-content').animate({
-    //         scrollTop: $(".scroll-here").offset().top
-    //     }, 2000);
-    // });
+    $(document).ready(function () {
+        $('.navbar-vertical-content').animate({
+            scrollTop: $(".scroll-here").offset().top
+        }, 2000);
+    });
 
-    /*$(function() {
+    $(function() {
         $('nav a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
-    });*/
-</script>
+    });
+</script> --}}
 </body>
 </html>

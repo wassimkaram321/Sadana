@@ -2359,4 +2359,31 @@
   'invalid_store_data' => 'Invalid store data',
   'Removing trademarks deletes associated products' => 'Removing trademarks deletes associated products',
   'Removing brands deletes associated products' => 'Removing brands deletes associated products',
+  '
+            Are_you_sure_vip_this_pharmacy ' => '
+            Are you sure vip this pharmacy ',
+  '
+                            pharmacy_deleted_successfully ' => '
+                            pharmacy deleted successfully ',
+  '
+            Are_you_sure_delete_this_pharmacy ' => '
+            Are you sure delete this pharmacy ',
+  'Clear all' => 'Clear all',
+  '
+            are_you_sure ? ' => '
+            are you sure   ',
+  '
+                            Brand_deleted_successfully ' => '
+                            Brand deleted successfully ',
+  '
+            Are_you_sure_delete_this_product ' => '
+            Are you sure delete this product ',
+  '
+            Are_you_sure_delete_this_area ' => '
+            Are you sure delete this area ',
+  '
+            All_users_belonging_to_this_area_will_be_removed ' => '
+            All users belonging to this area will be removed ',
+  'New Password' => 'New Password',
+  'Pharmacy_Deatils' => 'Pharmacy Deatils',
 );

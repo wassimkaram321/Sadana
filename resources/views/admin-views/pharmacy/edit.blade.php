@@ -3,7 +3,7 @@
 @section('title',\App\CPU\translate('Update Pharmacy'))
 
 @push('css_or_js')
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @endpush
 
 @section('content')
@@ -23,27 +23,22 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form action="{{route('admin.customer.update',[$user['id']])}}" method="post"
-                        enctype="multipart/form-data">
+                    <form action="{{route('admin.customer.update',[$user['id']])}}" method="post" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('first')}}
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('first')}}
                                         {{\App\CPU\translate('name')}}</label>
-                                    <input type="text" value="{{$user['f_name']}}" name="f_name" class="form-control"
-                                        placeholder="First Name" required>
+                                    <input type="text" value="{{$user['f_name']}}" name="f_name" class="form-control" placeholder="First Name" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('last')}}
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('last')}}
                                         {{\App\CPU\translate('name')}}</label>
-                                    <input type="text" value="{{$user['l_name']}}" name="l_name" class="form-control"
-                                        placeholder="Last Name" required>
+                                    <input type="text" value="{{$user['l_name']}}" name="l_name" class="form-control" placeholder="Last Name" required>
                                 </div>
                             </div>
                         </div>
@@ -51,18 +46,14 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('phone')}}</label>
-                                    <input type="number" value="{{$user['phone']}}" name="phone" class="form-control"
-                                        placeholder="Phone" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('phone')}}</label>
+                                    <input type="number" value="{{$user['phone']}}" name="phone" class="form-control" placeholder="Phone" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('email')}}</label>
-                                    <input type="email" value="{{$user['email']}}" name="email" class="form-control"
-                                        placeholder="Email" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('email')}}</label>
+                                    <input type="email" value="{{$user['email']}}" name="email" class="form-control" placeholder="Email" required>
                                 </div>
                             </div>
                         </div>
@@ -70,19 +61,15 @@
                         <div class="row">
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('street_address')}}</label>
-                                    <input type="text" value="{{$user['street_address']}}" name="street_address"
-                                        class="form-control" placeholder="Street address" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('street_address')}}</label>
+                                    <input type="text" value="{{$user['street_address']}}" name="street_address" class="form-control" placeholder="Street address" required>
                                 </div>
                             </div>
 
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('land_number')}}</label>
-                                    <input type="number" value="{{$user->pharmacy['land_number']}}" name="land_number"
-                                        class="form-control" placeholder="Land_number" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('land_number')}}</label>
+                                    <input type="number" value="{{$user->pharmacy['land_number']}}" name="land_number" class="form-control" placeholder="Land_number" required>
                                 </div>
                             </div>
 
@@ -93,18 +80,14 @@
 
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('latitude')}}</label>
-                                    <input type="text" value="{{$user->pharmacy['lat']}}" name="lat"
-                                        class="form-control" placeholder="Latitude" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('latitude')}}</label>
+                                    <input type="text" value="{{$user->pharmacy['lat']}}" name="lat" class="form-control" placeholder="Latitude" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('longitude')}}</label>
-                                    <input type="text" value="{{$user->pharmacy['lan']}}" name="lan"
-                                        class="form-control" placeholder="Longitude" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('longitude')}}</label>
+                                    <input type="text" value="{{$user->pharmacy['lan']}}" name="lan" class="form-control" placeholder="Longitude" required>
                                 </div>
                             </div>
 
@@ -114,18 +97,14 @@
 
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('pharmacy name')}}</label>
-                                    <input type="text" value="{{$user->pharmacy['name']}}" name="name"
-                                        class="form-control" placeholder="Pharmacy name" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('pharmacy name')}}</label>
+                                    <input type="text" value="{{$user->pharmacy['name']}}" name="name" class="form-control" placeholder="Pharmacy name" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('address')}}</label>
-                                    <input type="text" value="{{$user->pharmacy['Address']}}" name="Address"
-                                        class="form-control" placeholder="Address" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('address')}}</label>
+                                    <input type="text" value="{{$user->pharmacy['Address']}}" name="Address" class="form-control" placeholder="Address" required>
                                 </div>
                             </div>
 
@@ -136,18 +115,14 @@
 
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_start_time')}}</label>
-                                    <input type="time" value="{{$user->pharmacy['from']}}" name="from"
-                                        class="form-control" placeholder="9:00AM" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('Work_start_time')}}</label>
+                                    <input type="time" value="{{$user->pharmacy['from']}}" name="from" class="form-control" placeholder="9:00AM" required>
                                 </div>
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('Work_end_time')}}</label>
-                                    <input type="time" value="{{$user->pharmacy['to']}}" name="to" class="form-control"
-                                        placeholder="" required>
+                                    <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('Work_end_time')}}</label>
+                                    <input type="time" value="{{$user->pharmacy['to']}}" name="to" class="form-control" placeholder="" required>
                                 </div>
                             </div>
 
@@ -161,8 +136,7 @@
                                     <select name="city_id" class="form-control @error('city') is-invalid @enderror" required>
                                         <option value="0" selected disabled>select</option>
                                         @foreach(App\Model\City::all() as $key=> $city)
-                                        <option value="{{$city->id}}" {{ $city->id==$cus_city->id ? 'selected' : ''}}
-                                            >{{$city->city_name}}</option>
+                                        <option value="{{$city->id}}" {{ $city->id==$cus_city->id ? 'selected' : ''}}>{{$city->city_name}}</option>
                                         @endforeach
                                     </select>
                                     @error('city')
@@ -201,34 +175,39 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6 col-12">
+                            {{-- <div class="col-md-6 col-12">
                                 <div class="form-group">
                                     <label class="input-label"
                                         for="exampleFormControlInput1">{{\App\CPU\translate('card_number')}}<span style="color: red;">*</span></label>
-                                    <input type="number" step="0.001" value="{{$user->pharmacy['card_number']}}" name="card_number"
-                                        class="form-control" required>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 col-12">
-                                <div class="form-group">
-                                    <label class="input-label"
-                                        for="exampleFormControlInput1">{{\App\CPU\translate('Account Number')}}<span style="color: red;">*</span></label>
-                                    <input type="number" value="{{$user['pharmacy_id']}}" name="num_id"
-                                        class="form-control" required>
-                                </div>
-                            </div>
-
+                            <input type="number" step="0.001" value="{{$user->pharmacy['card_number']}}" name="card_number" class="form-control">
                         </div>
+                </div> --}}
 
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label class="input-label" for="exampleFormControlInput1">{{\App\CPU\translate('Account Number')}}<span style="color: red;">*</span></label>
+                        <input type="number" value="{{$user['pharmacy_id']}}" name="num_id" class="form-control" required>
+                    </div>
+                </div>
 
+            </div>
 
-                        <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>
-                    </form>
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <div class="form-group">
+                        <label class="input-label" for="exampleFormControlInput1">
+                            {{\App\CPU\translate('New Password')}}</label>
+                        <input type="password" placeholder="HJW22DzEz" name="password" class="form-control">
+                    </div>
                 </div>
             </div>
+
+            <button type="submit" class="btn btn-primary">{{\App\CPU\translate('update')}}</button>
+            </form>
         </div>
     </div>
+</div>
+</div>
 </div>
 
 @endsection
@@ -236,20 +215,20 @@
 @push('script_2')
 
 <script type="text/javascript">
-    $("document").ready(function () {
-        $('select[name="city_id"]').on('change', function () {
+    $("document").ready(function() {
+        $('select[name="city_id"]').on('change', function() {
             var cityId = $(this).val();
             if (cityId) {
                 $.ajax({
-                    url: '/admin/customer/groups/' + cityId,
-                    type: "GET",
-                    dataType: "json",
-                    success: function (data) {
+                    url: '/admin/customer/groups/' + cityId
+                    , type: "GET"
+                    , dataType: "json"
+                    , success: function(data) {
                         $('select[name="group_id"]').empty();
                         $('select[name="area_id"]').empty();
                         $('select[name="group_id"]').append('<option value="">Select Group</option>');
-                        $.each(data.groups,function(index,group){
-                        $('select[name="group_id"]').append('<option value="'+group.id+'">'+group.group_name+'</option>');
+                        $.each(data.groups, function(index, group) {
+                            $('select[name="group_id"]').append('<option value="' + group.id + '">' + group.group_name + '</option>');
                         })
                     }
 
@@ -264,31 +243,29 @@
 
     });
 
-    $("document").ready(function () {
-        $('select[name="group_id"]').on('change', function () {
+    $("document").ready(function() {
+        $('select[name="group_id"]').on('change', function() {
 
-        var groupId = $(this).val();
-        console.log(groupId);
-if (groupId) {
-    $.ajax({
-        url: '/admin/customer/areas/' + groupId,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
-            $('select[name="area_id"]').empty();
-            $('select[name="area_id"]').append('<option value="">Select Area</option>');
-            $.each(data.areas,function(index,area){
-            $('select[name="area_id"]').append('<option value="'+area.id+'">'+area.area_name+'</option>');
-            })
-        }
-    })
-} else {
-    $('select[name="area_id"]').empty();
-}
-});
+            var groupId = $(this).val();
+            console.log(groupId);
+            if (groupId) {
+                $.ajax({
+                    url: '/admin/customer/areas/' + groupId
+                    , type: "GET"
+                    , dataType: "json"
+                    , success: function(data) {
+                        $('select[name="area_id"]').empty();
+                        $('select[name="area_id"]').append('<option value="">Select Area</option>');
+                        $.each(data.areas, function(index, area) {
+                            $('select[name="area_id"]').append('<option value="' + area.id + '">' + area.area_name + '</option>');
+                        })
+                    }
+                })
+            } else {
+                $('select[name="area_id"]').empty();
+            }
+        });
     });
-
-
 
 </script>
 
@@ -298,58 +275,61 @@ if (groupId) {
 
 <script>
     function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
 
-                reader.onload = function (e) {
-                    $('#viewer').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
+            reader.onload = function(e) {
+                $('#viewer').attr('src', e.target.result);
             }
-        }
 
-        $("#customFileEg1").change(function () {
-            readURL(this);
-        });
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#customFileEg1").change(function() {
+        readURL(this);
+    });
+
 </script>
 
 <script src="{{asset('public/assets/back-end/js/spartan-multi-image-picker.js')}}"></script>
 <script type="text/javascript">
-    $(function () {
-            $("#coba").spartanMultiImagePicker({
-                fieldName: 'identity_image[]',
-                maxCount: 5,
-                rowHeight: '120px',
-                groupClassName: 'col-2',
-                maxFileSize: '',
-                placeholderImage: {
-                    image: '{{asset('public/assets/back-end/img/400x400/img2.jpg')}}',
-                    width: '100%'
-                },
-                dropFileLabel: "Drop Here",
-                onAddRow: function (index, file) {
+    $(function() {
+        $("#coba").spartanMultiImagePicker({
+            fieldName: 'identity_image[]'
+            , maxCount: 5
+            , rowHeight: '120px'
+            , groupClassName: 'col-2'
+            , maxFileSize: ''
+            , placeholderImage: {
+                image: '{{asset('
+                public / assets / back - end / img / 400 x400 / img2.jpg ')}}'
+                , width: '100%'
+            }
+            , dropFileLabel: "Drop Here"
+            , onAddRow: function(index, file) {
 
-                },
-                onRenderedPreview: function (index) {
+            }
+            , onRenderedPreview: function(index) {
 
-                },
-                onRemoveRow: function (index) {
+            }
+            , onRemoveRow: function(index) {
 
-                },
-                onExtensionErr: function (index, file) {
-                    toastr.error('Please only input png or jpg type file', {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                },
-                onSizeErr: function (index, file) {
-                    toastr.error('File size too big', {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                }
-            });
+            }
+            , onExtensionErr: function(index, file) {
+                toastr.error('Please only input png or jpg type file', {
+                    CloseButton: true
+                    , ProgressBar: true
+                });
+            }
+            , onSizeErr: function(index, file) {
+                toastr.error('File size too big', {
+                    CloseButton: true
+                    , ProgressBar: true
+                });
+            }
         });
+    });
+
 </script>
 @endpush

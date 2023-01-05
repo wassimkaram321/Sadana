@@ -12,7 +12,6 @@ use App\Model\Translation;
 
 class BounusController extends Controller
 {
-
     public function index(Request $request)
     {
         $bonuses = Bonus::all();
@@ -37,24 +36,33 @@ class BounusController extends Controller
 
     public function create()
     {
-        $bonuses = Bonus::get('salve_product_id');
+        $bonuses = Bonus::get();
         $idx = [];
+        $idxm = [];
         foreach ($bonuses as $b) {
             $ids = json_decode($b->salve_product_id);
             foreach ($ids as $i) {
                 $idx[] = $i;
             }
+
+            $idsm = json_decode($b->master_product_id);
+            foreach ($idsm as $im) {
+                $idxm[] = $im;
+            }
         }
-        $slave_products =  Product::whereNotin('id', $idx)->get();
-        $products = Product::get();
+        $result = array_merge($idx, $idxm);
+        $slave_products =  Product::whereNotIn('id', $result)->get();
+        $products = Product::whereNotIn('id', $result)->get();
         return view('admin-views.bonuses.create', compact('products', 'slave_products'));
     }
+
     public function store(Request $request)
     {
-
         $request->validate([
-            'first_product' => 'required',
-            'sec_products' => 'required',
+            'first_product' => 'required|array|min:1',
+            'sec_products' => 'required|array|min:1',
+            'main' => 'required|array|min:1',
+            'form' => 'required|array|min:1',
         ], [
 
             'first_product.required' => 'First Product is required!',
@@ -63,9 +71,17 @@ class BounusController extends Controller
             'sec_products.required' => 'Second Product Quantity  is required!!',
         ]);
 
+        $i=0;
+        foreach($request->sec_products as $sec_product)
+        {
+            $product=Product::where('id','=',$sec_product)->get()->first();
+            $product->locks="1";
+            $product->qty_locks=$request->form[$i];
+            $i++;
+            $product->save();
+        }
 
         $bonus = new Bonus();
-
         $bonus->master_product_id = json_encode($request->first_product);
         $bonus->master_product_quatity = json_encode($request->main);
         $bonus->salve_product_id = json_encode($request->sec_products);
@@ -149,9 +165,7 @@ class BounusController extends Controller
     public function get_salve_products(Request $request)
     {
         $bonuses1 = Bonus::where('id', $request->id)->get();
-
         $data = [];
-
         $ii = 0;
         foreach ($bonuses1 as $b) {
             $bonus_name = Product::where('id', $b->salve_product_id)->pluck('name')->first();

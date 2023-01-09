@@ -342,7 +342,7 @@ class CartManager
             } else {
                 $price = $product->unit_price;
             }
-
+            $price = $product->unit_price;
             $tax = Helpers::tax_calculation($price, $product['tax'], 'percent');
 
             //generate group id
@@ -371,13 +371,15 @@ class CartManager
 
 
             //calculation pure price
-            if ($request['pure_price'] == 1) {
+            if ($request['pure_price'] != 1) {
+                $cart['price'] = $price;
+                $cart['pure_price'] = 0;
+            } else {
                 if ($product->q_normal_offer != 0 && $product->normal_offer != 0) {
                     $total_qty = ((int)($request['quantity'] / $product->q_normal_offer)) * $product->normal_offer;
                     $cart['price'] = CartManager::pure_price_calculation($price, $total_qty, $request['quantity']);
                     $cart['pure_price'] = 1;
                 }
-            } else {
                 $cart['price'] = $price;
                 $cart['pure_price'] = 0;
             }
@@ -740,11 +742,14 @@ class CartManager
 
     public static function pure_price_calculation($price, $offer, $qty)
     {
-        if ($offer == 0)
-            $pure_price = $price;
+        if ($offer != 0)
+        {
+        $pure_price = ($price * $qty) / ($qty + $offer);
+        $pure_price = round($pure_price, -1);
+
+        }
         else {
-            $pure_price = ($price * $qty) / ($qty + $offer);
-            $pure_price = round($pure_price, -1);
+            $pure_price = $price;
         }
         return $pure_price;
     }

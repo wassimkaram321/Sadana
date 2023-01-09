@@ -2386,4 +2386,36 @@
             All users belonging to this area will be removed ',
   'New Password' => 'New Password',
   'Pharmacy_Deatils' => 'Pharmacy Deatils',
+  '
+            Are_you_sure_delete_this_city ' => '
+            Are you sure delete this city ',
+  '
+                            city_deleted_successfully ' => '
+                            city deleted successfully ',
+  '
+                        Status updated failed.Product must be approved ' => '
+                        Status updated failed.Product must be approved ',
+  '
+            Are_you_sure_delete_this_group ' => '
+            Are you sure delete this group ',
+  '
+                            group_deleted_successfully ' => '
+                            group deleted successfully ',
+  '
+                Are_you_sure_delete_this_area ' => '
+                Are you sure delete this area ',
+  '
+                All_users_belonging_to_this_area_will_be_removed ' => '
+                All users belonging to this area will be removed ',
+  '
+                                Area_deleted_successfully ' => '
+                                Area deleted successfully ',
+  '
+                            Status updated successfully ' => '
+                            Status updated successfully ',
+  '
+                            Status updated failed.Product must be approved ' => '
+                            Status updated failed.Product must be approved ',
+  'Status updated failed.Product must be approved' => 'Status updated failed.Product must be approved',
+  'All_users_belonging_to_this_city_will_be_removed' => 'All users belonging to this city will be removed',
 );

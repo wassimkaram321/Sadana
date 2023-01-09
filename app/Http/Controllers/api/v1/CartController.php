@@ -65,6 +65,7 @@ class CartController extends Controller
             'type.required' => translate('Type is required!')
         ]);
 
+
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)]);
         }

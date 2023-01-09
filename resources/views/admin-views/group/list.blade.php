@@ -131,16 +131,12 @@
     $(document).on('click', '.delete', function() {
         var id = $(this).attr("id");
         Swal.fire({
-            title: '{{ \App\CPU\translate('
-            Are_you_sure_delete_this_group ')}}?'
-            , text: '{{ \App\CPU\translate('
-            All_users_belonging_to_this_area_will_be_removed ')}}!!'
+            title: `{{ \App\CPU\translate("Are_you_sure_delete_this_group")}}?`
+            , text: `{{ \App\CPU\translate("All_users_belonging_to_this_group_will_be_removed")}}!!`
             , showCancelButton: true
             , confirmButtonColor: '#3085d6'
             , cancelButtonColor: '#d33'
-            , confirmButtonText: '{{ \App\CPU\translate('
-            Yes ')}}, {{ \App\CPU\translate('
-            delete_it ')}}!'
+            , confirmButtonText: `{{ \App\CPU\translate("Yes")}}, {{ \App\CPU\translate("delete_it")}}!`
         }).then((result) => {
             if (result.value) {
                 $.ajaxSetup({
@@ -155,8 +151,7 @@
                         id: id
                     }
                     , success: function() {
-                        toastr.success('{{ \App\CPU\translate('
-                            group_deleted_successfully ')}}');
+                        toastr.success(`{{ \App\CPU\translate("group_deleted_successfully")}}`);
                         location.reload();
                     }
                 });

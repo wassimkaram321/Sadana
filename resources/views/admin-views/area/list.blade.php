@@ -46,9 +46,6 @@
                 </div>
 
 
-
-
-
                 <div class="card-body" style="padding: 0">
                     <div class="table-responsive">
                         <table style="text-align: {{Session::get('direction') === " rtl" ? 'right' : 'left' }};" class="table table-borderless table-thead-bordered table-nowrap table-align-middle card-table">
@@ -126,49 +123,47 @@
 
 @push('script')
 <script>
-    $(document).on('click', '.delete', function() {
-        var id = $(this).attr("id");
-        Swal.fire({
-            title: '{{ \App\CPU\translate('
-            Are_you_sure_delete_this_area ')}}?'
-            , text: '{{ \App\CPU\translate('
-            All_users_belonging_to_this_area_will_be_removed ')}}!!'
-            , showCancelButton: true
-            , confirmButtonColor: '#3085d6'
-            , cancelButtonColor: '#d33'
-            , confirmButtonText: '{{ \App\CPU\translate('
-            Yes ')}}, {{ \App\CPU\translate('
-            delete_it ')}}!'
-        }).then((result) => {
-            if (result.value) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: "{{route('admin.city.area-delete')}}"
-                    , method: 'POST'
-                    , data: {
-                        id: id
-                    }
-                    , success: function() {
-                        toastr.success('{{ \App\CPU\translate('
-                            Area_deleted_successfully ')}}');
-                        location.reload();
-                    }
-                });
-            }
-        })
-    });
+    $(document).ready(function() {
 
-    $(".js-example-theme-single").select2({
-        theme: "classic"
-    });
+        $(document).on('click', '.delete', function() {
+            var id = $(this).attr("id");
+            Swal.fire({
+                title: `{{ \App\CPU\translate("Are_you_sure_delete_this_area")}}?`
+                , text: `{{ \App\CPU\translate("All_users_belonging_to_this_area_will_be_removed")}}!!`
+                , showCancelButton: true
+                , confirmButtonColor: '#3085d6'
+                , cancelButtonColor: '#d33'
+                , confirmButtonText: `{{ \App\CPU\translate("Yes")}}, {{ \App\CPU\translate("delete_it")}}!`
+            }).then((result) => {
+                if (result.value) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url: "{{route('admin.city.area-delete')}}"
+                        , method: 'POST'
+                        , data: {
+                            id: id
+                        }
+                        , success: function() {
+                            toastr.success(`{{ \App\CPU\translate("Area_deleted_successfully")}}`);
+                            location.reload();
+                        }
+                    });
+                }
+            })
+        });
 
-    $(".js-example-responsive").select2({
-        // dir: "rtl",
-        width: 'resolve'
+        $(".js-example-theme-single").select2({
+            theme: "classic"
+        });
+
+        $(".js-example-responsive").select2({
+            // dir: "rtl",
+            width: 'resolve'
+        });
     });
 
 </script>

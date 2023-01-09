@@ -141,44 +141,6 @@
 
 @push('script')
 <script>
-    $(document).on('click', '.delete', function() {
-        var id = $(this).attr("id");
-        Swal.fire({
-            title: '{{ \App\CPU\translate('
-            Are_you_sure_delete_this_city ')}}?'
-            , text: '{{ \App\CPU\translate('
-            All_users_belonging_to_this_area_will_be_removed ')}}!!'
-            , showCancelButton: true
-            , confirmButtonColor: '#3085d6'
-            , cancelButtonColor: '#d33'
-            , confirmButtonText: '{{ \App\CPU\translate('
-            Yes ')}}, {{ \App\CPU\translate('
-            delete_it ')}}!'
-        }).then((result) => {
-            if (result.value) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: "{{route('admin.city.delete')}}"
-                    , method: 'POST'
-                    , data: {
-                        id: id
-                    }
-                    , success: function(data) {
-                        console.log(data.groups);
-                        toastr.success('{{ \App\CPU\translate('
-                            city_deleted_successfully ')}}');
-                        location.reload();
-                    }
-                });
-            }
-        })
-    });
-
-
     $(document).on('change', '.status', function() {
         var id = $(this).attr("id");
         if ($(this).prop("checked") == true) {
@@ -200,11 +162,9 @@
             }
             , success: function(data) {
                 if (data.success == true) {
-                    toastr.success('{{\App\CPU\translate('
-                        Status updated successfully ')}}');
+                    toastr.success(`{{\App\CPU\translate("Status updated successfully")}}`);
                 } else if (data.success == false) {
-                    toastr.error('{{\App\CPU\translate('
-                        Status updated failed.Product must be approved ')}}');
+                    toastr.error(`{{\App\CPU\translate("Status updated failed.Product must be approved")}}`);
                     setTimeout(function() {
                         location.reload();
                     }, 2000);
@@ -245,4 +205,40 @@
 
 </script>
 
+<script>
+
+        $(document).on('click', '.delete', function() {
+            var id = $(this).attr("id");
+            Swal.fire({
+                title: `{{ \App\CPU\translate("Are_you_sure_delete_this_city")}}?`
+                , text: `{{ \App\CPU\translate("All_users_belonging_to_this_city_will_be_removed")}}!!`
+                , showCancelButton: true
+                , confirmButtonColor: '#3085d6'
+                , cancelButtonColor: '#d33'
+                , confirmButtonText: `{{ \App\CPU\translate("Yes")}}, {{ \App\CPU\translate("delete_it")}}!`
+            }).then((result) => {
+                if (result.value) {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url: "{{route('admin.city.delete')}}"
+                        , method: 'POST'
+                        , data: {
+                            id: id
+                        }
+                        , success: function(data) {
+                            console.log(data.groups);
+                            toastr.success(`{{ \App\CPU\translate("city_deleted_successfully")}}`);
+                            location.reload();
+                        }
+                    });
+                }
+            })
+        });
+
+
+</script>
 @endpush

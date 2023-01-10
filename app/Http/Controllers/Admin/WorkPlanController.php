@@ -65,7 +65,6 @@ class WorkPlanController extends Controller
 
         $validator = Validator::make($request->all(), [
             'begin_date' => 'required',
-            //'end_date' => 'required',
             'note' => 'required',
             'saler_id' => 'required',
             'pharamcies_ids' => 'required',

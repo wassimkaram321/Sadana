@@ -28,7 +28,6 @@ use Exception;
 class OrderController extends Controller
 {
 
-    //Done
     public function list(Request $request, $status)
     {
         $query_param = [];
@@ -78,9 +77,23 @@ class OrderController extends Controller
                 $query_param = ['customer_type' => $request['customer_type']];
             }
         }
-
-
         $orders = $orders->where('order_type', 'default_type')->orderBy('id', 'desc')->paginate(Helpers::pagination_limit())->appends($query_param);
+
+        foreach($orders as $order)
+        {
+            if($order->orderBy_id!=0)
+            {
+                $cus_id=$order->orderBy_id;         //pharamcy
+                $details = Pharmacy::where('id', '=', $cus_id)->get()->first();
+                $order['pharamcy_name']=$details->name;
+            }
+            else
+            {
+                $cus_id=$order->customer_id;       //user
+                $details = Pharmacy::where('user_id', '=', $cus_id)->get()->first();
+                $order['pharamcy_name']=$details->name;
+            }
+        }
         return view('admin-views.order.list', compact('orders', 'search'));
     }
 

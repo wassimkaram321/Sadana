@@ -5,6 +5,8 @@ namespace App\CPU;
 use App\Model\BusinessSetting;
 use App\Model\Currency;
 use App\Model\Order;
+use App\Model\WorkPlan;
+use App\Model\WorkPlanTask;
 use App\Model\OrderTransaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -128,4 +130,7 @@ class BackEndHelper
 
         return $max;
     }
+
+
+   
 }

@@ -167,40 +167,7 @@
 @endsection
 
 @push('script')
-    <script>
-        $(document).on('click', '.vip', function() {
-            var id = $(this).attr("id");
-            Swal.fire({
-                title: '{{ \App\CPU\translate('Are_you_sure_vip_this_pharmacy') }}?',
-                text: "{{ \App\CPU\translate('You_will_not_be_able_to_revert_this') }}!",
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: '{{ \App\CPU\translate('Yes') }}, {{ \App\CPU\translate('delete_it') }}!'
-            }).then((result) => {
-                if (result.value) {
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
-                        }
-                    });
-                    $.ajax({
-                        url: "{{ route('admin.pharmacy.delete') }}",
-                        method: 'POST',
-                        data: {
-                            id: id
-                        },
-                        success: function() {
-                            toastr.success(
-                                '{{ \App\CPU\translate('pharmacy_deleted_successfully') }}'
-                            );
-                            location.reload();
-                        }
-                    });
-                }
-            })
-        });
-    </script>
+   
     <script>
         $(document).on('click', '.delete', function() {
             var id = $(this).attr("id");

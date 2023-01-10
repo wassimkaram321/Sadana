@@ -29,6 +29,7 @@ class SalesManController extends Controller
         return view('admin-views.sales-man.index');
     }
 
+
     public function list(Request $request)
     {
         $query_param = [];
@@ -54,7 +55,6 @@ class SalesManController extends Controller
         }
         return view('admin-views.sales-man.list', compact('sales_men', 'search'));
     }
-
 
 
     public function search(Request $request)
@@ -152,6 +152,7 @@ class SalesManController extends Controller
         ]);
         $decrypted = Crypt::decrypt($request->saler_id);
         DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $id . ' AND sales_id=' . $decrypted . '');
+        SalerManager::remove_pharmacy_plan($id);
         return redirect()->back();
     }
 
@@ -166,7 +167,7 @@ class SalesManController extends Controller
                 ->where('pharmacy_id', '=', $pharma)
                 ->get()->first();
             if (isset($query) == false) {
-                $pharmacy = DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
+                 DB::insert('insert into sales_pharmacy (sales_id, pharmacy_id) values (?, ?)', [$id, $pharma]);
             }
         }
         return redirect()->back();
@@ -189,9 +190,12 @@ class SalesManController extends Controller
             ->get([
                 'pharmacies.id as pharma_id'
             ]);
+
         foreach ($pharmacies as $pharma) {
             DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $pharma['pharma_id'] . ' AND sales_id=' . $decrypted . '');
+            SalerManager::remove_pharmacy_plan($pharma['pharma_id']);
         }
+
         DB::delete('delete FROM sales_area WHERE area_id =' . $area_id . ' AND sales_id=' . $decrypted . '');
         return redirect()->back();
     }
@@ -241,6 +245,7 @@ class SalesManController extends Controller
 
         foreach ($pharmacies as $pharma) {
             DB::delete('delete FROM sales_pharmacy WHERE pharmacy_id =' . $pharma['pharma_id'] . ' AND sales_id=' . $decrypted . '');
+            SalerManager::remove_pharmacy_plan($pharma['pharma_id']);
         }
         foreach ($area_ids as $a) {
             DB::delete('delete FROM sales_area WHERE area_id =' . $a->id . ' AND sales_id=' . $decrypted . '');
@@ -339,14 +344,12 @@ class SalesManController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
         $request->validate([
             'f_name' => 'required',
             'l_name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'phone' => 'required|unique:users,phone,' . $id,
-            //'area_id' => 'required',
-            //'city_id' => 'required',
+
         ], [
             'f_name.required' => 'First name is required!'
         ]);
@@ -357,25 +360,15 @@ class SalesManController extends Controller
                 'email' => 'required|unique:users',
             ]);
         }
-
-        //$area=Area::where('id', $request->region_id)->get()->first();
-        //$city=City::where('id',$area->city_id)->get()->first();
-
         $sales_man->user_type = 'salesman';
         $sales_man->f_name = $request->f_name;
         $sales_man->l_name = $request->l_name;
         $sales_man->email = $request->email;
         $sales_man->phone = $request->phone;
-
-        // $sales_man->area_id = $request->area_id;
-        // $sales_man->city = $city->city_name;
-
         if (isset($request->password)) {
             $sales_man->password = strlen($request->password) > 1 ? bcrypt($request->password) : $sales_man['password'];
         }
-
         $sales_man->save();
-
         Toastr::success('Sales-man updated successfully!');
         return redirect('admin/sales-man/list');
     }
@@ -417,8 +410,6 @@ class SalesManController extends Controller
         $previousUrl = strtok(url()->previous(), '?');
         return redirect()->to($previousUrl . '?' . http_build_query(['from_date' => $request['from'], 'to_date' => $request['to'],'team' => $request['team_char']]))->with(['from' => $from, 'to' => $to]);
     }
-
-
 
 
     public function orders_report_team(Request $request)

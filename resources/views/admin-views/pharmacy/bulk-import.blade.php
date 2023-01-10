@@ -18,17 +18,15 @@
         </ol>
     </nav>
     <!-- Content Row -->
-    <div class="row" style="text-align: {{Session::get('direction') === " rtl" ? 'right' : 'left' }};">
-        <div class="col-12">
-            <div class="jumbotron" style="background: white">
+    <div class="row" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left' }};">
+        <div class="col-12" >
+            <div class="jumbotron" style="background: white" >
                 <h1 class="display-4">{{\App\CPU\translate('Instructions')}} : </h1>
                 <p> 1. {{\App\CPU\translate('Download the format file and fill it with proper data')}}.</p>
 
-                <p>2. {{\App\CPU\translate('You can download the example file to understand how the data must be
-                    filled')}}.</p>
+                <p>2. {{\App\CPU\translate('You can download the example file to understand how the data must be filled')}}.</p>
 
-                <p>3. {{\App\CPU\translate('Once you have downloaded and filled the format file, upload it in the form
-                    below and submit')}}.</p>
+                <p>3. {{\App\CPU\translate('Once you have downloaded and filled the format file, upload it in the form below and submit')}}.</p>
 
             </div>
         </div>
@@ -39,7 +37,7 @@
                 <div class="card mt-2 rest-part">
                     <div class="card-header">
                         <h4>{{\App\CPU\translate('Import Pharmacies File')}}</h4>
-                        <a href="{{asset('public/assets/pharmacy_format.xlsx')}}" download="" class="btn btn-secondary">{{\App\CPU\translate('Download Format')}}</a>
+                        <a href="{{asset('public/assets/pharmacy_format.xlsx')}}" download="" class="btn btn-secondary">{{\App\CPU\translate('Download_Format')}}</a>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
@@ -55,17 +53,13 @@
                 <div class="card card-footer">
                     <div class="row">
                         <div class="col-md-12" style="padding-top: 20px">
-                            <button type="submit" class="btn btn-primary">{{\App\CPU\translate('Submit')}}</button>
+                            <button type="submit" class="btn btn-primary">{{\App\CPU\translate('submit')}}</button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
-
-
-
 
 
 
@@ -89,11 +83,11 @@
                                     <div>{{\App\CPU\translate('pharmacies_table')}} ({{ $pharmacies->total() }})</div>
                                 </h5>
                                 <h5 class="flex-between">
-                                    <div>{{\App\CPU\translate('Active :')}} ({{ \App\Model\UserImportExcel::where('is_active', 1)->count()
+                                    <div>{{\App\CPU\translate('Active')}}:({{ \App\Model\UserImportExcel::where('is_active', 1)->count()
                                     }})</div>
                                 </h5>
                                 <h5 class="flex-between">
-                                    <div>{{\App\CPU\translate('InActive:')}} ({{ \App\Model\UserImportExcel::where('is_active', 0)->count()
+                                    <div>{{\App\CPU\translate('InActive')}}:({{ \App\Model\UserImportExcel::where('is_active', 0)->count()
                                     }})</div>
                                 </h5>
                             </div>
@@ -126,7 +120,7 @@
                                             {{ \App\CPU\translate('pharmacy') }} {{ \App\CPU\translate('ID') }}
                                         </th>
                                         <th scope="col">{{ \App\CPU\translate('pharamacy_name') }}</th>
-                                        <th scope="col">{{ \App\CPU\translate('card_number') }}</th>
+                                        <th scope="col">{{ \App\CPU\translate('Account_number') }}</th>
                                         <th scope="col">{{ \App\CPU\translate('street_address') }}</th>
                                         <th scope="col">{{ \App\CPU\translate('confirmation') }}</th>
                                         <th scope="col" style="width: 100px" class="text-center">
@@ -139,7 +133,7 @@
                                     <tr>
                                         <td>{{ $p->id }}</td>
                                         <td>{{ $p->pharmacy_name }}</td>
-                                        <td>{{ $p->card_number }}</td>
+                                        <td>{{ $p->num_id }}</td>
                                         <td> {{\Illuminate\Support\Str::limit($p->street_address,30)}}</td>
                                         <td>
                                             <label class="toggle-switch toggle-switch-sm">

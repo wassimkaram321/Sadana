@@ -12,19 +12,15 @@
         font-family: sans-serif;
     }
 
-
-
     .kanban-board {
         padding: 10px;
         display: flex;
         flex-wrap: wrap;
         flex-direction: row;
         gap: 15px;
-        /* justify-content: space-between; */
         font-family: sans-serif;
         border-color: #041562
     }
-
 
     .kanban-heading-text {
         font-size: 1rem;
@@ -44,10 +40,7 @@
         box-shadow: 0px 0px 25px -2px rgba(189, 189, 189, 0.5);
         padding: 0.6rem;
         min-width: 32%;
-        /* min-width: 250px; */
-        /* min-width: 14rem; */
         height: 300px;
-        /* max-height: 100%; */
         border-radius: 0.3rem;
         overflow-y: scroll;
     }
@@ -57,46 +50,45 @@
         background-color: #00c9a7;
         padding: 0.6rem;
         min-width: 250px;
-        /* min-width: 14rem; */
         height: 300px;
-        /* max-height: 100%; */
         border-radius: 0.3rem;
         overflow-y: scroll;
     }
 
-    .kanban-block strong {
+     .kanban-block .title-head  {
         border-radius: 10px;
         margin-bottom: 15px;
         background-color: #f1f1fc;
         color: #041562;
         font-size: 17px;
-        padding: 0.35rem;
-        /* min-width: 14rem; */
-        height: 40px;
+        padding: 0px 20px;
+        height: 48px;
         width: 100%;
         display: block;
         text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+     .kanban-block .title-head .conuter {
+        background: #ff00003b;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        font-size: 14px;
+        margin-bottom: 0px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .row {
         margin-right: 0px !important;
         margin-left: 0px !important;
-        /* gap: 10px */
     }
 
-    #todo {
-        /* background-color: #fec6d1; */
-    }
 
-    #inprogress {
-        /* background-color: #ffaf00; */
-        /* display: none; */
-    }
-
-    #done {
-        /* background-color: #678b67; */
-        /* display: none; */
-    }
 
     .task {
         display: flex;
@@ -136,7 +128,6 @@
 
     .create-new-task-block {
         display: none;
-        /* display: flex; */
         background: #ffaf00;
         width: 64.4%;
         flex-direction: column;
@@ -201,7 +192,9 @@
 
 @section('content')
 
-
+@php
+    $planDetails=\App\Model\PlanDetails::get(['Wpharmacy_id']);
+@endphp
 <div>
     <div class="kanban-heading" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
         <span class="kanban-heading-text task">{{\App\CPU\translate('Begin_Plan')}}&nbsp;&nbsp;:&nbsp;&nbsp;{{$begin}}</span>
@@ -212,7 +205,10 @@
     <div class="kanban-board">
 
         <div class="kanban-block" id="pharmacies" ondrop="drop(event,id)" ondragover="allowDrop(event)">
-            <strong>{{\App\CPU\translate('Pharmacies')}}</strong>
+            <div class="d-flex justify-content-between title-head">
+                <strong>{{\App\CPU\translate('Pharmacies')}}</strong>
+                <span class="conuter">{{$pharmacies->count()}}</span>
+            </div>
             @foreach ($pharmacies as $pharmacy)
             <div class="task" id={{$pharmacy->id}} draggable="true" ondragstart="drag(event)">
                 <span style="">{{$pharmacy->name}}</span>
@@ -226,15 +222,15 @@
         @php
         $date= $period->format('Y-m-d');
         $d= new \DateTime($date);
+        $pharmaciesSelectedTasks = \App\Model\WorkPlanTask::where([['task_plan_id','=',$plan_id],['task_date','=',$period->format('Y-m-d')]])->get(['pharmacy_id']);
+        $pharmaciesTask = \App\Pharmacy::whereIn('id', $pharmaciesSelectedTasks)->get();
         @endphp
 
         <div class="kanban-block" id={{$period->format('Y-m-d')}} ondrop="drop(event,id)" ondragover="allowDrop(event)">
-            <strong>{{$period->format('Y-m-d')}}&nbsp;&nbsp;&nbsp;{{\App\CPU\translate($d->format('l'))}}</strong>
-
-            @php
-            $pharmaciesSelectedTasks = \App\Model\WorkPlanTask::where([['task_plan_id','=',$plan_id],['task_date','=',$period->format('Y-m-d')]])->get(['pharmacy_id']);
-            $pharmaciesTask = \App\Pharmacy::whereIn('id', $pharmaciesSelectedTasks)->get();
-            @endphp
+            <div class="d-flex justify-content-between title-head">
+                <strong>{{$period->format('Y-m-d')}}&nbsp;&nbsp;&nbsp;{{\App\CPU\translate($d->format('l'))}}</strong>
+                <span class="conuter">{{$pharmaciesTask->count()}}</span>
+            </div>
             @foreach ($pharmaciesTask as $pharmacyTask)
             <div class="task" id={{$pharmacyTask->id}} draggable="true" ondragstart="drag(event)">
                 <span style="">{{$pharmacyTask->name}}</span>

@@ -191,10 +191,10 @@ class PharmacyController extends Controller
 
         foreach ($collections as $collection) {
 
-            $city_id=0;
-            $group_id=0;
-            $area_id=0;
-            
+            $city_id = 0;
+            $group_id = 0;
+            $area_id = 0;
+
             $city_id = $this->compare_city($collection['المدينة']);
             $group_id = $this->compare_group($collection['الكتلة'], $city_id);
             $area_id = $this->compare_area($collection['المنطقة'], $group_id);
@@ -467,50 +467,34 @@ class PharmacyController extends Controller
 
     public function activation_export($id)
     {
-
         try {
-
             $pharma = UserImportExcel::findOrFail($id);
-            if (isset($pharma->phone1) && $pharma->phone1 == 0) {
-                Toastr::success('Please enter the missing data before activating:(phone1)');
-                return back();
-            }
-            if (!isset($pharma->phone1)) {
-                Toastr::success('Please enter the missing data before activating:(phone1)');
-                return back();
-            }
+            if ((isset($pharma->phone1) && $pharma->phone1 == 0) || !isset($pharma->phone1) )
+                $pharma->phone1 = rand(900000000, 999999999);
 
-            if (isset($pharma->l_name) && $pharma->l_name == "") {
-                Toastr::success('Please enter the missing data before activating:(Last Name)');
-                return back();
-            }
-            if (!isset($pharma->l_name)) {
-                Toastr::success('Please enter the missing data before activating:(Last Name)');
-                return back();
-            }
+            if ((isset($pharma->l_name) && $pharma->l_name == "") || !isset($pharma->l_name) )
+                $pharma->l_name = $pharma->pharmacy_name;
 
-            if (isset($pharma->f_name) && $pharma->f_name == "") {
-                Toastr::success('Please enter the missing data before activating:(First Name)');
-                return back();
-            }
-            if (!isset($pharma->f_name)) {
-                Toastr::success('Please enter the missing data before activating:(First Name)');
-                return back();
-            }
+            if ((isset($pharma->f_name) && $pharma->f_name == "") || !isset($pharma->f_name) )
+                $pharma->f_name = $pharma->pharmacy_name;
 
-            if (!isset($pharma->num_id) || $pharma->num_id == 0 || $pharma->num_id == "") {
-                Toastr::success('Please enter the missing data before activating:(Account Number)');
-                return back();
-            }
+            if ((isset($pharma->num_id) && $pharma->num_id == "") || !isset($pharma->num_id) )
+                $pharma->num_id = rand(100000000, 999999999);
+
+            $password=(isset($pharma->password)) ? bcrypt($pharma->password) : bcrypt(123456789);
+            ($pharma->to && $pharma->to != "00:00" && $pharma->to != "00:00:00") ?  $to = $pharma->to : $to = "17:00:00";
+            ($pharma->from && $pharma->from != "00:00" && $pharma->from != "00:00:00") ?  $from = $pharma->from : $from = "09:00:00";
+            ($pharma->Land_number && is_numeric($pharma->Land_number)) ?  $Land_number = $pharma->Land_number : $Land_number = 0;
 
             $cityDB = City::where('id', '=', $pharma->city_id)->get()->first();
             $groupDB = Group::where('id', '=', $pharma->group_id)->get()->first();
             $areaDB = Area::where('id', '=', $pharma->area_id)->get()->first();
-            $randomId = rand(5000, 100000);
+            $randomId = rand(5000, 10000000);
             $randomId2 = rand(1, 10000);
+
             $emailNew = "Hiba_" . $randomId . $randomId2 . "@hiba.sy";
 
-            if (is_numeric($pharma->lat) &&  is_numeric($pharma->lng)) {
+            if ( (isset($pharma->lat) && isset($pharma->lng)) && (is_numeric($pharma->lat) &&  is_numeric($pharma->lng)) ) {
                 $LAT = $pharma->lat;
                 $LNG = $pharma->lng;
             } else {
@@ -519,13 +503,13 @@ class PharmacyController extends Controller
             }
 
             $dataUser = [
-                'name' => $pharma->f_name . ' ' . $pharma->l_name,
+                'name' => $pharma->f_name,
                 'f_name' => $pharma->f_name,
                 'l_name' => $pharma->l_name,
                 'phone' => $pharma->phone1,
                 'pharmacy_id' => $pharma->num_id,
                 'email' => $emailNew,
-                'password' => bcrypt($pharma->password),
+                'password' => $password,
                 'user_type' =>  "pharmacist",
                 'area_id' => $pharma->area_id,
                 'street_address' => $pharma->street_address,
@@ -539,23 +523,21 @@ class PharmacyController extends Controller
                 'city' => $cityDB->city_name,
                 'region' => $areaDB->area_name,
                 'user_type_id' => "pharmacist",
-                'from' =>  $pharma->from,
-                'to' => $pharma->to,
+                'from' =>  $from,
+                'to' => $to,
                 'card_number' => $pharma->card_number,
                 'Address' => $pharma->street_address,
-                'land_number' => $pharma->land_number,
+                'land_number' => $Land_number,
             ];
 
             $isFound = $this->UserI->searchAccountNumber($pharma->num_id);
-            if (!is_null($isFound))
-            {
+            if (!is_null($isFound)) {
                 //update
-                $userNew=$this->UserI->storeOrUpdate($pharma->num_id, $dataUser);
+                $userNew = $this->UserI->storeOrUpdate($pharma->num_id, $dataUser);
                 $this->pharmacyI->storeOrUpdate($userNew->id, $dataPharmacy);
-            } else
-            {
+            } else {
                 //insert
-                $userNew=$this->UserI->storeOrUpdate($id = null, $dataUser);
+                $userNew = $this->UserI->storeOrUpdate($id = null, $dataUser);
                 $this->pharmacyI->storeOrUpdate($userNew->id, $dataPharmacy);
             }
 

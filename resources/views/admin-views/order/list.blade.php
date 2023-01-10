@@ -113,6 +113,7 @@
                         </th>
                         <th class=" ">{{\App\CPU\translate('Order')}}</th>
                         <th>{{\App\CPU\translate('Date')}}</th>
+                        <th>{{\App\CPU\translate('pharmacy_name')}}</th>
                         <th>{{\App\CPU\translate('customer_name')}}</th>
                         <th>{{\App\CPU\translate('customer_type')}}</th>
                         <th>{{\App\CPU\translate('Status')}}</th>
@@ -137,12 +138,21 @@
 
                         <td>{{date('d M Y',strtotime($order['created_at']))}}</td>
 
+                        {{-- cus name --}}
                         <td>
                             @if($order->customer)
-                            {{-- <a class="text-body text-capitalize"
-                                       href="{{route('admin.orders.details',['id'=>$order['id']])}}">
-                            {{$order->customer['f_name'].' '.$order->customer['l_name']}}
-                            </a> --}}
+
+                            <a href="" id="editCompany" data-toggle="modal" data-target='#practice_modal' data-order_id="{{$order['id']}}">
+                                {{$order['pharamcy_name']}}
+                            </a>
+
+                            @else
+                            <label class="badge badge-danger">{{\App\CPU\translate('invalid_customer_data')}}</label>
+                            @endif
+                        </td>
+
+                        <td>
+                            @if($order->customer)
 
                             <a href="" id="editCompany" data-toggle="modal" data-target='#practice_modal' data-order_id="{{$order['id']}}">
                                 {{$order->customer['f_name'].' '.$order->customer['l_name']}}

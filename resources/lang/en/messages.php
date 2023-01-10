@@ -2418,4 +2418,6 @@
                             Status updated failed.Product must be approved ',
   'Status updated failed.Product must be approved' => 'Status updated failed.Product must be approved',
   'All_users_belonging_to_this_city_will_be_removed' => 'All users belonging to this city will be removed',
+  'All_users_belonging_to_this_group_will_be_removed' => 'All users belonging to this group will be removed',
+  'Account_number' => 'Account number',
 );

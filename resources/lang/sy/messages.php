@@ -2148,4 +2148,11 @@
   'Are_you_sure_delete_this_city' => 'هل انت متأكد من حذف المدينة',
   'All_users_belonging_to_this_city_will_be_removed' => 'جميع المستخدمين ضمن هذه المدينة سوف يتم ازالتهم',
   'All_users_belonging_to_this_group_will_be_removed' => 'جميع المستخدمين ضمن هذه الكتلة سوف يتم ازالتهم',
+  'Account_number'=>'رقم الحساب',
+  'confirmation'=>'تأكيد',
+  'Import Pharmacies File'=>'استيراد ملف الصيدليات',
+  'pharmacies_table'=>'عدد الصيدليات',
+  'Active'=>'قيد العمل',
+  'InActive'=>'المعلقة',
+  'Download_Format'=>'تنزيل ملف التنسيق ',
 );
